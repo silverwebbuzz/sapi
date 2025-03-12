@@ -1,0 +1,49 @@
+<IfModule mod_rewrite.c>
+    RewriteEngine On
+    
+    # Base URL redirects
+    RewriteBase /
+
+    # Handle client route (Embedded app)
+    RewriteCond %{REQUEST_URI} ^/client$
+    RewriteRule ^ client.php [QSA,L]
+
+    # Handle install flow
+    RewriteCond %{REQUEST_URI} ^/shopify/install
+    RewriteRule ^shopify/install$ shopify/install.php [QSA,L]
+
+    # Handle OAuth callback
+    RewriteCond %{REQUEST_URI} ^/shopify/callback
+    RewriteRule ^shopify/callback$ shopify/callback.php [QSA,L]
+
+    # Handle webhooks
+    RewriteCond %{REQUEST_URI} ^/shopify/webhook
+    RewriteRule ^shopify/webhook$ shopify/webhook.php [QSA,L]
+
+    # Security: Block direct access to PHP files
+    RewriteCond %{THE_REQUEST} ^[A-Z]{3,9}\ /.*\.php\ HTTP/
+    RewriteRule ^(.*)\.php$ /$1 [R=301,L]
+
+    # Security: Prevent directory listing
+    Options -Indexes
+
+    # Security: Protect sensitive files
+    <FilesMatch "(\.htaccess|config\.php|db\.php)">
+        Order allow,deny
+        Deny from all
+    </FilesMatch>
+</IfModule>
+
+# Required for embedded apps
+<IfModule mod_headers.c>
+    Header always set Content-Security-Policy "frame-ancestors https://*.shopify.com https://admin.shopify.com;"
+    Header always set X-Frame-Options "ALLOW-FROM https://admin.shopify.com"
+</IfModule>
+
+# Webhook specific handling
+<LocationMatch "/shopify/webhook">
+    SetEnvIf Request_Method "POST" REQUIRED
+    <LimitExcept POST>
+        Deny from all
+    </LimitExcept>
+</LocationMatch>
