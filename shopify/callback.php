@@ -50,8 +50,12 @@ if (isset($response['access_token'])) {
         ])
     ]);
     curl_exec($ch);
+    $status = curl_getinfo($ch, CURLINFO_HTTP_CODE);
     curl_close($ch);
-    
+
+    echo "Status: $status\n";
+echo "Response: $response\n";
+exit;
     $redirect_url = "https://{$shop}/admin/apps/" . SHOPIFY_API_KEY;
     header("Location: " . $redirect_url);
     exit;
