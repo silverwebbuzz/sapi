@@ -1,4 +1,6 @@
-<?php
+<?php // At the VERY TOP of callback.php
+ob_start(); // Start output buffering
+
 require_once '../config.php';
 require_once '../db.php';
 require_once 'shopify_functions.php';
@@ -32,6 +34,8 @@ if (isset($response['access_token'])) {
     $stmt->bind_param("ss", $shop, $response['access_token']);
     $stmt->execute();
 
+// After processing, clean buffers before sending JSON
+ob_end_clean();
     // Create webhook
     $webhook_url = SHOPIFY_APP_URL . '/shopify/webhook';
     $ch = curl_init("https://{$shop}/admin/api/" . SHOPIFY_API_VERSION . "/webhooks.json");
@@ -47,34 +51,32 @@ if (isset($response['access_token'])) {
                 'address' => $webhook_url,
                 'format' => 'json'
             ]
-        ])
+        ]),
+        CURLOPT_RETURNTRANSFER => true
     ]);
-   
-    $response_webhook = curl_exec($ch);
-    $httpStatus = curl_getinfo($ch, CURLINFO_HTTP_CODE);
+
+    $result = curl_exec($ch);
+    $status = curl_getinfo($ch, CURLINFO_HTTP_CODE);
     curl_close($ch);
 
-    echo "Status: $httpStatus\n";
-echo "Response: $response_webhook\n";
-print_r($response_webhook);
 
-// Check if webhook was created successfully
-if ($httpStatus == 201) {
-    $responseData = json_decode($response_webhook, true);
-    if (isset($responseData['webhook'])) {
-        echo "Webhook created successfully. ID: " . $responseData['webhook']['id'];
+// Add validation
+if ($status === 201) {
+    $webhook_data = json_decode($result, true);
+    if (json_last_error() === JSON_ERROR_NONE && isset($webhook_data['webhook'])) {
+        error_log("Webhook created: " . print_r($webhook_data, true));
     } else {
-        echo "Webhook creation response did not include webhook details.";
+        error_log("Invalid JSON response: " . $result);
     }
 } else {
-    echo "Failed to create webhook. HTTP status: {$httpStatus}. Response: {$response}";
+    error_log("Webhook creation failed: " . $result);
 }
 
-
-exit;
+ exit;
     $redirect_url = "https://{$shop}/admin/apps/" . SHOPIFY_API_KEY;
     header("Location: " . $redirect_url);
     exit;
 } else {
     die('Installation failed');
 }
+?>
