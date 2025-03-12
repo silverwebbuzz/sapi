@@ -55,6 +55,7 @@ if (isset($response['access_token'])) {
 
     echo "Status: $status\n";
 echo "Response: $response\n";
+print_r($response);
 exit;
     $redirect_url = "https://{$shop}/admin/apps/" . SHOPIFY_API_KEY;
     header("Location: " . $redirect_url);
