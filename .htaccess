@@ -28,10 +28,10 @@
     Options -Indexes
 
     # Security: Protect sensitive files
-    <FilesMatch "(\.htaccess|config\.php|db\.php)">
-        Order allow,deny
-        Deny from all
-    </FilesMatch>
+    #<FilesMatch "(\.htaccess|config\.php|db\.php)">
+    #    Order allow,deny
+    #    Deny from all
+    #</FilesMatch>
 </IfModule>
 
 # Required for embedded apps
