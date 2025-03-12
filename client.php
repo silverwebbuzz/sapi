@@ -4,7 +4,7 @@ require_once 'db.php';
 require_once 'shopify/shopify_functions.php';
 
 // Verify HMAC
-$params = $_GET;
+$installparams = $params = $_GET;
 echo "params: " . print_r($params, true); exit;
 if (!verifyHmac($params, SHOPIFY_API_SECRET)) die('Invalid HMAC');
 
@@ -17,7 +17,9 @@ $stmt->bind_param("s", $shop);
 $stmt->execute();
 
 if ($stmt->get_result()->num_rows === 0) {
-    header("Location: /shopify/install?shop=" . urlencode($shop) . "&hmac=" . $params['hmac']);
+
+    $install_url = getInstallUrl($shop, SHOPIFY_APP_SCOPES, SHOPIFY_APP_URL . '/shopify/callback');
+    header("Location: $install_url");
     exit();
 }
 
