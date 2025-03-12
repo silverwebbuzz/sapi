@@ -2,10 +2,11 @@
 require_once 'config.php';
 require_once 'db.php';
 
+
 $params = $_GET;
 if (!verifyHmac($params, SHOPIFY_API_SECRET)) die('Invalid HMAC');
 
-// Validate nonce
+// Validate nonce       
 if ($_SESSION['nonce'] !== $_GET['state']) die('Invalid nonce');
 
 // Exchange code for access token
