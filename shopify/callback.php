@@ -54,19 +54,18 @@ if (isset($response['access_token'])) {
     $status = curl_getinfo($ch, CURLINFO_HTTP_CODE);
     curl_close($ch);
 
-// Add validation
-if ($status === 201) {
-    $webhook_data = json_decode($result, true);
-    if (json_last_error() === JSON_ERROR_NONE && isset($webhook_data['webhook'])) {
-        error_log("Webhook created: " . print_r($webhook_data, true));
+    // Add validation
+    if ($status === 201) {
+        $webhook_data = json_decode($result, true);
+        if (json_last_error() === JSON_ERROR_NONE && isset($webhook_data['webhook'])) {
+            error_log("Webhook created: " . print_r($webhook_data, true));
+        } else {
+            error_log("Invalid JSON response: " . $result);
+        }
     } else {
-        error_log("Invalid JSON response: " . $result);
+        error_log("Webhook creation failed: " . $result);
     }
-} else {
-    error_log("Webhook creation failed: " . $result);
-}
 
- exit;
     $redirect_url = "https://{$shop}/admin/apps/" . SHOPIFY_API_KEY;
     header("Location: " . $redirect_url);
     exit;
