@@ -1,6 +1,6 @@
 <?php
-require_once '..config.php';
-require_once '..db.php';
+require_once '../config.php';
+require_once '../db.php';
 
 // Verify webhook HMAC
 $hmac = $_SERVER['HTTP_X_SHOPIFY_HMAC_SHA256'];
