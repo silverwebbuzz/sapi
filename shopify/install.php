@@ -4,6 +4,7 @@ require_once '../db.php';
 require_once 'shopify_functions.php';
 
 $params = $_GET;
+echo "params: " . print_r($params, true); 
 if (!verifyHmac($params, SHOPIFY_API_SECRET)) die('Invalid HMAC');
 
 $shop = $params['shop'];
