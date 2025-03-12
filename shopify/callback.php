@@ -49,13 +49,28 @@ if (isset($response['access_token'])) {
             ]
         ])
     ]);
-    curl_exec($ch);
-    $status = curl_getinfo($ch, CURLINFO_HTTP_CODE);
+   
+    $response_webhook = curl_exec($ch);
+    $httpStatus = curl_getinfo($ch, CURLINFO_HTTP_CODE);
     curl_close($ch);
 
-    echo "Status: $status\n";
-echo "Response: $response\n";
-print_r($response);
+    echo "Status: $httpStatus\n";
+echo "Response: $response_webhook\n";
+print_r($response_webhook);
+
+// Check if webhook was created successfully
+if ($httpStatus == 201) {
+    $responseData = json_decode($response_webhook, true);
+    if (isset($responseData['webhook'])) {
+        echo "Webhook created successfully. ID: " . $responseData['webhook']['id'];
+    } else {
+        echo "Webhook creation response did not include webhook details.";
+    }
+} else {
+    echo "Failed to create webhook. HTTP status: {$httpStatus}. Response: {$response}";
+}
+
+
 exit;
     $redirect_url = "https://{$shop}/admin/apps/" . SHOPIFY_API_KEY;
     header("Location: " . $redirect_url);
