@@ -47,8 +47,7 @@ if (isset($response['access_token'])) {
                 'address' => $webhook_url,
                 'format' => 'json'
             ]
-        ]),
-        CURLOPT_RETURNTRANSFER => true
+        ])
     ]);
 
     $result = curl_exec($ch);
