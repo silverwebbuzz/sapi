@@ -21,8 +21,8 @@
     RewriteRule ^shopify/webhook$ shopify/webhook.php [QSA,L]
 
     # Security: Block direct access to PHP files
-    RewriteCond %{THE_REQUEST} ^[A-Z]{3,9}\ /.*\.php\ HTTP/
-    RewriteRule ^(.*)\.php$ /$1 [R=301,L]
+    #RewriteCond %{THE_REQUEST} ^[A-Z]{3,9}\ /.*\.php\ HTTP/
+    #RewriteRule ^(.*)\.php$ /$1 [R=301,L]
 
     # Security: Prevent directory listing
     Options -Indexes
