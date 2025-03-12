@@ -1,12 +1,30 @@
 <?php
 // Verify HMAC
-function verifyHmac($params, $secret) {
-    if (empty($params['hmac'])) return false;
+function verifyHmac(array $params) {
+    if (empty($params['hmac'])) {
+        error_log("HMAC parameter missing");
+        return false;
+    }
+
     $hmac = $params['hmac'];
     unset($params['hmac']);
+    
+    // Debug: Log received parameters
+    error_log("Received Params: " . print_r($params, true));
+    
     ksort($params);
-    $query = http_build_query($params);
-    return hash_equals($hmac, hash_hmac('sha256', $query, $secret));
+    $query = http_build_query($params, '', '&', PHP_QUERY_RFC3986);
+    
+    // Debug: Log generated query string
+    error_log("Generated Query: " . $query);
+    
+    $calculated_hmac = hash_hmac('sha256', $query, SHOPIFY_API_SECRET);
+    
+    // Debug: Log both HMACs
+    error_log("Received HMAC: " . $hmac);
+    error_log("Calculated HMAC: " . $calculated_hmac);
+    
+    return hash_equals($hmac, $calculated_hmac);
 }
 // Verify shop domain format
 function validateShopDomain($shop) {
