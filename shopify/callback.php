@@ -34,8 +34,6 @@ if (isset($response['access_token'])) {
     $stmt->bind_param("ss", $shop, $response['access_token']);
     $stmt->execute();
 
-// After processing, clean buffers before sending JSON
-ob_end_clean();
     // Create webhook
     $webhook_url = SHOPIFY_APP_URL . '/shopify/webhook';
     $ch = curl_init("https://{$shop}/admin/api/" . SHOPIFY_API_VERSION . "/webhooks.json");
