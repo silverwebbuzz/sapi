@@ -51,8 +51,10 @@ if (isset($response['access_token'])) {
     ]);
     curl_exec($ch);
     curl_close($ch);
-
-    header("Location: " . BASE_URL . "/client?shop=" . urlencode($shop) . "&hmac=" . $params['hmac']);
+    
+    $redirect_url = "https://{$shop}/admin/apps/" . SHOPIFY_API_KEY;
+    header("Location: " . $redirect_url);
+    exit;
 } else {
     die('Installation failed');
 }
