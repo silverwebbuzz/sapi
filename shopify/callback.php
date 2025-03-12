@@ -1,7 +1,7 @@
 <?php
 require_once '../config.php';
-require_once 'db.php';
-
+require_once '../db.php';
+require_once 'shopify_functions.php';
 
 $params = $_GET;
 if (!verifyHmac($params, SHOPIFY_API_SECRET)) die('Invalid HMAC');
