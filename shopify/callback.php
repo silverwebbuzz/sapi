@@ -1,6 +1,4 @@
-<?php // At the VERY TOP of callback.php
-ob_start(); // Start output buffering
-
+<?php 
 require_once '../config.php';
 require_once '../db.php';
 require_once 'shopify_functions.php';
@@ -56,7 +54,6 @@ if (isset($response['access_token'])) {
     $result = curl_exec($ch);
     $status = curl_getinfo($ch, CURLINFO_HTTP_CODE);
     curl_close($ch);
-
 
 // Add validation
 if ($status === 201) {
