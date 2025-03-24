@@ -26,7 +26,7 @@ if (!$store || $store['status'] === 'uninstalled') {
 }
 
 $stmt = $conn->prepare("
-    SELECT p.name AS plan_name, p.price, p.order_limit, s.end_date 
+    SELECT p.name AS plan_name, p.price, p.order_limit, s.end_date, st.id as store_id
     FROM store_subscriptions s
     JOIN stores st ON s.store_id = st.id
     JOIN plans p ON s.plan_id = p.id
@@ -43,7 +43,7 @@ if ($result->num_rows > 0) {
     echo "<p>Price: $" . $subscription['price'] . " / month</p>";
     echo "<p>Order Limit: " . $subscription['order_limit'] . " orders</p>";
     echo "<p>Subscription ends on: " . $subscription['end_date'] . "</p>";
-    echo "<a href='dashboard.php?shop=$shop'>Go to Dashboard</a>";
+    echo "<a href='dashboard.php??shop_id=".$subscription['store_id']."'>Go to Dashboard</a>";
 } else {
     // Store is NOT subscribed, show pricing plans
     include 'pricing.php';
