@@ -73,8 +73,16 @@ if ($subscription_result->num_rows > 0) {
 
     $response = curl_exec($ch);
     curl_close($ch);
-    $orders = json_decode($response, true)['orders'] ?? [];
+    if ($http_code != 200) {
+        die("Shopify API error: HTTP Code $http_code - Response: " . $response);
+    }
 
+    $orders = json_decode($response, true)['orders'] ?? [];
+    if (!isset($orders['orders'])) {
+        die("Unexpected API response: " . $response);
+    }
+    
+    $orders = $orders['orders'];
     if (!$orders) {
         die("No orders found.");
     }
