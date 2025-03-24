@@ -2,7 +2,8 @@
 require_once 'config.php';
 require_once 'db.php';
 require_once 'shopify/shopify_functions.php';
-
+// Check if installed
+$conn = DB::getInstance();
 $plans = $conn->query("SELECT * FROM plans")->fetch_all(MYSQLI_ASSOC);
 ?>
 <!DOCTYPE html>
