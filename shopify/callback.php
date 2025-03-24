@@ -108,8 +108,7 @@ if (isset($response['access_token'])) {
                 'X-Shopify-Access-Token: ' . $response['access_token']
             ],
             CURLOPT_POST => true,
-            CURLOPT_POSTFIELDS => json_encode(['webhook' => $webhook]),
-            CURLOPT_RETURNTRANSFER => true
+            CURLOPT_POSTFIELDS => json_encode(['webhook' => $webhook])
         ]);
     
         $result = curl_exec($ch);
