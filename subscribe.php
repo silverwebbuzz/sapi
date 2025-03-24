@@ -88,9 +88,15 @@ if ($subscription_result->num_rows > 0) {
     // Insert orders into the database
     $stmt = $conn->prepare("
     INSERT INTO `$invoice_table` 
-    (shop, order_id, customer_name, customer_email, billing_address, shipping_address, currency, subtotal_price, total_price, tax_amount, discount_amount, shipping_cost, invoice_status, email_status, payment_method, order_status) 
-    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 'pending', 'pending', ?, ?) 
+    (order_id, customer_name, customer_email, billing_address, shipping_address, currency, subtotal_price, total_price, tax_amount, discount_amount, shipping_cost, invoice_status, email_status, payment_method, order_status) 
+    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 'pending', 'pending', ?, ?) 
     ON DUPLICATE KEY UPDATE 
+        customer_name = VALUES(customer_name),
+        customer_email = VALUES(customer_email),
+        billing_address = VALUES(billing_address),
+        shipping_address = VALUES(shipping_address),
+        currency = VALUES(currency),
+        subtotal_price = VALUES(subtotal_price),
         total_price = VALUES(total_price),
         tax_amount = VALUES(tax_amount),
         discount_amount = VALUES(discount_amount),
@@ -100,10 +106,6 @@ if ($subscription_result->num_rows > 0) {
         payment_method = VALUES(payment_method),
         order_status = VALUES(order_status)
     ");
-
-    if (!$stmt) {
-        die("Query Preparation Failed: " . $conn->error);
-    }
 
     if (!$stmt) {
         die("Query Preparation Failed: " . $conn->error);
@@ -118,54 +120,26 @@ if ($subscription_result->num_rows > 0) {
         $tax_amount = isset($order['total_tax']) ? $order['total_tax'] : 0.00;
         $discount_amount = isset($order['total_discounts']) ? $order['total_discounts'] : 0.00;
         $shipping_cost = isset($order['total_shipping_price_set']['shop_money']['amount']) ? $order['total_shipping_price_set']['shop_money']['amount'] : 0.00;
-    
         $billing_address = json_encode($order['billing_address'] ?? []);
         $shipping_address = json_encode($order['shipping_address'] ?? []);
-    
-        // Added extra fields
-        $created_at = $order['created_at'] ?? null;
         $payment_method = $order['gateway'] ?? 'Unknown';
         $order_status = $order['financial_status'] ?? 'pending';
-        echo "<pre>";
-        echo "ORDER DATA:\n";
-        print_r([
-            'shop' => $shopify_domain,
-            'order_id' => $order_id,
-            'customer_name' => $customer_name,
-            'customer_email' => $customer_email,
-            'billing_address' => $billing_address,
-            'shipping_address' => $shipping_address,
-            'currency' => $currency,
-            'subtotal_price' => $subtotal_price,
-            'total_price' => $total_price,
-            'tax_amount' => $tax_amount,
-            'discount_amount' => $discount_amount,
-            'shipping_cost' => $shipping_cost,
-            'created_at' => $created_at,
-            'payment_method' => $payment_method,
-            'order_status' => $order_status
-        ]);
-        echo "</pre>";
+       
 
-
-
-
-        $stmt->bind_param("sssssssdsssssss", 
-            $shopify_domain, 
-            $order_id,  
-            $customer_name, 
-            $customer_email, 
-            $billing_address, 
-            $shipping_address, 
-            $currency, 
-            $subtotal_price, 
-            $total_price, 
-            $tax_amount, 
-            $discount_amount, 
-            $shipping_cost,
-            $created_at,
-            $payment_method,
-            $order_status
+        $stmt->bind_param("ssssssdddddss", 
+        $order_id,  
+        $customer_name, 
+        $customer_email, 
+        $billing_address, 
+        $shipping_address, 
+        $currency, 
+        $subtotal_price, 
+        $total_price, 
+        $tax_amount, 
+        $discount_amount, 
+        $shipping_cost,
+        $payment_method,
+        $order_status
         );
 
         if (!$stmt->execute()) {
