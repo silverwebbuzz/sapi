@@ -4,6 +4,9 @@
     # Base URL redirects
     RewriteBase /
 
+    # Allow access to static files (CSS, JS, images, fonts)
+    RewriteCond %{REQUEST_URI} !\.(css|js|png|jpg|jpeg|gif|ico|svg|woff|woff2|ttf|eot|otf)$ [NC]
+
     # Handle client route (Embedded app)
     RewriteCond %{REQUEST_URI} ^/client$
     RewriteRule ^ client.php [QSA,L]
