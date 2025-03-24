@@ -82,6 +82,9 @@ if ($subscription_result->num_rows > 0) {
     }
 
     $orders = json_decode($response, true)['orders'] ?? [];
+    echo "<pre>";
+    print_r($orders);
+    exit;
     if (!isset($orders['orders'])) {
         die("Unexpected API response: " . $response);
     }
