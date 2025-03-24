@@ -79,7 +79,7 @@ if (isset($response['access_token'])) {
           country_code = VALUES(country_code), 
           country_name = VALUES(country_name), 
           updated_at = NOW(),
-          status=";
+          status=VALUES(status)";
 
     $conn = DB::getInstance();
     $stmt = $conn->prepare($query);
