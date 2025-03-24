@@ -23,7 +23,7 @@ $plans = $conn->query("SELECT * FROM plans")->fetch_all(MYSQLI_ASSOC);
                 <p class="price">$<?= number_format($plan['price'], 2) ?>/month</p>
                 <p class="orders"><?= $plan['order_limit'] ?> Orders per month</p>
                 <p class="description"><?= htmlspecialchars($plan['description']) ?></p>
-                <form action="subscribe.php" method="POST">
+                <form action="subscribe.php" method="GET">
                     <input type="hidden" name="shop_id" value="<?= $store['id'] ?>">
                     <input type="hidden" name="plan_id" value="<?= $plan['id'] ?>">
                     <button type="submit">Start Free Trial</button>

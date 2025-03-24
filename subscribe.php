@@ -6,9 +6,9 @@ if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
     die("Invalid request method.");
 }
 
-// Retrieve POST parameters
-$shop_id = $_POST['shop_id'];
-$plan_id = $_POST['plan_id'];
+// Retrieve GET parameters
+$shop_id = $_GET['shop_id'];
+$plan_id = $_GET['plan_id'];
 
 $conn = DB::getInstance();
 
