@@ -38,7 +38,7 @@ $plans = $conn->query("SELECT * FROM plans")->fetch_all(MYSQLI_ASSOC);
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Pricing Plans</title>
-    <link rel="stylesheet" href="styles.css">
+    <link rel="stylesheet" href="<?= BASE_URL ?>styles.css">
 </head>
 <body>
 
