@@ -64,12 +64,13 @@ if ($subscription_result->num_rows > 0) {
 
     $access_token = $store['access_token'];
     // Fetch last 50 paid orders from Shopify
-    $api_url = "https://{$shop}/admin/api/" . SHOPIFY_API_VERSION . "/orders.json?financial_status=paid&limit=50";
+    echo $api_url = "https://{$shop}/admin/api/" . SHOPIFY_API_VERSION . "/orders.json?financial_status=paid&limit=50";
     $ch = curl_init($api_url);
-    curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
-    curl_setopt($ch, CURLOPT_HTTPHEADER, [
-        "Content-Type: application/json",
-        "X-Shopify-Access-Token: $access_token"
+    curl_setopt_array($ch, [
+        CURLOPT_RETURNTRANSFER => true,
+        CURLOPT_HTTPHEADER => [
+            "X-Shopify-Access-Token: $access_token"
+        ]
     ]);
 
     $response = curl_exec($ch);
