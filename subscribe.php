@@ -41,6 +41,7 @@ if ($subscription_result->num_rows > 0) {
     $create_table_query = "CREATE TABLE IF NOT EXISTS `$invoice_table` (
         `id` int(11) NOT NULL AUTO_INCREMENT PRIMARY KEY,
         `order_id` varchar(50) NOT NULL,  -- Changed from BIGINT to VARCHAR
+        `order_number` varchar(16) DEFAULT NULL,
         `customer_name` varchar(255) DEFAULT NULL,
         `customer_email` varchar(255) DEFAULT NULL,
         `billing_address` LONGTEXT DEFAULT NULL,  -- Changed to LONGTEXT for larger JSON data
@@ -55,7 +56,8 @@ if ($subscription_result->num_rows > 0) {
         `email_status` enum('pending','sent') DEFAULT 'pending',
         `created_at` timestamp NULL DEFAULT current_timestamp(),
         `payment_method` varchar(50) DEFAULT NULL,  -- Added payment method
-        `order_status` ENUM('pending','paid','failed','refunded') DEFAULT 'pending'  -- Added order status
+        `order_status` ENUM('pending','paid','failed','refunded') DEFAULT 'pending',
+        `products` LONGTEXT DEFAULT NULL 
     ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;";
 
     if ($conn->query($create_table_query) === TRUE) {
@@ -88,8 +90,8 @@ if ($subscription_result->num_rows > 0) {
     // Insert orders into the database
     $stmt = $conn->prepare("
     INSERT INTO `$invoice_table` 
-    (order_id, customer_name, customer_email, billing_address, shipping_address, currency, subtotal_price, total_price, tax_amount, discount_amount, shipping_cost, invoice_status, email_status, payment_method, order_status) 
-    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 'pending', 'pending', ?, ?) 
+    (order_id, order_number, customer_name, customer_email, billing_address, shipping_address, currency, subtotal_price, total_price, tax_amount, discount_amount, shipping_cost, invoice_status, email_status, payment_method, order_status, products) 
+    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 'pending', 'pending', ?, ?, ?) 
     ON DUPLICATE KEY UPDATE 
         customer_name = VALUES(customer_name),
         customer_email = VALUES(customer_email),
@@ -104,14 +106,16 @@ if ($subscription_result->num_rows > 0) {
         invoice_status = VALUES(invoice_status),
         email_status = VALUES(email_status),
         payment_method = VALUES(payment_method),
-        order_status = VALUES(order_status)
+        order_status = VALUES(order_status),
+        products = VALUES(products)
     ");
 
     if (!$stmt) {
         die("Query Preparation Failed: " . $conn->error);
     }
     foreach ($orders as $order) {
-        $order_id = $order['id'];  
+        $order_id = $order['id']; 
+        $order_number = $order['order_number'];
         $customer_name = $order['customer']['first_name'] . ' ' . $order['customer']['last_name'];
         $customer_email = $order['customer']['email'];
         $currency = $order['currency'];
@@ -124,10 +128,12 @@ if ($subscription_result->num_rows > 0) {
         $shipping_address = json_encode($order['shipping_address'] ?? []);
         $payment_method = $order['gateway'] ?? 'Unknown';
         $order_status = $order['financial_status'] ?? 'pending';
-       
+        $products = json_encode($order['line_items'], JSON_UNESCAPED_UNICODE);
 
-        $stmt->bind_param("ssssssdddddss", 
-        $order_id,  
+
+        $stmt->bind_param("sssssssdddddsss", 
+        $order_id,
+        $order_number,
         $customer_name, 
         $customer_email, 
         $billing_address, 
@@ -139,7 +145,8 @@ if ($subscription_result->num_rows > 0) {
         $discount_amount, 
         $shipping_cost,
         $payment_method,
-        $order_status
+        $order_status,
+        $products
         );
 
         if (!$stmt->execute()) {
