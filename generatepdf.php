@@ -13,14 +13,16 @@ $order_id = $_GET['order_id'];
 
 $conn = DB::getInstance();
 // Fetch the correct invoice table for this shop
-$table_query = $conn->prepare("SELECT invoice_table FROM shops WHERE shop_id = ?");
+$table_query = $conn->prepare("SELECT shop FROM stores WHERE id = ?");
 $table_query->bind_param("s", $shop_id);
 $table_query->execute();
 $result = $table_query->get_result();
 
 if ($result->num_rows > 0) {
     $shop_data = $result->fetch_assoc();
-    $invoice_table = $shop_data['invoice_table']; // Get table name
+
+    $shop_name = preg_replace('/[^a-zA-Z0-9_]/', '_', strtolower($shop_data['shop'])); // Sanitize table name
+    $invoice_table = "invoices_" . $shop_name;// Get table name
 
     // Fetch invoice details
     $stmt = $conn->prepare("SELECT * FROM `$invoice_table` WHERE order_id = ?");
