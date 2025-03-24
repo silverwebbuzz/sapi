@@ -1,29 +1,41 @@
 <?php
+require_once 'config.php';
 require_once 'db.php';
 
-$store_id = 1; // Assume the store is logged in
+if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
+    die("Invalid request method.");
+}
+
+// Retrieve POST parameters
+$shop_id = $_POST['shop_id'];
 $plan_id = $_POST['plan_id'];
 
 $conn = DB::getInstance();
 
-// Check if store already has a subscription
-$stmt = $conn->prepare("SELECT id FROM store_subscriptions WHERE store_id = ?");
-$stmt->bind_param("i", $store_id);
+// Check if store already has an active subscription
+$stmt = $conn->prepare("SELECT id FROM store_subscriptions WHERE store_id = ? AND status = 'active'");
+$stmt->bind_param("i", $shop_id);
 $stmt->execute();
-$result = $stmt->get_result();
+$subscription_result = $stmt->get_result();
 
-if ($result->num_rows > 0) {
-    // Update existing subscription
-    $update = $conn->prepare("UPDATE store_subscriptions SET plan_id = ?, start_date = NOW(), end_date = DATE_ADD(NOW(), INTERVAL 7 DAY), status = 'active' WHERE store_id = ?");
-    $update->bind_param("ii", $plan_id, $store_id);
-    $update->execute();
+if ($subscription_result->num_rows > 0) {
+    // Store is already subscribed
+    header("Location: dashboard.php?shop_id=$shop_id");
+    exit();
 } else {
-    // Create a new subscription
-    $insert = $conn->prepare("INSERT INTO store_subscriptions (store_id, plan_id, start_date, end_date, status) VALUES (?, ?, NOW(), DATE_ADD(NOW(), INTERVAL 7 DAY), 'active')");
-    $insert->bind_param("ii", $store_id, $plan_id);
-    $insert->execute();
-}
+    // Subscribe the store (7-day free trial)
+    $stmt = $conn->prepare("
+        INSERT INTO store_subscriptions (store_id, plan_id, start_date, end_date, status) 
+        VALUES (?, ?, NOW(), DATE_ADD(NOW(), INTERVAL 7 DAY), 'active')
+    ");
+    $stmt->bind_param("ii", $shop_id, $plan_id);
 
-// Redirect back to pricing page
-header("Location: pricing.php?success=1");
-exit();
+    if ($stmt->execute()) {
+        // Redirect to dashboard after successful subscription
+        header("Location: dashboard?shop_id=$shop_id");
+        exit();
+    } else {
+        echo "Error: " . $stmt->error;
+    }
+}
+?>

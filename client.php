@@ -12,7 +12,7 @@ $shop = $params['shop'];
 
 // Check if installed
 $conn = DB::getInstance();
-$stmt = $conn->prepare("SELECT status FROM stores WHERE shop = ?");
+$stmt = $conn->prepare("SELECT id,status FROM stores WHERE shop = ?");
 $stmt->bind_param("s", $shop);
 $stmt->execute();
 $result = $stmt->get_result();
@@ -25,7 +25,30 @@ if (!$store || $store['status'] === 'uninstalled') {
     exit();
 }
 
-header("Location: dashboard?shop=$shop");
+$stmt = $conn->prepare("
+    SELECT p.name AS plan_name, p.price, p.order_limit, s.end_date 
+    FROM store_subscriptions s
+    JOIN stores st ON s.store_id = st.id
+    JOIN plans p ON s.plan_id = p.id
+    WHERE st.shop = ? AND s.status = 'active'
+");
+$stmt->bind_param("s", $shop);
+$stmt->execute();
+$result = $stmt->get_result();
+
+if ($result->num_rows > 0) {
+    // Store is subscribed, show plan details
+    $subscription = $result->fetch_assoc();
+    echo "<h2>You are subscribed to the <strong>" . $subscription['plan_name'] . "</strong> plan.</h2>";
+    echo "<p>Price: $" . $subscription['price'] . " / month</p>";
+    echo "<p>Order Limit: " . $subscription['order_limit'] . " orders</p>";
+    echo "<p>Subscription ends on: " . $subscription['end_date'] . "</p>";
+    echo "<a href='dashboard.php?shop=$shop'>Go to Dashboard</a>";
+} else {
+    // Store is NOT subscribed, show pricing plans
+    include 'pricing.php';
+}
+
 exit();
 
 // Set security headers for embedded app
