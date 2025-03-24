@@ -24,12 +24,6 @@ if (!$store || $store['status'] === 'uninstalled') {
     header("Location: $install_url");
     exit();
 }
-else
-{
-    $install_url = getInstallUrl($shop, SHOPIFY_APP_SCOPES, SHOPIFY_APP_URL . '/shopify/callback');
-    header("Location: $install_url");
-    exit();
-}
 
 // Set security headers for embedded app
 header("Content-Security-Policy: frame-ancestors https://*.shopify.com https://admin.shopify.com");
