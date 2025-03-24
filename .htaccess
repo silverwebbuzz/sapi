@@ -15,6 +15,10 @@
     RewriteCond %{REQUEST_URI} ^/dashboard$
     RewriteRule ^ dashboard.php [QSA,L]
 
+    # Handle client route (Embedded app)
+    RewriteCond %{REQUEST_URI} ^/subscribe$
+    RewriteRule ^ subscribe.php [QSA,L]
+
     # Handle install flow
     RewriteCond %{REQUEST_URI} ^/shopify/install
     RewriteRule ^shopify/install$ shopify/install.php [QSA,L]
