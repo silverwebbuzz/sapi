@@ -122,7 +122,30 @@ if ($subscription_result->num_rows > 0) {
         $created_at = $order['created_at'] ?? null;
         $payment_method = $order['gateway'] ?? 'Unknown';
         $order_status = $order['financial_status'] ?? 'pending';
-    
+        echo "<pre>";
+        echo "ORDER DATA:\n";
+        print_r([
+            'shop' => $shopify_domain,
+            'order_id' => $order_id,
+            'customer_name' => $customer_name,
+            'customer_email' => $customer_email,
+            'billing_address' => $billing_address,
+            'shipping_address' => $shipping_address,
+            'currency' => $currency,
+            'subtotal_price' => $subtotal_price,
+            'total_price' => $total_price,
+            'tax_amount' => $tax_amount,
+            'discount_amount' => $discount_amount,
+            'shipping_cost' => $shipping_cost,
+            'created_at' => $created_at,
+            'payment_method' => $payment_method,
+            'order_status' => $order_status
+        ]);
+        echo "</pre>";
+
+
+
+
         $stmt->bind_param("sssssssdsssssss", 
             $shopify_domain, 
             $order_id,  
