@@ -27,29 +27,61 @@ curl_close($ch);
 
 if (isset($response['access_token'])) {
 
-    echo "<pre>";
-    print_r($response);
-    echo "</pre>";
-    die();
-    
-    $store_name = explode(',', $response['scope'])[0];
-    $store_domain = explode('.', $shop)[0];
     $access_token = $response['access_token'];
-    $email = $response['email'];
-    $phone = $response['phone'];
-    $country = $response['country'];
-    $currency = $response['currency'];
-    $timezone = $response['timezone'];
-    $iana_timezone = $response['iana_timezone'];
-    $country_code = $response['country_code'];
-    $country_name = $response['country_name'];
-    $created_at = $response['created_at'];
-    $updated_at = $response['updated_at'];
+    // Step 2: Fetch Store Details
+        $shopDetailsUrl = "https://{$shop}/admin/api/" . SHOPIFY_API_VERSION . "/shop.json";
+        $ch = curl_init($shopDetailsUrl);
+        curl_setopt_array($ch, [
+            CURLOPT_RETURNTRANSFER => true,
+            CURLOPT_HTTPHEADER => [
+                "X-Shopify-Access-Token: $access_token"
+            ]
+        ]);
+        $shopDetailsResponse = json_decode(curl_exec($ch), true);
+        curl_close($ch);
 
-    // Save store details
+        if (!isset($shopDetailsResponse['shop'])) {
+            die("Error: Failed to retrieve shop details.");
+        }
+        
+        // Step 3: Extract Data
+        $shop          = $shopDetailsResponse['shop']['myshopify_domain'];
+        $store_name    = $shopDetailsResponse['shop']['name'] ?? '';
+        $store_domain  = $shopDetailsResponse['shop']['domain'] ?? $shop;
+        $email         = $shopDetailsResponse['shop']['email'] ?? '';
+        $phone         = $shopDetailsResponse['shop']['phone'] ?? '';
+        $current_plan  = $shopDetailsResponse['shop']['plan_name'] ?? '';
+        $country       = $shopDetailsResponse['shop']['country'] ?? '';
+        $currency      = $shopDetailsResponse['shop']['currency'] ?? '';
+        $timezone      = $shopDetailsResponse['shop']['timezone'] ?? '';
+        $iana_timezone = $shopDetailsResponse['shop']['iana_timezone'] ?? '';
+        $country_code  = $shopDetailsResponse['shop']['country_code'] ?? '';
+        $country_name  = $shopDetailsResponse['shop']['country_name'] ?? '';
+        $created_at    = $shopDetailsResponse['shop']['created_at'] ?? '';
+        $updated_at    = $shopDetailsResponse['shop']['updated_at'] ?? '';
+
+        // Step 4: Insert or Update Store Information
+        $query = "INSERT INTO stores 
+          (shop, store_name, store_domain, access_token, email, phone, current_plan, country, currency, timezone, iana_timezone, country_code, country_name, created_at, updated_at) 
+          VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+          ON DUPLICATE KEY UPDATE 
+          store_name = VALUES(store_name), 
+          store_domain = VALUES(store_domain), 
+          access_token = VALUES(access_token), 
+          email = VALUES(email), 
+          phone = VALUES(phone), 
+          current_plan = VALUES(current_plan), 
+          country = VALUES(country), 
+          currency = VALUES(currency), 
+          timezone = VALUES(timezone), 
+          iana_timezone = VALUES(iana_timezone), 
+          country_code = VALUES(country_code), 
+          country_name = VALUES(country_name), 
+          updated_at = NOW()";
+
     $conn = DB::getInstance();
-    $stmt = $conn->prepare("INSERT INTO stores (shop, access_token, store_name, store_domain, email, phone, country, currency, timezone, iana_timezone, country_code, country_name, created_at, updated_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, NOW(), NOW())");
-    $stmt->bind_param("ss", $shop, $response['access_token']);
+    $stmt = $conn->prepare($query);
+    $stmt->bind_param("sssssssssssssss", $shop, $store_name, $store_domain, $access_token, $email, $phone, $current_plan, $country, $currency, $timezone, $iana_timezone, $country_code, $country_name, $created_at, $updated_at);
     $stmt->execute();
 
     // Create webhook
