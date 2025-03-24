@@ -79,6 +79,7 @@ $invoices_query = $conn->query("SELECT * FROM `$invoice_table` ORDER BY created_
                 <th>Total Price</th>
                 <th>Status</th>
                 <th>Date</th>
+                <th>Invoice</th>
             </tr>
             <?php while ($invoice = $invoices_query->fetch_assoc()): ?>
                 <tr>
@@ -87,6 +88,7 @@ $invoices_query = $conn->query("SELECT * FROM `$invoice_table` ORDER BY created_
                     <td>$<?= number_format($invoice['total_price'], 2) ?></td>
                     <td><?= ucfirst($invoice['invoice_status']) ?></td>
                     <td><?= $invoice['created_at'] ?></td>
+                    <td><?= BASE_URL ?>/generatepdf?shop_id=<?= $shop_id ?>&order_id<?= $invoice['order_id'] ?></td>
                 </tr>
             <?php endwhile; ?>
         </table>
