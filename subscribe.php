@@ -104,6 +104,10 @@ if ($subscription_result->num_rows > 0) {
     if (!$stmt) {
         die("Query Preparation Failed: " . $conn->error);
     }
+
+    if (!$stmt) {
+        die("Query Preparation Failed: " . $conn->error);
+    }
     foreach ($orders as $order) {
         $order_id = $order['id'];  
         $customer_name = $order['customer']['first_name'] . ' ' . $order['customer']['last_name'];
