@@ -83,7 +83,7 @@ if (isset($response['access_token'])) {
 
     $conn = DB::getInstance();
     $stmt = $conn->prepare($query);
-    $stmt->bind_param("sssssssssssssss", $shop, $store_name, $store_domain, $access_token, $email, $phone, $current_plan, $country, $currency, $timezone, $iana_timezone, $country_code, $country_name, $created_at, $updated_at, $status);
+    $stmt->bind_param("ssssssssssssssss", $shop, $store_name, $store_domain, $access_token, $email, $phone, $current_plan, $country, $currency, $timezone, $iana_timezone, $country_code, $country_name, $created_at, $updated_at, $status);
     $stmt->execute();
 
     // Create webhook
