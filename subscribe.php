@@ -24,7 +24,7 @@ if ($subscription_result->num_rows > 0) {
     exit();
 } else {
     // Fetch store details
-    $stmt = $conn->prepare("SELECT shop FROM stores WHERE id = ?");
+    $stmt = $conn->prepare("SELECT shop,access_token FROM stores WHERE id = ?");
     $stmt->bind_param("i", $shop_id);
     $stmt->execute();
     $result = $stmt->get_result();
@@ -62,6 +62,7 @@ if ($subscription_result->num_rows > 0) {
         echo "Error creating table: " . $conn->error;
     }
 
+    $access_token = $store['access_token'];
     // Fetch last 50 paid orders from Shopify
     $api_url = "https://{$shop}/admin/api/" . SHOPIFY_API_VERSION . "/orders.json?status=any&financial_status=paid&limit=50";
     $ch = curl_init($api_url);
@@ -81,7 +82,7 @@ if ($subscription_result->num_rows > 0) {
     if (!isset($orders['orders'])) {
         die("Unexpected API response: " . $response);
     }
-    
+
     $orders = $orders['orders'];
     if (!$orders) {
         die("No orders found.");
