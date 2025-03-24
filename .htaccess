@@ -35,6 +35,10 @@
         Order allow,deny
         Deny from all
     </FilesMatch>
+    <FilesMatch "\.(css|js|png|jpg|jpeg|gif|ico|svg|woff|woff2|ttf|eot|otf)$">
+        Order allow,deny
+        Allow from all
+    </FilesMatch>
 </IfModule>
 
 # Required for embedded apps
