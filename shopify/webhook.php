@@ -40,63 +40,76 @@ if ($topic === 'app/uninstalled') {
         die("Invoice table not found for store.");
     }
 
-    // Handle Order Creation
-
+    // Extract order details from webhook payload
     $order_id = $payload['id'];
-    $customer_name = $payload['customer']['first_name'] . ' ' . $payload['customer']['last_name'];
-    $customer_email = $payload['customer']['email'];
-    $currency = $payload['currency'];
-    $subtotal_price = $payload['subtotal_price'];
-    $total_price = $payload['total_price'];
-    $tax_amount = isset($payload['total_tax']) ? $payload['total_tax'] : 0.00;
-    $discount_amount = isset($payload['total_discounts']) ? $payload['total_discounts'] : 0.00;
-    $shipping_cost = isset($payload['total_shipping_price_set']['shop_money']['amount']) ? $payload['total_shipping_price_set']['shop_money']['amount'] : 0.00;
+    $order_number = $payload['order_number'] ?? '';
+    $customer_name = trim(($payload['customer']['first_name'] ?? '') . ' ' . ($payload['customer']['last_name'] ?? ''));
+    $customer_email = $payload['customer']['email'] ?? '';
+    $currency = $payload['currency'] ?? '';
+    $subtotal_price = $payload['subtotal_price'] ?? 0.00;
+    $total_price = $payload['total_price'] ?? 0.00;
+    $tax_amount = $payload['total_tax'] ?? 0.00;
+    $discount_amount = $payload['total_discounts'] ?? 0.00;
+    $shipping_cost = $payload['total_shipping_price_set']['shop_money']['amount'] ?? 0.00;
 
     $billing_address = json_encode($payload['billing_address'] ?? []);
     $shipping_address = json_encode($payload['shipping_address'] ?? []);
-
-    // Fetch payment method (if available)
     $payment_method = $payload['payment_gateway_names'][0] ?? 'Unknown'; 
-
-    // Fetch order status
     $order_status = $payload['financial_status'] ?? 'pending';
 
+    // Extract products from line items
+    $products = [];
+    if (!empty($payload['line_items'])) {
+        foreach ($payload['line_items'] as $item) {
+            $products[] = [
+                'product_id' => $item['product_id'] ?? '',
+                'name' => $item['name'] ?? '',
+                'price' => $item['price'] ?? 0.00,
+                'quantity' => $item['quantity'] ?? 1
+            ];
+        }
+    }
+    $products_json = json_encode($products);
+
     // Store order in invoices table
-    $stmt = $conn->prepare("
-        INSERT INTO `$invoice_table` 
-        (shop, order_id, customer_name, customer_email, billing_address, shipping_address, currency, subtotal_price, total_price, tax_amount, discount_amount, shipping_cost, invoice_status, email_status, payment_method, order_status) 
-        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 'pending', 'pending', ?, ?) 
-        ON DUPLICATE KEY UPDATE
-            customer_name = VALUES(customer_name),
-            customer_email = VALUES(customer_email),
-            billing_address = VALUES(billing_address),
-            shipping_address = VALUES(shipping_address),
-            subtotal_price = VALUES(subtotal_price),
-            total_price = VALUES(total_price),
-            tax_amount = VALUES(tax_amount),
-            discount_amount = VALUES(discount_amount),
-            shipping_cost = VALUES(shipping_cost),
-            invoice_status = 'pending',
-            email_status = 'pending',
-            payment_method = VALUES(payment_method),
-            order_status = VALUES(order_status)
+    // Insert or update order in invoices table
+    $stmt = $conn->prepare(" 
+    INSERT INTO `$invoice_table` 
+    (order_id, order_number, customer_name, customer_email, billing_address, shipping_address, currency, subtotal_price, total_price, tax_amount, discount_amount, shipping_cost, invoice_status, email_status, payment_method, order_status, products) 
+    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 'pending', 'pending', ?, ?, ?) 
+    ON DUPLICATE KEY UPDATE
+        customer_name = VALUES(customer_name),
+        customer_email = VALUES(customer_email),
+        billing_address = VALUES(billing_address),
+        shipping_address = VALUES(shipping_address),
+        subtotal_price = VALUES(subtotal_price),
+        total_price = VALUES(total_price),
+        tax_amount = VALUES(tax_amount),
+        discount_amount = VALUES(discount_amount),
+        shipping_cost = VALUES(shipping_cost),
+        invoice_status = 'pending',
+        email_status = 'pending',
+        payment_method = VALUES(payment_method),
+        order_status = VALUES(order_status),
+        products = VALUES(products)
     ");
 
-    $stmt->bind_param("sisssssdssssss",
-        $shop,
-        $order_id,
-        $customer_name,
-        $customer_email,
-        $billing_address,
-        $shipping_address,
-        $currency,
-        $subtotal_price,
-        $total_price,
-        $tax_amount,
-        $discount_amount,
-        $shipping_cost,
-        $payment_method,
-        $order_status
+    $stmt->bind_param("ssssssssddddssssss",
+    $order_id,
+    $order_number,
+    $customer_name,
+    $customer_email,
+    $billing_address,
+    $shipping_address,
+    $currency,
+    $subtotal_price,
+    $total_price,
+    $tax_amount,
+    $discount_amount,
+    $shipping_cost,
+    $payment_method,
+    $order_status,
+    $products_json
     );
 
     if ($stmt->execute()) {
