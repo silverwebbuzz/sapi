@@ -12,12 +12,20 @@ $shop = $params['shop'];
 
 // Check if installed
 $conn = DB::getInstance();
-$stmt = $conn->prepare("SELECT id FROM stores WHERE shop = ?");
+$stmt = $conn->prepare("SELECT status FROM stores WHERE shop = ?");
 $stmt->bind_param("s", $shop);
 $stmt->execute();
+$result = $stmt->get_result();
+$store = $result->fetch_assoc();
 
-if ($stmt->get_result()->num_rows === 0) {
-
+// If store does not exist or was uninstalled, restart installation
+if (!$store || $store['status'] === 'uninstalled') {
+    $install_url = getInstallUrl($shop, SHOPIFY_APP_SCOPES, SHOPIFY_APP_URL . '/shopify/callback');
+    header("Location: $install_url");
+    exit();
+}
+else
+{
     $install_url = getInstallUrl($shop, SHOPIFY_APP_SCOPES, SHOPIFY_APP_URL . '/shopify/callback');
     header("Location: $install_url");
     exit();

@@ -86,7 +86,39 @@ if (isset($response['access_token'])) {
 
     // Create webhook
     $webhook_url = SHOPIFY_APP_URL . '/shopify/webhook';
-    $ch = curl_init("https://{$shop}/admin/api/" . SHOPIFY_API_VERSION . "/webhooks.json");
+    $webhooks = [
+        [
+            'topic'   => 'orders/create',
+            'address' => $webhook_base_url,
+            'format'  => 'json'
+        ],
+        [
+            'topic'   => 'app/uninstalled',
+            'address' => $webhook_base_url,
+            'format'  => 'json'
+        ]
+    ];
+    foreach ($webhooks as $webhook) {
+        $ch = curl_init("https://{$shop}/admin/api/" . SHOPIFY_API_VERSION . "/webhooks.json");
+        curl_setopt_array($ch, [
+            CURLOPT_HTTPHEADER => [
+                'Content-Type: application/json',
+                'X-Shopify-Access-Token: ' . $response['access_token']
+            ],
+            CURLOPT_POST => true,
+            CURLOPT_POSTFIELDS => json_encode(['webhook' => $webhook]),
+            CURLOPT_RETURNTRANSFER => true
+        ]);
+    
+        $result = curl_exec($ch);
+        $status = curl_getinfo($ch, CURLINFO_HTTP_CODE);
+        curl_close($ch);
+    
+        if ($status !== 201 && $status !== 200) {
+            error_log("Failed to register webhook: " . json_encode($webhook) . " | Response: " . $result);
+        }
+    }
+    /*$ch = curl_init("https://{$shop}/admin/api/" . SHOPIFY_API_VERSION . "/webhooks.json");
     curl_setopt_array($ch, [
         CURLOPT_HTTPHEADER => [
             'Content-Type: application/json',
@@ -104,19 +136,7 @@ if (isset($response['access_token'])) {
 
     $result = curl_exec($ch);
     $status = curl_getinfo($ch, CURLINFO_HTTP_CODE);
-    curl_close($ch);
-
-    // Add validation
-    if ($status === 201) {
-        $webhook_data = json_decode($result, true);
-        if (json_last_error() === JSON_ERROR_NONE && isset($webhook_data['webhook'])) {
-            error_log("Webhook created: " . print_r($webhook_data, true));
-        } else {
-            error_log("Invalid JSON response: " . $result);
-        }
-    } else {
-        error_log("Webhook creation failed: " . $result);
-    }
+    curl_close($ch);*/
 
     $redirect_url = "https://{$shop}/admin/apps/" . SHOPIFY_API_KEY;
     header("Location: " . $redirect_url);
