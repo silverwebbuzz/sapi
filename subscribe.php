@@ -57,7 +57,7 @@ if ($subscription_result->num_rows > 0) {
     ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;";
 
     if ($conn->query($create_table_query) === TRUE) {
-        echo "Subscription activated, and invoice table `$invoice_table` created successfully.";
+       // echo "Subscription activated, and invoice table `$invoice_table` created successfully.";
     } else {
         echo "Error creating table: " . $conn->error;
     }
@@ -76,19 +76,9 @@ if ($subscription_result->num_rows > 0) {
 
     $response = curl_exec($ch);
     curl_close($ch);
-    if ($http_code != 200) {
-        die("Shopify API error: HTTP Code $http_code - Response: " . $response);
-    }
-
+    
     $orders = json_decode($response, true)['orders'] ?? [];
-    if (!isset($orders['orders'])) {
-        die("Unexpected API response: " . $response);
-    }
 
-    $orders = $orders['orders'];
-    if (!$orders) {
-        die("No orders found.");
-    }
     // Insert orders into the database
     $stmt = $conn->prepare("
         INSERT INTO `$invoice_table` (shop, order_id, customer_name, customer_email, billing_address, shipping_address, currency, subtotal_price, total_price, tax_amount, discount_amount, shipping_cost, invoice_status, email_status)
@@ -128,7 +118,6 @@ if ($subscription_result->num_rows > 0) {
     }
 
     echo "Orders inserted successfully!";
-
 
     // Subscribe the store (7-day free trial)
     $stmt = $conn->prepare("
