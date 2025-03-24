@@ -2,7 +2,7 @@
 require_once 'config.php';
 require_once 'db.php';
 
-if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
+if ($_SERVER['REQUEST_METHOD'] !== 'GET') {
     die("Invalid request method.");
 }
 
