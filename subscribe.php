@@ -62,6 +62,63 @@ if ($subscription_result->num_rows > 0) {
         echo "Error creating table: " . $conn->error;
     }
 
+    // Fetch last 50 paid orders from Shopify
+    $api_url = "https://{$shop}/admin/api/" . SHOPIFY_API_VERSION . "/orders.json?status=any&financial_status=paid&limit=50";
+    $ch = curl_init($api_url);
+    curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+    curl_setopt($ch, CURLOPT_HTTPHEADER, [
+        "Content-Type: application/json",
+        "X-Shopify-Access-Token: $access_token"
+    ]);
+
+    $response = curl_exec($ch);
+    curl_close($ch);
+    $orders = json_decode($response, true)['orders'] ?? [];
+
+    if (!$orders) {
+        die("No orders found.");
+    }
+    // Insert orders into the database
+    $stmt = $conn->prepare("
+        INSERT INTO `$invoice_table` (shop, order_id, customer_name, customer_email, billing_address, shipping_address, currency, subtotal_price, total_price, tax_amount, discount_amount, shipping_cost, invoice_status, email_status)
+        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 'pending', 'pending')
+        ON DUPLICATE KEY UPDATE order_id = order_id
+    ");
+
+    foreach ($orders as $order) {
+        $order_id = $order['id'];
+        $customer_name = $order['customer']['first_name'] . ' ' . $order['customer']['last_name'];
+        $customer_email = $order['customer']['email'];
+        $currency = $order['currency'];
+        $subtotal_price = $order['subtotal_price'];
+        $total_price = $order['total_price'];
+        $tax_amount = isset($order['total_tax']) ? $order['total_tax'] : 0.00;
+        $discount_amount = isset($order['total_discounts']) ? $order['total_discounts'] : 0.00;
+        $shipping_cost = isset($order['total_shipping_price_set']['shop_money']['amount']) ? $order['total_shipping_price_set']['shop_money']['amount'] : 0.00;
+        
+        $billing_address = json_encode($order['billing_address'] ?? []);
+        $shipping_address = json_encode($order['shipping_address'] ?? []);
+
+        $stmt->bind_param("sisssssdssss",
+            $shopify_domain,
+            $order_id,
+            $customer_name,
+            $customer_email,
+            $billing_address,
+            $shipping_address,
+            $currency,
+            $subtotal_price,
+            $total_price,
+            $tax_amount,
+            $discount_amount,
+            $shipping_cost
+        );
+        $stmt->execute();
+    }
+
+    echo "Orders inserted successfully!";
+
+
     // Subscribe the store (7-day free trial)
     $stmt = $conn->prepare("
         INSERT INTO store_subscriptions (store_id, plan_id, start_date, end_date, status) 
