@@ -5,9 +5,9 @@ define('PUBLIC_URL', BASE_URL);
 
 // Database Configuration
 define('DB_HOST', 'localhost');
-define('DB_NAME', 'u843459215_swbAutoPdfInvo');
-define('DB_USER', 'u843459215_swbAutoPdfInvo');
-define('DB_PASS', 'Yfobs@1109');
+define('DB_NAME', 'u843459215_sapi');
+define('DB_USER', 'u843459215_sapi');
+define('DB_PASS', 'Sapi@1109');
 
 // Shopify Configuration
 define('SHOPIFY_APP_NAME', 'SWB : Auto PDF Invoice');

@@ -26,9 +26,29 @@ $response = json_decode(curl_exec($ch), true);
 curl_close($ch);
 
 if (isset($response['access_token'])) {
+
+    echo "<pre>";
+    print_r($response);
+    echo "</pre>";
+    die();
+    
+    $store_name = explode(',', $response['scope'])[0];
+    $store_domain = explode('.', $shop)[0];
+    $access_token = $response['access_token'];
+    $email = $response['email'];
+    $phone = $response['phone'];
+    $country = $response['country'];
+    $currency = $response['currency'];
+    $timezone = $response['timezone'];
+    $iana_timezone = $response['iana_timezone'];
+    $country_code = $response['country_code'];
+    $country_name = $response['country_name'];
+    $created_at = $response['created_at'];
+    $updated_at = $response['updated_at'];
+
     // Save store details
     $conn = DB::getInstance();
-    $stmt = $conn->prepare("INSERT INTO stores (shop, access_token, created_at, updated_at) VALUES (?, ?, NOW(), NOW())");
+    $stmt = $conn->prepare("INSERT INTO stores (shop, access_token, store_name, store_domain, email, phone, country, currency, timezone, iana_timezone, country_code, country_name, created_at, updated_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, NOW(), NOW())");
     $stmt->bind_param("ss", $shop, $response['access_token']);
     $stmt->execute();
 
