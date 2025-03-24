@@ -40,11 +40,11 @@ if ($subscription_result->num_rows > 0) {
     // ✅ Create Dynamic Invoice Table for the Store
     $create_table_query = "CREATE TABLE IF NOT EXISTS `$invoice_table` (
         `id` int(11) NOT NULL AUTO_INCREMENT PRIMARY KEY,
-        `order_id` bigint(20) NOT NULL,
+        `order_id` varchar(50) NOT NULL,  -- Changed from BIGINT to VARCHAR
         `customer_name` varchar(255) DEFAULT NULL,
         `customer_email` varchar(255) DEFAULT NULL,
-        `billing_address` text DEFAULT NULL,
-        `shipping_address` text DEFAULT NULL,
+        `billing_address` LONGTEXT DEFAULT NULL,  -- Changed to LONGTEXT for larger JSON data
+        `shipping_address` LONGTEXT DEFAULT NULL, -- Changed to LONGTEXT
         `currency` varchar(10) DEFAULT NULL,
         `subtotal_price` decimal(10,2) DEFAULT NULL,
         `total_price` decimal(10,2) DEFAULT NULL,
@@ -53,7 +53,9 @@ if ($subscription_result->num_rows > 0) {
         `shipping_cost` decimal(10,2) DEFAULT NULL,
         `invoice_status` enum('pending','generated') DEFAULT 'pending',
         `email_status` enum('pending','sent') DEFAULT 'pending',
-        `created_at` timestamp NULL DEFAULT current_timestamp()
+        `created_at` timestamp NULL DEFAULT current_timestamp(),
+        `payment_method` varchar(50) DEFAULT NULL,  -- Added payment method
+        `order_status` ENUM('pending','paid','failed','refunded') DEFAULT 'pending'  -- Added order status
     ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;";
 
     if ($conn->query($create_table_query) === TRUE) {
@@ -82,26 +84,25 @@ if ($subscription_result->num_rows > 0) {
     }
 
     $orders = json_decode($response, true)['orders'] ?? [];
-    echo "<pre>";
-    print_r($orders);
-    exit;
-    if (!isset($orders['orders'])) {
-        die("Unexpected API response: " . $response);
-    }
-
-    $orders = $orders['orders'];
-    if (!$orders) {
-        die("No orders found.");
-    }
+    
     // Insert orders into the database
     $stmt = $conn->prepare("
-        INSERT INTO `$invoice_table` (shop, order_id, customer_name, customer_email, billing_address, shipping_address, currency, subtotal_price, total_price, tax_amount, discount_amount, shipping_cost, invoice_status, email_status)
-        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 'pending', 'pending')
-        ON DUPLICATE KEY UPDATE order_id = order_id
+    INSERT INTO `$invoice_table` 
+    (shop, order_id, customer_name, customer_email, billing_address, shipping_address, currency, subtotal_price, total_price, tax_amount, discount_amount, shipping_cost, invoice_status, email_status, payment_method, order_status) 
+    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 'pending', 'pending', ?, ?) 
+    ON DUPLICATE KEY UPDATE 
+        total_price = VALUES(total_price),
+        tax_amount = VALUES(tax_amount),
+        discount_amount = VALUES(discount_amount),
+        shipping_cost = VALUES(shipping_cost),
+        invoice_status = VALUES(invoice_status),
+        email_status = VALUES(email_status),
+        payment_method = VALUES(payment_method),
+        order_status = VALUES(order_status)
     ");
 
     foreach ($orders as $order) {
-        $order_id = $order['id'];
+        $order_id = $order['id'];  
         $customer_name = $order['customer']['first_name'] . ' ' . $order['customer']['last_name'];
         $customer_email = $order['customer']['email'];
         $currency = $order['currency'];
@@ -110,23 +111,31 @@ if ($subscription_result->num_rows > 0) {
         $tax_amount = isset($order['total_tax']) ? $order['total_tax'] : 0.00;
         $discount_amount = isset($order['total_discounts']) ? $order['total_discounts'] : 0.00;
         $shipping_cost = isset($order['total_shipping_price_set']['shop_money']['amount']) ? $order['total_shipping_price_set']['shop_money']['amount'] : 0.00;
-        
+    
         $billing_address = json_encode($order['billing_address'] ?? []);
         $shipping_address = json_encode($order['shipping_address'] ?? []);
-
-        $stmt->bind_param("sisssssdssss",
-            $shopify_domain,
-            $order_id,
-            $customer_name,
-            $customer_email,
-            $billing_address,
-            $shipping_address,
-            $currency,
-            $subtotal_price,
-            $total_price,
-            $tax_amount,
-            $discount_amount,
-            $shipping_cost
+    
+        // Added extra fields
+        $created_at = $order['created_at'] ?? null;
+        $payment_method = $order['gateway'] ?? 'Unknown';
+        $order_status = $order['financial_status'] ?? 'pending';
+    
+        $stmt->bind_param("sssssssdsssssss", 
+            $shopify_domain, 
+            $order_id,  
+            $customer_name, 
+            $customer_email, 
+            $billing_address, 
+            $shipping_address, 
+            $currency, 
+            $subtotal_price, 
+            $total_price, 
+            $tax_amount, 
+            $discount_amount, 
+            $shipping_cost,
+            $created_at,
+            $payment_method,
+            $order_status
         );
         $stmt->execute();
     }
