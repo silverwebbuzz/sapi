@@ -28,3 +28,18 @@ if (!$store || $store['status'] === 'uninstalled') {
 // Set security headers for embedded app
 header("Content-Security-Policy: frame-ancestors https://*.shopify.com https://admin.shopify.com");
 echo "<h1>Welcome to SWB Auto PDF Invoices</h1>";
+
+//plan display
+$plans = $conn->query("SELECT * FROM plans")->fetch_all(MYSQLI_ASSOC);
+?>
+<form action="subscribe.php" method="POST">
+    <select name="plan_id">
+        <?php foreach ($plans as $plan) : ?>
+            <option value="<?= $plan['id'] ?>">
+                <?= $plan['name'] ?> - $<?= $plan['price'] ?>/month (<?= $plan['order_limit'] ?> Orders)
+            </option>
+        <?php endforeach; ?>
+    </select>
+    <input type="hidden" name="store_id" value="1"> <!-- Example Store ID -->
+    <button type="submit">Subscribe</button>
+</form>
