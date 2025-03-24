@@ -91,7 +91,7 @@ if ($subscription_result->num_rows > 0) {
     $stmt = $conn->prepare("
     INSERT INTO `$invoice_table` 
     (order_id, order_number, customer_name, customer_email, billing_address, shipping_address, currency, subtotal_price, total_price, tax_amount, discount_amount, shipping_cost, invoice_status, email_status, payment_method, order_status, products) 
-    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 'pending', 'pending', ?, ?, ?) 
+    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 'pending', 'pending', ?, ?, ?) 
     ON DUPLICATE KEY UPDATE 
         customer_name = VALUES(customer_name),
         customer_email = VALUES(customer_email),
@@ -109,7 +109,7 @@ if ($subscription_result->num_rows > 0) {
         order_status = VALUES(order_status),
         products = VALUES(products)
     ");
-
+    
     if (!$stmt) {
         die("Query Preparation Failed: " . $conn->error);
     }
