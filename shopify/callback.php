@@ -87,20 +87,15 @@ if (isset($response['access_token'])) {
     $stmt->execute();
 
     // Create webhook
-    $webhook_url = SHOPIFY_APP_URL . '/shopify/webhook';
-    $webhooks = [
-        [
-            'topic'   => 'orders/create',
-            'address' => $webhook_base_url,
-            'format'  => 'json'
-        ],
-        [
-            'topic'   => 'app/uninstalled',
-            'address' => $webhook_base_url,
-            'format'  => 'json'
-        ]
+
+    $webhook_url = SHOPIFY_APP_URL . '/shopify/webhook'; 
+    $topics = [
+        'orders/create',
+        'orders/paid',
+        'app/uninstalled'
     ];
-    foreach ($webhooks as $webhook) {
+
+    foreach ($topics as $topic) {
         $ch = curl_init("https://{$shop}/admin/api/" . SHOPIFY_API_VERSION . "/webhooks.json");
         curl_setopt_array($ch, [
             CURLOPT_HTTPHEADER => [
@@ -108,18 +103,28 @@ if (isset($response['access_token'])) {
                 'X-Shopify-Access-Token: ' . $response['access_token']
             ],
             CURLOPT_POST => true,
-            CURLOPT_POSTFIELDS => json_encode(['webhook' => $webhook])
+            CURLOPT_POSTFIELDS => json_encode([
+                'webhook' => [
+                    'topic' => $topic,
+                    'address' => $webhook_url,
+                    'format' => 'json'
+                ]
+            ]),
+            CURLOPT_RETURNTRANSFER => true
         ]);
-    
+
         $result = curl_exec($ch);
         $status = curl_getinfo($ch, CURLINFO_HTTP_CODE);
         curl_close($ch);
-    
-        if ($status !== 201 && $status !== 200) {
-            error_log("Failed to register webhook: " . json_encode($webhook) . " | Response: " . $result);
+
+        if ($status == 201) {
+            error_log("Webhook for {$topic} registered successfully!");
+        } else {
+            error_log("Failed to register webhook for {$topic}. Response: " . $result);
             exit;
         }
     }
+
     /*$ch = curl_init("https://{$shop}/admin/api/" . SHOPIFY_API_VERSION . "/webhooks.json");
     curl_setopt_array($ch, [
         CURLOPT_HTTPHEADER => [
