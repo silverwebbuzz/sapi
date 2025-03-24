@@ -59,11 +59,12 @@ if (isset($response['access_token'])) {
         $country_name  = $shopDetailsResponse['shop']['country_name'] ?? '';
         $created_at    = $shopDetailsResponse['shop']['created_at'] ?? '';
         $updated_at    = $shopDetailsResponse['shop']['updated_at'] ?? '';
+        $status = "installed";
 
         // Step 4: Insert or Update Store Information
         $query = "INSERT INTO stores 
-          (shop, store_name, store_domain, access_token, email, phone, current_plan, country, currency, timezone, iana_timezone, country_code, country_name, created_at, updated_at) 
-          VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+          (shop, store_name, store_domain, access_token, email, phone, current_plan, country, currency, timezone, iana_timezone, country_code, country_name, created_at, updated_at,status) 
+          VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
           ON DUPLICATE KEY UPDATE 
           store_name = VALUES(store_name), 
           store_domain = VALUES(store_domain), 
@@ -77,11 +78,12 @@ if (isset($response['access_token'])) {
           iana_timezone = VALUES(iana_timezone), 
           country_code = VALUES(country_code), 
           country_name = VALUES(country_name), 
-          updated_at = NOW()";
+          updated_at = NOW(),
+          status=";
 
     $conn = DB::getInstance();
     $stmt = $conn->prepare($query);
-    $stmt->bind_param("sssssssssssssss", $shop, $store_name, $store_domain, $access_token, $email, $phone, $current_plan, $country, $currency, $timezone, $iana_timezone, $country_code, $country_name, $created_at, $updated_at);
+    $stmt->bind_param("sssssssssssssss", $shop, $store_name, $store_domain, $access_token, $email, $phone, $current_plan, $country, $currency, $timezone, $iana_timezone, $country_code, $country_name, $created_at, $updated_at, $status);
     $stmt->execute();
 
     // Create webhook
@@ -116,6 +118,7 @@ if (isset($response['access_token'])) {
     
         if ($status !== 201 && $status !== 200) {
             error_log("Failed to register webhook: " . json_encode($webhook) . " | Response: " . $result);
+            exit;
         }
     }
     /*$ch = curl_init("https://{$shop}/admin/api/" . SHOPIFY_API_VERSION . "/webhooks.json");
