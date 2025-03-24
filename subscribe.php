@@ -101,6 +101,9 @@ if ($subscription_result->num_rows > 0) {
         order_status = VALUES(order_status)
     ");
 
+    if (!$stmt) {
+        die("Query Preparation Failed: " . $conn->error);
+    }
     foreach ($orders as $order) {
         $order_id = $order['id'];  
         $customer_name = $order['customer']['first_name'] . ' ' . $order['customer']['last_name'];
@@ -137,7 +140,12 @@ if ($subscription_result->num_rows > 0) {
             $payment_method,
             $order_status
         );
-        $stmt->execute();
+
+        if (!$stmt->execute()) {
+            die("Query Execution Failed: " . $stmt->error);
+        } else {
+            echo "Insert Successful for Order ID: $order_id <br>";
+        }
     }
 
     echo "Orders inserted successfully!";
