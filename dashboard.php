@@ -1,4 +1,4 @@
-dashBoard<?php
+<?php
 require_once 'config.php';
 require_once 'db.php';
 
@@ -35,6 +35,12 @@ $subscription_result = $stmt->get_result();
 
 $subscription = $subscription_result->num_rows > 0 ? $subscription_result->fetch_assoc() : null;
 
+
+//fetch invoices
+$invoice_table = "invoices_" . preg_replace('/[^a-zA-Z0-9_]/', '_', strtolower($store['shop']));
+
+$invoices_query = $conn->query("SELECT * FROM `$invoice_table` ORDER BY created_at DESC LIMIT 10");
+
 ?>
 
 <!DOCTYPE html>
@@ -64,5 +70,28 @@ $subscription = $subscription_result->num_rows > 0 ? $subscription_result->fetch
             <a href="pricing.php?shop_id=<?= $shop_id ?>" class="btn">Choose a Plan</a>
         <?php endif; ?>
     </div>
+    <h2>Recent Invoices</h2>
+    <?php if ($invoices_query->num_rows > 0): ?>
+        <table>
+            <tr>
+                <th>Order ID</th>
+                <th>Customer</th>
+                <th>Total Price</th>
+                <th>Status</th>
+                <th>Date</th>
+            </tr>
+            <?php while ($invoice = $invoices_query->fetch_assoc()): ?>
+                <tr>
+                    <td><?= $invoice['order_id'] ?></td>
+                    <td><?= htmlspecialchars($invoice['customer_name']) ?></td>
+                    <td>$<?= number_format($invoice['total_price'], 2) ?></td>
+                    <td><?= ucfirst($invoice['invoice_status']) ?></td>
+                    <td><?= $invoice['created_at'] ?></td>
+                </tr>
+            <?php endwhile; ?>
+        </table>
+    <?php else: ?>
+        <p>No invoices found.</p>
+    <?php endif; ?>
 </body>
 </html>

@@ -29,6 +29,17 @@ if ($topic === 'app/uninstalled') {
         error_log("Failed to update store status: " . $stmt->error);
     }
 } elseif ($topic === 'orders/create') {
+
+    // Sanitize shop name to match table name
+    $shop_name = preg_replace('/[^a-zA-Z0-9_]/', '_', strtolower($shop));
+    $invoice_table = "invoices_" . $shop_name;
+
+    // Check if table exists
+    $table_check = $conn->query("SHOW TABLES LIKE '$invoice_table'");
+    if ($table_check->num_rows === 0) {
+        die("Invoice table not found for store.");
+    }
+
     // Handle Order Creation
     $order_id = $payload['id'];
     $customer_name = $payload['customer']['first_name'] . ' ' . $payload['customer']['last_name'];
@@ -45,7 +56,7 @@ if ($topic === 'app/uninstalled') {
 
     // Store order in invoices table
     $stmt = $conn->prepare("
-        INSERT INTO invoices (shop, order_id, customer_name, customer_email, billing_address, shipping_address, currency, subtotal_price, total_price, tax_amount, discount_amount, shipping_cost, invoice_status, email_status)
+        INSERT INTO `$invoice_table` (shop, order_id, customer_name, customer_email, billing_address, shipping_address, currency, subtotal_price, total_price, tax_amount, discount_amount, shipping_cost, invoice_status, email_status)
         VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 'pending', 'pending')
         ON DUPLICATE KEY UPDATE
             customer_name = VALUES(customer_name),
