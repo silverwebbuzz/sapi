@@ -89,7 +89,7 @@ require_once '../shopify/shopify_functions.php';
             <!-- Menu -->
 
             <!-- Content -->
-            <div class="container-xxl flex-grow-1 container-p-y">
+            <div class="container-fluid flex-grow-1 container-p-y">
               <div class="row g-6">
                 <!-- Website Analytics -->
                 <div class="col-xl-6 col">
