@@ -32,7 +32,7 @@
                     </svg>
                   </span>
                 </span>
-                <span class="app-brand-text demo menu-text fw-bold text-heading">Vuexy</span>
+                <span class="app-brand-text demo menu-text fw-bold text-heading">SWB Auto PDF Invoices - </span>
               </a>
 
               <a href="javascript:void(0);" class="layout-menu-toggle menu-link text-large ms-auto d-xl-none">
@@ -132,20 +132,9 @@
                     <li>
                       <div class="dropdown-divider my-1 mx-n2"></div>
                     </li>
+                    
                     <li>
-                      <a class="dropdown-item" href="pages-profile-user.html">
-                        <i class="icon-base ti tabler-user me-3 icon-md"></i
-                        ><span class="align-middle">My Profile</span>
-                      </a>
-                    </li>
-                    <li>
-                      <a class="dropdown-item" href="pages-account-settings-account.html">
-                        <i class="icon-base ti tabler-settings me-3 icon-md"></i
-                        ><span class="align-middle">Settings</span>
-                      </a>
-                    </li>
-                    <li>
-                      <a class="dropdown-item" href="pages-account-settings-billing.html">
+                      <a class="dropdown-item" href="<?= BASE_SHOPIFY_AF_URL ?>billlist">
                         <span class="d-flex align-items-center align-middle">
                           <i class="flex-shrink-0 icon-base ti tabler-file-dollar me-3 icon-md"></i
                           ><span class="flex-grow-1 align-middle">Billing</span>
@@ -159,7 +148,7 @@
                       <div class="dropdown-divider my-1 mx-n2"></div>
                     </li>
                     <li>
-                      <a class="dropdown-item" href="pages-pricing.html">
+                      <a class="dropdown-item" href="<?= BASE_SHOPIFY_AF_URL ?>subscriptionplans">
                         <i class="icon-base ti tabler-currency-dollar me-3 icon-md"></i
                         ><span class="align-middle">Pricing</span>
                       </a>
