@@ -9,10 +9,14 @@
 /* JS global variables
  !Please use the hex color code (#000) here. Don't use rgba(), hsl(), etc
 */
+/* JS global variables
+ !Please use the hex color code (#000) here. Don't use rgba(), hsl(), etc
+*/
+
 window.config = {
   // global color variables for charts except chartjs
   colors: {
-    primary: window.Helpers.getCssVar('primary'),
+    primary: '#000000',
     secondary: window.Helpers.getCssVar('secondary'),
     success: window.Helpers.getCssVar('success'),
     info: window.Helpers.getCssVar('info'),
