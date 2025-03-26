@@ -3,40 +3,6 @@ require_once '../config.php';
 require_once '../db.php';
 require_once('../vendor/tecnickcom/tcpdf/tcpdf.php');
 
-// Create new PDF document
-$pdf = new TCPDF(PDF_PAGE_ORIENTATION, PDF_UNIT, PDF_PAGE_FORMAT, true, 'UTF-8', false);
-
-// Set document information
-$pdf->SetCreator(PDF_CREATOR);
-$pdf->SetAuthor('Your Company');
-$pdf->SetTitle('Invoice');
-
-// Add a page
-$pdf->AddPage();
-
-// HTML content
-$html = '<h1>INVOICE</h1>
-         <p>Invoice #: INV-2023-001</p>
-         <table border="1">
-           <tr>
-             <th>Description</th>
-             <th>Amount</th>
-           </tr>
-           <tr>
-             <td>Web Design</td>
-             <td>$500.00</td>
-           </tr>
-         </table>';
-
-// Output HTML content
-$pdf->writeHTML($html, true, false, true, false, '');
-
-// Output PDF
-$pdf->Output('invoice.pdf', 'D'); // 'D' for download, 'I' for inline
-
-exit;
-
-
 if ($_SERVER['REQUEST_METHOD'] !== 'GET') {
     die("Invalid request method.");
 }
@@ -46,8 +12,9 @@ $shop_id = $_GET['shop_id'];
 $order_id = $_GET['order_id'];
 
 $conn = DB::getInstance();
+
 // Fetch the correct invoice table for this shop
-$table_query = $conn->prepare("SELECT shop FROM stores WHERE id = ?");
+$table_query = $conn->prepare("SELECT * FROM stores WHERE id = ?");
 $table_query->bind_param("s", $shop_id);
 $table_query->execute();
 $result = $table_query->get_result();
@@ -55,8 +22,8 @@ $result = $table_query->get_result();
 if ($result->num_rows > 0) {
     $shop_data = $result->fetch_assoc();
 
-    $shop_name = preg_replace('/[^a-zA-Z0-9_]/', '_', strtolower($shop_data['shop'])); // Sanitize table name
-    $invoice_table = "invoices_" . $shop_name;// Get table name
+    $shop_name = preg_replace('/[^a-zA-Z0-9_]/', '_', strtolower($shop_data['shop']));
+    $invoice_table = "invoices_" . $shop_name;
 
     // Fetch invoice details
     $stmt = $conn->prepare("SELECT * FROM `$invoice_table` WHERE order_id = ?");
@@ -72,71 +39,108 @@ if ($result->num_rows > 0) {
         $shipping_address = json_decode($invoice['shipping_address'], true);
         $products = json_decode($invoice['products'], true);
 
-        // Create PDF
-        $pdf = new FPDF();
-        $pdf->AddPage();
-        $pdf->SetFont('Arial', 'B', 16);
-
-        // Invoice Title
-        $pdf->Cell(190, 10, "Invoice #{$invoice['order_number']}", 0, 1, 'C');
-        $pdf->Ln(10);
-
-        // Customer Details
-        $pdf->SetFont('Arial', '', 12);
-        $pdf->Cell(100, 10, "Customer: " . $invoice['customer_name']);
-        $pdf->Ln(6);
-        $pdf->Cell(100, 10, "Email: " . $invoice['customer_email']);
-        $pdf->Ln(10);
-
-        // Billing Address
-        $pdf->SetFont('Arial', 'B', 12);
-        $pdf->Cell(100, 10, "Billing Address:");
-        $pdf->Ln(6);
-        $pdf->SetFont('Arial', '', 12);
-        $pdf->MultiCell(190, 10, implode(", ", $billing_address));
-        $pdf->Ln(10);
-
-        // Shipping Address
-        $pdf->SetFont('Arial', 'B', 12);
-        $pdf->Cell(100, 10, "Shipping Address:");
-        $pdf->Ln(6);
-        $pdf->SetFont('Arial', '', 12);
-        $pdf->MultiCell(190, 10, implode(", ", $shipping_address));
-        $pdf->Ln(10);
-
-        // Order Details Table Header
-        $pdf->SetFont('Arial', 'B', 12);
-        $pdf->Cell(80, 10, "Product", 1);
-        $pdf->Cell(30, 10, "Qty", 1);
-        $pdf->Cell(40, 10, "Price", 1);
-        $pdf->Cell(40, 10, "Total", 1);
-        $pdf->Ln();
-
-        // Order Items
-        $pdf->SetFont('Arial', '', 12);
-        foreach ($products as $product) {
-            $pdf->Cell(80, 10, $product['name'], 1);
-            $pdf->Cell(30, 10, $product['quantity'], 1);
-            $pdf->Cell(40, 10, $product['price'], 1);
-            $pdf->Cell(40, 10, number_format($product['quantity'] * $product['price'], 2), 1);
-            $pdf->Ln();
+        // Prepare company information
+        $company_name = "Silver WebBuzz Pvt. Ltd.";
+        $company_address = "1109, Satyamev Eminence, Science City Road, Sola, Ahmedabad, Gujarat 380060";
+        $company_phone = "+91 1234567890";
+        $company_email = "accounts@silverwebbuzz.com";
+        
+        // Prepare order items HTML
+        $items_html = '';
+        $counter = 1;
+        foreach ($products as $item) {
+            $tax_rate = 0;
+            $tax_amount = 0;
+            
+            // Get tax information if available
+            if (isset($item['tax_lines']) && !empty($item['tax_lines'])) {
+                $tax_rate = $item['tax_lines'][0]['rate'] * 100;
+                $tax_amount = $item['tax_lines'][0]['price'];
+            }
+            
+            $items_html .= '<tr>';
+            $items_html .= '<td>'.$counter.'</td>';
+            $items_html .= '<td>'.$item['name'].'</td>';
+            $items_html .= '<td>-</td>'; // HSN/SAC code would go here
+            $items_html .= '<td>'.$item['quantity'].'</td>';
+            $items_html .= '<td class="text-right">'.$invoice['currency'].' '.number_format($item['price'], 2).'</td>';
+            $items_html .= '<td class="text-right">'.$tax_rate.'%</td>';
+            $items_html .= '<td class="text-right">'.$invoice['currency'].' '.number_format($tax_amount, 2).'</td>';
+            $items_html .= '<td class="text-right">'.$invoice['currency'].' '.number_format($item['price'] * $item['quantity'], 2).'</td>';
+            $items_html .= '</tr>';
+            $counter++;
         }
 
-        // Invoice Total
-        $pdf->SetFont('Arial', 'B', 12);
-        $pdf->Cell(110, 10, "", 0);
-        $pdf->Cell(40, 10, "Total:", 1);
-        $pdf->Cell(40, 10, $invoice['total_price'], 1);
-        $pdf->Ln();
+        // Prepare replacements array
+        $replacements = [
+            '{{Company_Logo}}' => $shop_data['logo'] ? '<img src="'.$shop_data['logo'].'" class="logo">' : '',
+            '{{Company_Name}}' => $company_name,
+            '{{Company_Address}}' => $company_address,
+            '{{Company_Phone}}' => $company_phone,
+            '{{Company_Email}}' => $company_email,
+            '{{Company_GSTIN}}' => $shop_data['gstin'] ?? '',
+            '{{Order_Number}}' => $invoice['order_number'],
+            '{{Invoice_Date}}' => date('d/m/Y', strtotime($invoice['created_at'])),
+            '{{Due_Date}}' => date('d/m/Y', strtotime($invoice['created_at'].' +15 days')),
+            '{{Billing_Name}}' => $billing_address['name'] ?? '',
+            '{{Billing_Address1}}' => $billing_address['address1'] ?? '',
+            '{{Billing_Address2}}' => $billing_address['address2'] ?? '',
+            '{{Billing_City}}' => $billing_address['city'] ?? '',
+            '{{Billing_State}}' => $billing_address['province'] ?? '',
+            '{{Billing_Zip}}' => $billing_address['zip'] ?? '',
+            '{{Billing_Country}}' => $billing_address['country'] ?? '',
+            '{{Billing_GSTIN}}' => '', // Add GSTIN if available
+            '{{Shipping_Name}}' => isset($shipping_address['name']) ? $shipping_address['name'] : ($billing_address['name'] ?? ''),
+            '{{Shipping_Address1}}' => isset($shipping_address['address1']) ? $shipping_address['address1'] : ($billing_address['address1'] ?? ''),
+            '{{Shipping_Address2}}' => isset($shipping_address['address2']) ? $shipping_address['address2'] : ($billing_address['address2'] ?? ''),
+            '{{Shipping_City}}' => isset($shipping_address['city']) ? $shipping_address['city'] : ($billing_address['city'] ?? ''),
+            '{{Shipping_State}}' => isset($shipping_address['province']) ? $shipping_address['province'] : ($billing_address['province'] ?? ''),
+            '{{Shipping_Zip}}' => isset($shipping_address['zip']) ? $shipping_address['zip'] : ($billing_address['zip'] ?? ''),
+            '{{Shipping_Country}}' => isset($shipping_address['country']) ? $shipping_address['country'] : ($billing_address['country'] ?? ''),
+            '{{Order_Items}}' => $items_html,
+            '{{Subtotal}}' => $invoice['currency'].' '.number_format($invoice['subtotal_price'], 2),
+            '{{Tax_Amount}}' => $invoice['currency'].' '.number_format($invoice['tax_amount'], 2),
+            '{{Shipping_Cost}}' => $invoice['currency'].' '.number_format($invoice['shipping_cost'], 2),
+            '{{Discount_Amount}}' => $invoice['currency'].' '.number_format($invoice['discount_amount'], 2),
+            '{{Total_Amount}}' => $invoice['currency'].' '.number_format($invoice['total_price'], 2),
+            '{{Payment_Method}}' => $invoice['payment_method'] ?? 'Unknown',
+            '{{Payment_Status}}' => ucfirst($invoice['order_status'])
+        ];
 
-        // Output PDF
-        $pdf->Output('D', "Invoice_{$invoice['order_number']}.pdf"); // Force download
+        // Load HTML template
+        $template = file_get_contents('invoice_template.html');
+        $html = str_replace(array_keys($replacements), array_values($replacements), $template);
+
+        // Create new PDF document
+        $pdf = new TCPDF(PDF_PAGE_ORIENTATION, PDF_UNIT, PDF_PAGE_FORMAT, true, 'UTF-8', false);
+
+        // Set document information
+        $pdf->SetCreator(PDF_CREATOR);
+        $pdf->SetAuthor($company_name);
+        $pdf->SetTitle('Invoice '.$invoice['order_number']);
+        $pdf->SetSubject('Invoice');
+
+        // Remove default header/footer
+        $pdf->setPrintHeader(false);
+        $pdf->setPrintFooter(false);
+
+        // Add a page
+        $pdf->AddPage();
+
+        // Output HTML content
+        $pdf->writeHTML($html, true, false, true, false, '');
+
+        // Close and output PDF document
+        $pdf->Output('invoice_'.$invoice['order_number'].'.pdf', 'I');
+        
+        // Update invoice status
+        $update_stmt = $conn->prepare("UPDATE `$invoice_table` SET invoice_status = 'generated' WHERE order_id = ?");
+        $update_stmt->bind_param("s", $order_id);
+        $update_stmt->execute();
     } else {
-        echo "Invoice not found for order_id: $order_id.";
+        die("No invoice found with the specified order ID.");
     }
 } else {
-    echo "Invalid shop_id: $shop_id.";
+    die("No shop found with the specified ID.");
 }
-
-$conn->close();
 ?>

@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <style>
+        body { font-family: Arial, sans-serif; color: #333; margin: 0; padding: 20px; }
+        .container { max-width: 800px; margin: 0 auto; }
+        .header { display: flex; justify-content: space-between; margin-bottom: 30px; }
+        .company-info { width: 60%; }
+        .invoice-info { width: 35%; text-align: right; }
+        .invoice-title { font-size: 24px; color: #2c3e50; margin-bottom: 5px; }
+        .address-box { margin: 20px 0; padding: 15px; background: #f8f9fa; border-radius: 5px; }
+        table { width: 100%; border-collapse: collapse; margin: 20px 0; }
+        th { background: #2c3e50; color: white; padding: 10px; text-align: left; }
+        td { padding: 10px; border-bottom: 1px solid #ddd; }
+        .text-right { text-align: right; }
+        .text-center { text-align: center; }
+        .total-row { font-weight: bold; }
+        .footer { margin-top: 50px; font-size: 12px; text-align: center; color: #7f8c8d; }
+        .logo { max-height: 80px; margin-bottom: 10px; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <div class="company-info">
+                {{Company_Logo}}
+                <h2>{{Company_Name}}</h2>
+                <p>{{Company_Address}}</p>
+                <p>Phone: {{Company_Phone}} | Email: {{Company_Email}}</p>
+                <p>GSTIN: {{Company_GSTIN}}</p>
+            </div>
+            <div class="invoice-info">
+                <h1 class="invoice-title">TAX INVOICE</h1>
+                <p><strong>Invoice #:</strong> {{Order_Number}}</p>
+                <p><strong>Date:</strong> {{Invoice_Date}}</p>
+                <p><strong>Due Date:</strong> {{Due_Date}}</p>
+            </div>
+        </div>
+
+        <div style="display: flex; justify-content: space-between; margin-bottom: 20px;">
+            <div class="address-box" style="width: 48%;">
+                <h3>Bill To:</h3>
+                <p>{{Billing_Name}}</p>
+                <p>{{Billing_Address1}}</p>
+                <p>{{Billing_Address2}}</p>
+                <p>{{Billing_City}}, {{Billing_State}} {{Billing_Zip}}</p>
+                <p>{{Billing_Country}}</p>
+                <p>GSTIN: {{Billing_GSTIN}}</p>
+            </div>
+            
+            <div class="address-box" style="width: 48%;">
+                <h3>Ship To:</h3>
+                <p>{{Shipping_Name}}</p>
+                <p>{{Shipping_Address1}}</p>
+                <p>{{Shipping_Address2}}</p>
+                <p>{{Shipping_City}}, {{Shipping_State}} {{Shipping_Zip}}</p>
+                <p>{{Shipping_Country}}</p>
+            </div>
+        </div>
+
+        <table>
+            <thead>
+                <tr>
+                    <th>#</th>
+                    <th>Description</th>
+                    <th>HSN/SAC</th>
+                    <th>Qty</th>
+                    <th>Unit Price</th>
+                    <th>Tax Rate</th>
+                    <th>Tax Amount</th>
+                    <th>Amount</th>
+                </tr>
+            </thead>
+            <tbody>
+                {{Order_Items}}
+            </tbody>
+            <tfoot>
+                <tr>
+                    <td colspan="6" class="total-row text-right">Subtotal</td>
+                    <td class="total-row">{{Tax_Amount}}</td>
+                    <td class="total-row">{{Subtotal}}</td>
+                </tr>
+                <tr>
+                    <td colspan="6" class="total-row text-right">Shipping</td>
+                    <td class="total-row">-</td>
+                    <td class="total-row">{{Shipping_Cost}}</td>
+                </tr>
+                <tr>
+                    <td colspan="6" class="total-row text-right">Discount</td>
+                    <td class="total-row">-</td>
+                    <td class="total-row">{{Discount_Amount}}</td>
+                </tr>
+                <tr>
+                    <td colspan="6" class="total-row text-right">Total</td>
+                    <td class="total-row">{{Tax_Amount}}</td>
+                    <td class="total-row">{{Total_Amount}}</td>
+                </tr>
+            </tfoot>
+        </table>
+
+        <div style="margin-top: 30px;">
+            <p><strong>Payment Method:</strong> {{Payment_Method}}</p>
+            <p><strong>Payment Status:</strong> {{Payment_Status}}</p>
+            <p><strong>Notes:</strong> Thank you for your business! Payment due within 15 days.</p>
+        </div>
+
+        <div class="footer">
+            <p>{{Company_Name}} | {{Company_Address}} | {{Company_Phone}}</p>
+            <p>This is a computer generated invoice. No signature required.</p>
+        </div>
+    </div>
+</body>
+</html>
