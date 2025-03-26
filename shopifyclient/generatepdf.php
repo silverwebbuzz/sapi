@@ -108,7 +108,7 @@ if ($result->num_rows > 0) {
         ];
 
         // Load HTML template
-        $template = file_get_contents('invoice_template.html');
+        $template = file_get_contents('Invoice_Temp/invoice1.html');
         $html = str_replace(array_keys($replacements), array_values($replacements), $template);
 
         // Create new PDF document
@@ -131,10 +131,12 @@ if ($result->num_rows > 0) {
         $pdf->writeHTML($html, true, false, true, false, '');
 
         // Close and output PDF document
-        $pdf->Output('invoice_'.$invoice['order_number'].'.pdf', 'I');
-        
+        //$pdf->Output('invoice_'.$invoice['order_number'].'.pdf', 'I');
+        $pdf_content = $pdf->Output('', 'S');
+        $encoded_pdf = base64_encode($pdf_content); // Encode PDF for storage
+
         // Update invoice status
-        $update_stmt = $conn->prepare("UPDATE `$invoice_table` SET invoice_status = 'generated' WHERE order_id = ?");
+        $update_stmt = $conn->prepare("UPDATE `$invoice_table` SET invoice_status = 'generated', pdf_invoice = '".$encoded_pdf."'  WHERE order_id = ?");
         $update_stmt->bind_param("s", $order_id);
         $update_stmt->execute();
     } else {
