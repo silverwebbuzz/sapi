@@ -138,8 +138,7 @@ if ($result->num_rows > 0) {
         $pdf->writeHTML($html, true, false, true, false, '');
 
         // Close and output PDF document
-        $pdf->Output('invoice_'.$invoice['order_number'].'.pdf', 'I');
-        exit;
+        //$pdf->Output('invoice_'.$invoice['order_number'].'.pdf', 'I');
         $pdf_content = $pdf->Output('', 'S');
         $encoded_pdf = base64_encode($pdf_content); // Encode PDF for storage
 
@@ -178,22 +177,21 @@ if ($result->num_rows > 0) {
 
 // Email sending function
 function sendEmailWithAttachment($to_email, $to_name, $subject, $html_body, $attachment_content, $attachment_name) {
-    require_once '../vendor/autoload.php';
     
     $mail = new PHPMailer\PHPMailer\PHPMailer(true);
     
     try {
         // Server settings (configure with your SMTP details)
         $mail->isSMTP();
-        $mail->Host = 'smtp.yourdomain.com';
+        $mail->Host = 'smtp.silverwebbuzz.com';
         $mail->SMTPAuth = true;
-        $mail->Username = 'noreply@yourdomain.com';
-        $mail->Password = 'your-email-password';
+        $mail->Username = 'bhavik.koradiya@silverwebbuzz.com';
+        $mail->Password = 'Bhavik@1109';
         $mail->SMTPSecure = PHPMailer\PHPMailer\PHPMailer::ENCRYPTION_STARTTLS;
-        $mail->Port = 587;
+        $mail->Port = 465;
         
         // Recipients
-        $mail->setFrom('noreply@yourdomain.com', 'Your Store Name');
+        $mail->setFrom('bhavik.koradiya@gmail.com', 'Bhavik Koradiya');
         $mail->addAddress($to_email, $to_name);
         
         // Content
