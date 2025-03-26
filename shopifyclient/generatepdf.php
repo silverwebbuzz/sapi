@@ -1,7 +1,14 @@
 <?php
 require_once '../config.php';
 require_once '../db.php';
-require_once('../vendor/tecnickcom/tcpdf/tcpdf.php');
+require_once '../vendor/tecnickcom/tcpdf/tcpdf.php';
+require_once '../vendor/autoload.php';
+
+// Import PHPMailer classes
+use PHPMailer\PHPMailer\PHPMailer;
+use PHPMailer\PHPMailer\SMTP;
+use PHPMailer\PHPMailer\Exception;
+
 
 if ($_SERVER['REQUEST_METHOD'] !== 'GET') {
     die("Invalid request method.");
