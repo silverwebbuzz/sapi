@@ -108,7 +108,7 @@ if ($result->num_rows > 0) {
         ];
 
         // Load HTML template
-        $template = file_get_contents('Invoice_Temp/invoice1.html');
+        $template = file_get_contents('Invoice_Temp/invoice3.html');
         $html = str_replace(array_keys($replacements), array_values($replacements), $template);
 
         // Create new PDF document
@@ -131,18 +131,77 @@ if ($result->num_rows > 0) {
         $pdf->writeHTML($html, true, false, true, false, '');
 
         // Close and output PDF document
-        //$pdf->Output('invoice_'.$invoice['order_number'].'.pdf', 'I');
+        $pdf->Output('invoice_'.$invoice['order_number'].'.pdf', 'I');
+        exit;
         $pdf_content = $pdf->Output('', 'S');
         $encoded_pdf = base64_encode($pdf_content); // Encode PDF for storage
 
-        // Update invoice status
-        $update_stmt = $conn->prepare("UPDATE `$invoice_table` SET invoice_status = 'generated', pdf_invoice = '".$encoded_pdf."'  WHERE order_id = ?");
-        $update_stmt->bind_param("s", $order_id);
+        // Send email with attachment
+        $email_sent = sendEmailWithAttachment(
+            $to_email,
+            $to_name,
+            $subject,
+            $body,
+            $pdf_content,
+            "invoice_{$invoice['order_number']}.pdf"
+        );
+
+        // Single database update for both PDF and email status
+        $update_stmt = $conn->prepare("UPDATE `$invoice_table` 
+        SET 
+            invoice_status = 'generated',
+            pdf_invoice = ?,
+            email_status = ?,
+            email_sent_at = NOW()
+        WHERE order_id = ?
+        ");
+
+        $email_status = $email_sent ? 'sent' : 'failed';
+        $update_stmt->bind_param("sss", $encoded_pdf, $email_status, $order_id);
         $update_stmt->execute();
+
     } else {
         die("No invoice found with the specified order ID.");
     }
 } else {
     die("No shop found with the specified ID.");
+}
+
+
+
+// Email sending function
+function sendEmailWithAttachment($to_email, $to_name, $subject, $html_body, $attachment_content, $attachment_name) {
+    require_once '../vendor/autoload.php';
+    
+    $mail = new PHPMailer\PHPMailer\PHPMailer(true);
+    
+    try {
+        // Server settings (configure with your SMTP details)
+        $mail->isSMTP();
+        $mail->Host = 'smtp.yourdomain.com';
+        $mail->SMTPAuth = true;
+        $mail->Username = 'noreply@yourdomain.com';
+        $mail->Password = 'your-email-password';
+        $mail->SMTPSecure = PHPMailer\PHPMailer\PHPMailer::ENCRYPTION_STARTTLS;
+        $mail->Port = 587;
+        
+        // Recipients
+        $mail->setFrom('noreply@yourdomain.com', 'Your Store Name');
+        $mail->addAddress($to_email, $to_name);
+        
+        // Content
+        $mail->isHTML(true);
+        $mail->Subject = $subject;
+        $mail->Body = $html_body;
+        $mail->AltBody = strip_tags($html_body);
+        
+        // Add PDF attachment from string
+        $mail->addStringAttachment($attachment_content, $attachment_name, 'base64', 'application/pdf');
+        
+        return $mail->send();
+    } catch (Exception $e) {
+        error_log("Email send failed: " . $mail->ErrorInfo);
+        return false;
+    }
 }
 ?>
