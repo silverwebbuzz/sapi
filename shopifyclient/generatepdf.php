@@ -1,7 +1,41 @@
 <?php
-require_once 'config.php';
-require_once 'db.php';
-require('fpdf/fpdf.php');
+require_once '../config.php';
+require_once '../db.php';
+require_once('../vendor/tecnickcom/tcpdf/tcpdf.php');
+
+// Create new PDF document
+$pdf = new TCPDF(PDF_PAGE_ORIENTATION, PDF_UNIT, PDF_PAGE_FORMAT, true, 'UTF-8', false);
+
+// Set document information
+$pdf->SetCreator(PDF_CREATOR);
+$pdf->SetAuthor('Your Company');
+$pdf->SetTitle('Invoice');
+
+// Add a page
+$pdf->AddPage();
+
+// HTML content
+$html = '<h1>INVOICE</h1>
+         <p>Invoice #: INV-2023-001</p>
+         <table border="1">
+           <tr>
+             <th>Description</th>
+             <th>Amount</th>
+           </tr>
+           <tr>
+             <td>Web Design</td>
+             <td>$500.00</td>
+           </tr>
+         </table>';
+
+// Output HTML content
+$pdf->writeHTML($html, true, false, true, false, '');
+
+// Output PDF
+$pdf->Output('invoice.pdf', 'D'); // 'D' for download, 'I' for inline
+
+exit;
+
 
 if ($_SERVER['REQUEST_METHOD'] !== 'GET') {
     die("Invalid request method.");
