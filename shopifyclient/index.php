@@ -316,8 +316,8 @@ $invoices_query = $conn->query("SELECT * FROM `$invoice_table` ORDER BY created_
                 <div class="col-xxl-12">
                   <div class="card">
                     <div class="table-responsive mb-4">
-                      <table id="myTable">
-                        <thead class="border-top">
+                      <table id="myTable" class="table">
+                        <thead class="table-dark">
                           <tr>
                             <th>Order ID</th>
                             <th>Customer</th>
