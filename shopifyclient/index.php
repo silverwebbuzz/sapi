@@ -320,21 +320,21 @@ $invoices_query = $conn->query("SELECT * FROM `$invoice_table` ORDER BY created_
                         <thead class="table-dark">
                           <tr>
                             <th>Order ID</th>
+                            <th>Date</th>
                             <th>Customer</th>
                             <th>Total Price</th>
-                            <th>Status</th>
-                            <th>Date</th>
                             <th>Invoice</th>
+                            <th>Email</th>
                           </tr>
                         </thead>
                         <tbody>
                             <?php while ($invoice = $invoices_query->fetch_assoc()): ?>
                               <tr>
-                                  <td><?= $invoice['order_id'] ?></td>
+                                  <td><?= $invoice['order_number'] ?></td>
+                                  <td><?= $invoice['created_at'] ?></td>
                                   <td><?= htmlspecialchars($invoice['customer_name']) ?></td>
                                   <td>$<?= number_format($invoice['total_price'], 2) ?></td>
                                   <td><?= ucfirst($invoice['invoice_status']) ?></td>
-                                  <td><?= $invoice['created_at'] ?></td>
                                   <td><?= BASE_URL ?>/generatepdf?shop_id=<?= $shop_id ?>&order_id<?= $invoice['order_id'] ?></td>
                               </tr>
                           <?php endwhile; ?>
