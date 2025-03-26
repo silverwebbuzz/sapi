@@ -43,7 +43,7 @@ if ($result->num_rows > 0) {
     echo "<p>Price: $" . $subscription['price'] . " / month</p>";
     echo "<p>Order Limit: " . $subscription['order_limit'] . " orders</p>";
     echo "<p>Subscription ends on: " . $subscription['end_date'] . "</p>";
-    echo "<a href='dashboard.php?shop_id=".$subscription['store_id']."'>Go to Dashboard</a>";
+    echo "<a href='shopifyclient/index.php?shop_id=".$subscription['store_id']."'>Go to Dashboard</a>";
 } else {
     // Store is NOT subscribed, show pricing plans
     include 'pricing.php';

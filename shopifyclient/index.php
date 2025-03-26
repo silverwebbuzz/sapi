@@ -2,6 +2,45 @@
 require_once '../db.php';
 require_once '../shopify/shopify_functions.php';
 
+// Check if store_id is provided
+if (!isset($_GET['shop_id'])) {
+  die("Invalid request. Shop ID missing.");
+}
+
+$shop_id = intval($_GET['shop_id']);
+$conn = DB::getInstance();
+
+// Fetch Store Information
+$stmt = $conn->prepare("SELECT * FROM stores WHERE id = ?");
+$stmt->bind_param("i", $shop_id);
+$stmt->execute();
+$store_result = $stmt->get_result();
+
+if ($store_result->num_rows === 0) {
+  die("Store not found.");
+}
+
+$store = $store_result->fetch_assoc();
+
+// Fetch Active Subscription
+$stmt = $conn->prepare("
+  SELECT s.*, p.name AS plan_name, p.order_limit, p.price
+  FROM store_subscriptions s
+  JOIN plans p ON s.plan_id = p.id
+  WHERE s.store_id = ? AND s.status = 'active'
+");
+$stmt->bind_param("i", $shop_id);
+$stmt->execute();
+$subscription_result = $stmt->get_result();
+
+$subscription = $subscription_result->num_rows > 0 ? $subscription_result->fetch_assoc() : null;
+
+
+//fetch invoices
+$invoice_table = "invoices_" . preg_replace('/[^a-zA-Z0-9_]/', '_', strtolower($store['shop']));
+
+$invoices_query = $conn->query("SELECT * FROM `$invoice_table` ORDER BY created_at DESC LIMIT 10");
+
 ?>
 <!doctype html>
 
@@ -277,18 +316,29 @@ require_once '../shopify/shopify_functions.php';
                 <div class="col-xxl-12">
                   <div class="card">
                     <div class="table-responsive mb-4">
-                      <table class="table datatable-project table-sm">
+                      <table id="myTable">
                         <thead class="border-top">
                           <tr>
-                            <th></th>
-                            <th></th>
-                            <th>Project</th>
-                            <th>Leader</th>
-                            <th>Team</th>
-                            <th class="w-px-200">Progress</th>
-                            <th>Action</th>
+                            <th>Order ID</th>
+                            <th>Customer</th>
+                            <th>Total Price</th>
+                            <th>Status</th>
+                            <th>Date</th>
+                            <th>Invoice</th>
                           </tr>
                         </thead>
+                        <tbody>
+                            <?php while ($invoice = $invoices_query->fetch_assoc()): ?>
+                              <tr>
+                                  <td><?= $invoice['order_id'] ?></td>
+                                  <td><?= htmlspecialchars($invoice['customer_name']) ?></td>
+                                  <td>$<?= number_format($invoice['total_price'], 2) ?></td>
+                                  <td><?= ucfirst($invoice['invoice_status']) ?></td>
+                                  <td><?= $invoice['created_at'] ?></td>
+                                  <td><?= BASE_URL ?>/generatepdf?shop_id=<?= $shop_id ?>&order_id<?= $invoice['order_id'] ?></td>
+                              </tr>
+                          <?php endwhile; ?>
+                        </tbody>
                       </table>
                     </div>
                   </div>
@@ -352,5 +402,10 @@ require_once '../shopify/shopify_functions.php';
 
     <!-- Page JS -->
     <script src="<?= BASE_TEMPLATE_URL ?>assets/js/dashboards-analytics.js"></script>
+    <script>
+        $(document).ready(function() {
+            $('#myTable').DataTable();
+        });
+    </script>
   </body>
 </html>
