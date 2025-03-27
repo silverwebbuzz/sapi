@@ -116,7 +116,9 @@ if (isset($access_token)) {
         $restapi_json, $created_at, $updated_at, $app_install_date
     );
 
-    $stmt->execute();
+    $stmt->execute(); exit;
+
+
     // Create webhook
 
     if (registerShopifyWebhooks($shop, $access_token)) {
