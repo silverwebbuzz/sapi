@@ -105,7 +105,7 @@ if (isset($access_token)) {
 
         $conn = DB::getInstance();
         $stmt = $conn->prepare($query);
-        $stmt->bind_param("ssssssssssssssssssssssssssssssss", 
+        $stmt->bind_param("sssssssssssssssssssssssssssssss", 
         $shop, $domain, $access_token, $shopify_id, $store_name, $shop_owner, $logo_url, $email, $phone, 
         $plan_display_name, $plan_name, $country, $currency, $timezone, $iana_timezone, 
         $country_code, $country_name, $address1, $address2, $city, $zip, $province, 
