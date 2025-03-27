@@ -16,23 +16,15 @@ $access_token = getAccessToken($shop, $code);
 
 if (isset($access_token)) {
 
-    // Step 2: Fetch Store Details
-        $shopDetailsUrl = "https://{$shop}/admin/api/" . SHOPIFY_API_VERSION . "/shop.json";
-        $ch = curl_init($shopDetailsUrl);
-        curl_setopt_array($ch, [
-            CURLOPT_RETURNTRANSFER => true,
-            CURLOPT_HTTPHEADER => [
-                "X-Shopify-Access-Token: $access_token"
-            ]
-        ]);
-        $shopDetailsResponse_json = curl_exec($ch);
+    // Step 2: Fetch Store Details via shopify Rest API
+        $shopDetailsResponse_json = getShopDetailsRestAPI($shop,$access_token); //return value in json
         $shopDetailsResponse = json_decode($shopDetailsResponse_json, true);
-        curl_close($ch);
 
         if (!isset($shopDetailsResponse['shop'])) {
             die("Error: Failed to retrieve shop details.");
         }
         print_r($shopDetailsResponse); exit;
+        
         // Step 3: Extract Data
         $shop                                   = $shopDetailsResponse['shop']['myshopify_domain'];
         $domain                                 = $shopDetailsResponse['shop']['domain'] ?? $shop;

@@ -44,9 +44,8 @@ function getInstallUrl($shop, $scopes, $redirectUrl) {
     ]);
 }
 
-//Get Accress Token
-$response = getAccessToken($shop, $code); 
-function getAccessToken($shop){
+//Get Access Token from Shopify
+function getAccessToken($shop,$code){
     $ch = curl_init("https://{$shop}/admin/oauth/access_token");
     curl_setopt_array($ch, [
         CURLOPT_RETURNTRANSFER => true,
@@ -54,11 +53,26 @@ function getAccessToken($shop){
         CURLOPT_POSTFIELDS => [
             'client_id' => SHOPIFY_API_KEY,
             'client_secret' => SHOPIFY_API_SECRET,
-            'code' => $_GET['code']
+            'code' => $code
         ]
     ]);
 
     $response = json_decode(curl_exec($ch), true);
     curl_close($ch);
     return $access_token = $response['access_token'];
+}
+
+//Get Shop all detials from shopify through rest API
+function getShopDetailsRestAPI($shop,$access_token){
+    $shopDetailsUrl = "https://{$shop}/admin/api/" . SHOPIFY_API_VERSION . "/shop.json";
+    $ch = curl_init($shopDetailsUrl);
+    curl_setopt_array($ch, [
+        CURLOPT_RETURNTRANSFER => true,
+        CURLOPT_HTTPHEADER => [
+            "X-Shopify-Access-Token: $access_token"
+        ]
+    ]);
+    $shopDetailsResponse_json = curl_exec($ch);
+    curl_close($ch);
+    return $shopDetailsResponse_json;
 }
