@@ -52,12 +52,13 @@ if ($subscription_result->num_rows > 0) {
         `tax_amount` decimal(10,2) DEFAULT NULL,
         `discount_amount` decimal(10,2) DEFAULT NULL,
         `shipping_cost` decimal(10,2) DEFAULT NULL,
-        `invoice_status` enum('pending','generated') DEFAULT 'pending',
-        `email_status` enum('pending','sent') DEFAULT 'pending',
         `created_at` timestamp NULL DEFAULT current_timestamp(),
         `payment_method` varchar(50) DEFAULT NULL,  -- Added payment method
         `order_status` ENUM('pending','paid','failed','refunded') DEFAULT 'pending',
         `products` LONGTEXT DEFAULT NULL,
+        `invoice_status` enum('pending','generated') DEFAULT 'pending',
+        `email_status` enum('pending','sent') DEFAULT 'pending',
+        `pdf_invoice` LONGTEXT DEFAULT NULL,
          UNIQUE KEY (`order_id`)  -- Ensuring order_id remains unique
     ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;";
 
