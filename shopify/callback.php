@@ -8,26 +8,14 @@ if (!verifyHmac($params, SHOPIFY_API_SECRET)) die('Invalid HMAC');
 
 // Validate nonce       
 if ($_SESSION['nonce'] !== $_GET['state']) die('Invalid nonce');
-
-// Exchange code for access token
+    
 $shop = $_GET['shop'];
-$ch = curl_init("https://{$shop}/admin/oauth/access_token");
-curl_setopt_array($ch, [
-    CURLOPT_RETURNTRANSFER => true,
-    CURLOPT_POST => true,
-    CURLOPT_POSTFIELDS => [
-        'client_id' => SHOPIFY_API_KEY,
-        'client_secret' => SHOPIFY_API_SECRET,
-        'code' => $_GET['code']
-    ]
-]);
+$code = $_GET['code'];
+// Shopify code for access token
+$access_token = getAccessToken($shop, $code); 
 
-$response = json_decode(curl_exec($ch), true);
-curl_close($ch);
+if (isset($access_token)) {
 
-if (isset($response['access_token'])) {
-
-    $access_token = $response['access_token'];
     // Step 2: Fetch Store Details
         $shopDetailsUrl = "https://{$shop}/admin/api/" . SHOPIFY_API_VERSION . "/shop.json";
         $ch = curl_init($shopDetailsUrl);
@@ -37,34 +25,52 @@ if (isset($response['access_token'])) {
                 "X-Shopify-Access-Token: $access_token"
             ]
         ]);
-        $shopDetailsResponse = json_decode(curl_exec($ch), true);
-        echo "<pre>";
-        print_r($shopDetailsResponse);
-        exit;
-
-
+        $shopDetailsResponse_json = curl_exec($ch);
+        $shopDetailsResponse = json_decode($shopDetailsResponse_json, true);
         curl_close($ch);
 
         if (!isset($shopDetailsResponse['shop'])) {
             die("Error: Failed to retrieve shop details.");
         }
-        
+        print_r($shopDetailsResponse); exit;
         // Step 3: Extract Data
-        $shop          = $shopDetailsResponse['shop']['myshopify_domain'];
-        $store_name    = $shopDetailsResponse['shop']['name'] ?? '';
-        $store_domain  = $shopDetailsResponse['shop']['domain'] ?? $shop;
-        $email         = $shopDetailsResponse['shop']['email'] ?? '';
-        $phone         = $shopDetailsResponse['shop']['phone'] ?? '';
-        $current_plan  = $shopDetailsResponse['shop']['plan_name'] ?? '';
-        $country       = $shopDetailsResponse['shop']['country'] ?? '';
-        $currency      = $shopDetailsResponse['shop']['currency'] ?? '';
-        $timezone      = $shopDetailsResponse['shop']['timezone'] ?? '';
-        $iana_timezone = $shopDetailsResponse['shop']['iana_timezone'] ?? '';
-        $country_code  = $shopDetailsResponse['shop']['country_code'] ?? '';
-        $country_name  = $shopDetailsResponse['shop']['country_name'] ?? '';
-        $created_at    = $shopDetailsResponse['shop']['created_at'] ?? '';
-        $updated_at    = $shopDetailsResponse['shop']['updated_at'] ?? '';
+        $shop                                   = $shopDetailsResponse['shop']['myshopify_domain'];
+        $domain                                 = $shopDetailsResponse['shop']['domain'] ?? $shop;
+        $access_token                           = $access_token;
+        $shopify_id                             = $shopDetailsResponse['shop']['id'] ?? '';
+        $store_name                             = $shopDetailsResponse['shop']['name'] ?? '';
+        $shop_owner                             = $shopDetailsResponse['shop']['shop_owner'] ?? '';
+        $logo_url                               = 
+        $email                                  = $shopDetailsResponse['shop']['email'] ?? '';
+        $phone                                  = $shopDetailsResponse['shop']['phone'] ?? '';
+        $plan_display_name                      = $shopDetailsResponse['shop']['plan_display_name'] ?? '';
+        $plan_name                              = $shopDetailsResponse['shop']['plan_name'] ?? '';
+        $country                                = $shopDetailsResponse['shop']['country'] ?? '';
+        $currency                               = $shopDetailsResponse['shop']['currency'] ?? '';
+        $timezone                               = $shopDetailsResponse['shop']['timezone'] ?? '';
+        $iana_timezone                          = $shopDetailsResponse['shop']['iana_timezone'] ?? '';
+        $country_code                           = $shopDetailsResponse['shop']['country_code'] ?? '';
+        $country_name                           = $shopDetailsResponse['shop']['country_name'] ?? '';
+        $address1                               = $shopDetailsResponse['shop']['address1'] ?? '';
+        $address2                               = $shopDetailsResponse['shop']['address2'] ?? '';
+        $city                                   = $shopDetailsResponse['shop']['city'] ?? '';
+        $zip                                    = $shopDetailsResponse['shop']['zip'] ?? '';
+        $province                               = $shopDetailsResponse['shop']['province'] ?? '';
+        $province_code                          = $shopDetailsResponse['shop']['province_code'] ?? '';
+        $primary_locale                         = $shopDetailsResponse['shop']['primary_locale'] ?? '';
+        $money_format                           = $shopDetailsResponse['shop']['money_format'] ?? '';
+        $money_with_currency_format             = $shopDetailsResponse['shop']['money_with_currency_format'] ?? '';
+        $money_in_emails_format                 = $shopDetailsResponse['shop']['money_in_emails_format'] ?? '';
+        $money_with_currency_in_emails_format   = $shopDetailsResponse['shop']['money_with_currency_in_emails_format'] ?? '';
+        $tax_id                                 = $shopDetailsResponse['shop'][''] ?? '';
+        $gstin                                  = $shopDetailsResponse['shop'][''] ?? '';
+        $tax_settings                           = $shopDetailsResponse['shop'][''] ?? '';
+        $smtp_settings                          = '';
+        $restapi_json                           = $shopDetailsResponse_json;
+        $created_at                             = $shopDetailsResponse['shop']['created_at'] ?? '';
+        $updated_at                             = $shopDetailsResponse['shop']['updated_at'] ?? '';
         $status = "installed";
+        
 
         // Step 4: Insert or Update Store Information
         $query = "INSERT INTO stores 

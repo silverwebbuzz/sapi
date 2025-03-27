@@ -43,3 +43,22 @@ function getInstallUrl($shop, $scopes, $redirectUrl) {
         'state' => $nonce
     ]);
 }
+
+//Get Accress Token
+$response = getAccessToken($shop, $code); 
+function getAccessToken($shop){
+    $ch = curl_init("https://{$shop}/admin/oauth/access_token");
+    curl_setopt_array($ch, [
+        CURLOPT_RETURNTRANSFER => true,
+        CURLOPT_POST => true,
+        CURLOPT_POSTFIELDS => [
+            'client_id' => SHOPIFY_API_KEY,
+            'client_secret' => SHOPIFY_API_SECRET,
+            'code' => $_GET['code']
+        ]
+    ]);
+
+    $response = json_decode(curl_exec($ch), true);
+    curl_close($ch);
+    return $access_token = $response['access_token'];
+}
