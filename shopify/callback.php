@@ -62,7 +62,6 @@ if (isset($access_token)) {
     $restapi_json                           = $shopDetailsResponse_json;
     $created_at                             = $shopDetailsResponse['shop']['created_at'] ?? '';
     $updated_at                             = $shopDetailsResponse['shop']['updated_at'] ?? '';
-    $app_install_date = date('Y-m-d H:i:s');
 
     // Step 4: Insert or Update Store Information
     $query = "INSERT INTO stores 
@@ -72,7 +71,7 @@ if (isset($access_token)) {
         province_code, primary_locale, money_format, money_with_currency_format, 
         money_in_emails_format, money_with_currency_in_emails_format, 
         restapi_json, created_at, updated_at, app_install_date) 
-    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, NOW())
     ON DUPLICATE KEY UPDATE 
     domain = VALUES(domain),
     access_token = VALUES(access_token), 
@@ -102,22 +101,20 @@ if (isset($access_token)) {
     money_in_emails_format = VALUES(money_in_emails_format), 
     money_with_currency_in_emails_format = VALUES(money_with_currency_in_emails_format), 
     restapi_json = VALUES(restapi_json), 
-    updated_at = VALUES(app_install_date),
-    app_install_date =  NOW()";
+    updated_at = NOW(),
+    app_install_date = NOW()";
 
     $conn = DB::getInstance();
     $stmt = $conn->prepare($query);
-    $stmt->bind_param("sssssssssssssssssssssssssssssss", 
+    $stmt->bind_param("ssssssssssssssssssssssssssssss", 
         $shop, $domain, $access_token, $shopify_id, $store_name, $shop_owner, $logo_url, $email, $phone, 
         $plan_display_name, $plan_name, $country, $currency, $timezone, $iana_timezone, 
         $country_code, $country_name, $address1, $address2, $city, $zip, $province, 
         $province_code, $primary_locale, $money_format, $money_with_currency_format, 
         $money_in_emails_format, $money_with_currency_in_emails_format, 
-        $restapi_json, $created_at, $updated_at, $app_install_date
+        $restapi_json, $created_at, $updated_at
     );
-
-    $stmt->execute(); exit;
-
+    $stmt->execute();
 
     // Create webhook
 
