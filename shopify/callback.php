@@ -38,6 +38,11 @@ if (isset($response['access_token'])) {
             ]
         ]);
         $shopDetailsResponse = json_decode(curl_exec($ch), true);
+        echo "<pre>";
+        print_r($shopDetailsResponse);
+        exit;
+
+
         curl_close($ch);
 
         if (!isset($shopDetailsResponse['shop'])) {
@@ -124,26 +129,6 @@ if (isset($response['access_token'])) {
             exit;
         }
     }
-
-    /*$ch = curl_init("https://{$shop}/admin/api/" . SHOPIFY_API_VERSION . "/webhooks.json");
-    curl_setopt_array($ch, [
-        CURLOPT_HTTPHEADER => [
-            'Content-Type: application/json',
-            'X-Shopify-Access-Token: ' . $response['access_token']
-        ],
-        CURLOPT_POST => true,
-        CURLOPT_POSTFIELDS => json_encode([
-            'webhook' => [
-                'topic' => 'orders/create',
-                'address' => $webhook_url,
-                'format' => 'json'
-            ]
-        ])
-    ]);
-
-    $result = curl_exec($ch);
-    $status = curl_getinfo($ch, CURLINFO_HTTP_CODE);
-    curl_close($ch);*/
 
     $redirect_url = "https://{$shop}/admin/apps/" . SHOPIFY_API_KEY;
     header("Location: " . $redirect_url);
