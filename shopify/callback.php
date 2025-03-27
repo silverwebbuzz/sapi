@@ -23,18 +23,20 @@ if (isset($access_token)) {
             die("Error: Failed to retrieve shop details.");
         }
         echo "<pre>";
-        print_r($shopDetailsResponse);
-        //Fetch Store logo and tax details via shopify Graphql
-        $logotax = getShopLogoAndTax($shop,$access_token);
-        $logo_url = getShopLogo($shop, $access_token);
-        print_r($logotax); 
-        print_r($logo_url); 
-        exit;
-
-        // Step 3: Extract Data
         $shop                                   = $shopDetailsResponse['shop']['myshopify_domain'];
         $domain                                 = $shopDetailsResponse['shop']['domain'] ?? $shop;
-        $access_token                           = $access_token;
+       
+        //Fetch Store logo and tax details via shopify Graphql
+        $logotax = getShopTax($shop,$access_token);
+        $logo_url = getShopLogo($shop, $access_token);
+       echo  $imagePath = "https://".$domain."/cdn/shop/files/".str_replace('shopify://shop_images/', '', $logo_url);
+        
+        print_r($logotax); 
+        print_r($logo_url); 
+
+        exit;
+
+        // Step 3: Define Data
         $shopify_id                             = $shopDetailsResponse['shop']['id'] ?? '';
         $store_name                             = $shopDetailsResponse['shop']['name'] ?? '';
         $shop_owner                             = $shopDetailsResponse['shop']['shop_owner'] ?? '';
