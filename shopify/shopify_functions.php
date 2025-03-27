@@ -129,3 +129,44 @@ function getShopLogo($shop, $access_token) {
 
     return $assets;
 }
+
+function registerShopifyWebhooks($shop, $access_token) {
+    $webhook_url = SHOPIFY_APP_URL . '/shopify/webhook'; 
+    $topics = [
+        'orders/create',
+        'orders/paid',
+        'app/uninstalled'
+    ];
+
+    foreach ($topics as $topic) {
+        $ch = curl_init("https://{$shop}/admin/api/" . SHOPIFY_API_VERSION . "/webhooks.json");
+        curl_setopt_array($ch, [
+            CURLOPT_HTTPHEADER => [
+                'Content-Type: application/json',
+                'X-Shopify-Access-Token: ' . $access_token
+            ],
+            CURLOPT_POST => true,
+            CURLOPT_POSTFIELDS => json_encode([
+                'webhook' => [
+                    'topic' => $topic,
+                    'address' => $webhook_url,
+                    'format' => 'json'
+                ]
+            ]),
+            CURLOPT_RETURNTRANSFER => true
+        ]);
+
+        $result = curl_exec($ch);
+        $status = curl_getinfo($ch, CURLINFO_HTTP_CODE);
+        curl_close($ch);
+
+        if ($status == 201) {
+            error_log("Webhook for {$topic} registered successfully!");
+        } else {
+            error_log("Failed to register webhook for {$topic}. Response: " . $result);
+            return false;
+        }
+    }
+
+    return true;
+}

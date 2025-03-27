@@ -116,49 +116,17 @@ if (isset($access_token)) {
         $restapi_json, $created_at, $updated_at, $app_install_date
     );
 
-
     // Create webhook
 
-    $webhook_url = SHOPIFY_APP_URL . '/shopify/webhook'; 
-    $topics = [
-        'orders/create',
-        'orders/paid',
-        'app/uninstalled'
-    ];
-
-    foreach ($topics as $topic) {
-        $ch = curl_init("https://{$shop}/admin/api/" . SHOPIFY_API_VERSION . "/webhooks.json");
-        curl_setopt_array($ch, [
-            CURLOPT_HTTPHEADER => [
-                'Content-Type: application/json',
-                'X-Shopify-Access-Token: ' . $response['access_token']
-            ],
-            CURLOPT_POST => true,
-            CURLOPT_POSTFIELDS => json_encode([
-                'webhook' => [
-                    'topic' => $topic,
-                    'address' => $webhook_url,
-                    'format' => 'json'
-                ]
-            ]),
-            CURLOPT_RETURNTRANSFER => true
-        ]);
-
-        $result = curl_exec($ch);
-        $status = curl_getinfo($ch, CURLINFO_HTTP_CODE);
-        curl_close($ch);
-
-        if ($status == 201) {
-            error_log("Webhook for {$topic} registered successfully!");
-        } else {
-            error_log("Failed to register webhook for {$topic}. Response: " . $result);
-            exit;
-        }
+    if (registerShopifyWebhooks($shop, $access_token)) {
+        $redirect_url = "https://{$shop}/admin/apps/" . SHOPIFY_API_KEY;
+        header("Location: " . $redirect_url);
+        exit;
+    } else {
+        //echo "Webhook registration failed.";
+        die('Installation failed');
     }
-
-    $redirect_url = "https://{$shop}/admin/apps/" . SHOPIFY_API_KEY;
-    header("Location: " . $redirect_url);
-    exit;
+    
 } else {
     die('Installation failed');
 }
