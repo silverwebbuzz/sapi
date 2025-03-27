@@ -106,15 +106,17 @@ if (isset($access_token)) {
 
     $conn = DB::getInstance();
     $stmt = $conn->prepare($query);
-    $stmt->bind_param("ssssssssssssssssssssssssssssss", 
-        $shop, $domain, $access_token, $shopify_id, $store_name, $shop_owner, $logo_url, $email, $phone, 
-        $plan_display_name, $plan_name, $country, $currency, $timezone, $iana_timezone, 
-        $country_code, $country_name, $address1, $address2, $city, $zip, $province, 
-        $province_code, $primary_locale, $money_format, $money_with_currency_format, 
-        $money_in_emails_format, $money_with_currency_in_emails_format, 
-        $restapi_json, $created_at, $updated_at
+    $stmt->bind_param("ssssssssssssssssssssssssssssssss", 
+    $shop, $domain, $access_token, $shopify_id, $store_name, $shop_owner, $logo_url, $email, $phone, 
+    $plan_display_name, $plan_name, $country, $currency, $timezone, $iana_timezone, 
+    $country_code, $country_name, $address1, $address2, $city, $zip, $province, 
+    $province_code, $primary_locale, $money_format, $money_with_currency_format, 
+    $money_in_emails_format, $money_with_currency_in_emails_format, 
+    $restapi_json, $created_at, $updated_at, $app_install_date
     );
-    $stmt->execute();
+    if (!$stmt->execute()) {
+        die("SQL Error: " . $stmt->error);
+    }
 
     // Create webhook
 
