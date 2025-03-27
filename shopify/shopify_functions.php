@@ -82,25 +82,23 @@ function getShopLogoAndTax($shop, $access_token) {
     $query = [
         'query' => '{
             shop {
-                primaryDomain {
-                    url
+                branding {
+                    logo {
+                        originalSrc
+                    }
+                }
+                themes(first: 1, role: "main") {
+                    edges {
+                        node {
+                            settings
+                        }
+                    }
                 }
                 metafields(namespace: "global", first: 10) {
                     edges {
                         node {
                             key
                             value
-                        }
-                    }
-                }
-                themes(first: 1, role: "main") {
-                    edges {
-                        node {
-                            preview {
-                                image {
-                                    src
-                                }
-                            }
                         }
                     }
                 }
@@ -125,8 +123,16 @@ function getShopLogoAndTax($shop, $access_token) {
     $data = json_decode($response, true);
     $shop_data = $data['data']['shop'] ?? [];
 
-    // Extract logo from active theme
-    $logo_url = $shop_data['themes']['edges'][0]['node']['preview']['image']['src'] ?? '';
+    // Attempt to get logo from branding API
+    $logo_url = $shop_data['branding']['logo']['originalSrc'] ?? '';
+
+    // If branding logo is not available, check the active theme settings (sometimes the logo is stored in theme settings)
+    if (empty($logo_url) && isset($shop_data['themes']['edges'][0]['node']['settings'])) {
+        $theme_settings = json_decode($shop_data['themes']['edges'][0]['node']['settings'], true);
+        if (isset($theme_settings['logo'])) {
+            $logo_url = $theme_settings['logo'];
+        }
+    }
 
     // Extract tax-related metafields
     $tax_settings = [];

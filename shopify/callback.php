@@ -26,7 +26,7 @@ if (isset($access_token)) {
         print_r($shopDetailsResponse);
         //Fetch Store logo and tax details via shopify Graphql
         $logotax = getShopLogoAndTax($shop,$access_token);
-        print_r($shopDetailsResponse); exit;
+        print_r($logotax); exit;
 
         // Step 3: Extract Data
         $shop                                   = $shopDetailsResponse['shop']['myshopify_domain'];
