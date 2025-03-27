@@ -103,7 +103,8 @@ if (isset($access_token)) {
     restapi_json = VALUES(restapi_json), 
     updated_at = NOW(),
     app_install_date = NOW()";
-
+    
+    $conn = DB::getInstance();
     $stmt = $conn->prepare($query);
     $stmt->bind_param("sssssssssssssssssssssssssssssss", 
         $shop, $domain, $access_token, $shopify_id, $store_name, $shop_owner, $logo_url, $email, $phone, 
