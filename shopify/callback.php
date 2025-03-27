@@ -22,25 +22,22 @@ if (isset($access_token)) {
         if (!isset($shopDetailsResponse['shop'])) {
             die("Error: Failed to retrieve shop details.");
         }
-        echo "<pre>";
+
         $shop                                   = $shopDetailsResponse['shop']['myshopify_domain'];
         $domain                                 = $shopDetailsResponse['shop']['domain'] ?? $shop;
        
-        //Fetch Store logo and tax details via shopify Graphql
-        $logotax = getShopTax($shop,$access_token);
-        $logo_url = getShopLogo($shop, $access_token);
-       echo  $imagePath = "https://".$domain."/cdn/shop/files/".str_replace('shopify://shop_images/', '', $logo_url);
-        
-        print_r($logotax); 
-        print_r($logo_url); 
-
-        exit;
+        //Fetch Store logo details via shopify Graphql
+        $logo_data = getShopLogo($shop, $access_token);
+        if(isset($logo_data)){
+            $logo_url = "https://".$domain."/cdn/shop/files/".str_replace('shopify://shop_images/', '', $logo_data);
+        } else {
+            $logo_url = ''; 
+        }
 
         // Step 3: Define Data
         $shopify_id                             = $shopDetailsResponse['shop']['id'] ?? '';
         $store_name                             = $shopDetailsResponse['shop']['name'] ?? '';
         $shop_owner                             = $shopDetailsResponse['shop']['shop_owner'] ?? '';
-        $logo_url                               = 
         $email                                  = $shopDetailsResponse['shop']['email'] ?? '';
         $phone                                  = $shopDetailsResponse['shop']['phone'] ?? '';
         $plan_display_name                      = $shopDetailsResponse['shop']['plan_display_name'] ?? '';
@@ -61,18 +58,67 @@ if (isset($access_token)) {
         $money_format                           = $shopDetailsResponse['shop']['money_format'] ?? '';
         $money_with_currency_format             = $shopDetailsResponse['shop']['money_with_currency_format'] ?? '';
         $money_in_emails_format                 = $shopDetailsResponse['shop']['money_in_emails_format'] ?? '';
-        $money_with_currency_in_emails_format   = $shopDetailsResponse['shop']['money_with_currency_in_emails_format'] ?? '';
-        $tax_id                                 = $shopDetailsResponse['shop'][''] ?? '';
-        $gstin                                  = $shopDetailsResponse['shop'][''] ?? '';
-        $tax_settings                           = $shopDetailsResponse['shop'][''] ?? '';
-        $smtp_settings                          = '';
+        $money_with_currency_in_emails_format   = $shopDetailsResponse['shop']['money_with_currency_in_emails_format'] ?? ''; 
         $restapi_json                           = $shopDetailsResponse_json;
         $created_at                             = $shopDetailsResponse['shop']['created_at'] ?? '';
         $updated_at                             = $shopDetailsResponse['shop']['updated_at'] ?? '';
-        $status = "installed";
-        
+        exit;
 
         // Step 4: Insert or Update Store Information
+        $query = "INSERT INTO stores 
+        (shop, domain, access_token, shopify_id, store_name, shop_owner, email, phone, 
+         plan_display_name, plan_name, country, currency, timezone, iana_timezone, 
+         country_code, country_name, address1, address2, city, zip, province, 
+         province_code, primary_locale, money_format, money_with_currency_format, 
+         money_in_emails_format, money_with_currency_in_emails_format, 
+         restapi_json, created_at, updated_at, app_install_date) 
+        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+        ON DUPLICATE KEY UPDATE 
+        domain = VALUES(domain),
+        access_token = VALUES(access_token), 
+        shopify_id = VALUES(shopify_id),
+        store_name = VALUES(store_name), 
+        shop_owner = VALUES(shop_owner),
+        email = VALUES(email), 
+        phone = VALUES(phone), 
+        plan_display_name = VALUES(plan_display_name),
+        plan_name = VALUES(plan_name),
+        country = VALUES(country), 
+        currency = VALUES(currency), 
+        timezone = VALUES(timezone), 
+        iana_timezone = VALUES(iana_timezone), 
+        country_code = VALUES(country_code), 
+        country_name = VALUES(country_name), 
+        address1 = VALUES(address1), 
+        address2 = VALUES(address2),
+        city = VALUES(city), 
+        zip = VALUES(zip), 
+        province = VALUES(province),
+        province_code = VALUES(province_code),
+        primary_locale = VALUES(primary_locale), 
+        money_format = VALUES(money_format), 
+        money_with_currency_format = VALUES(money_with_currency_format), 
+        money_in_emails_format = VALUES(money_in_emails_format), 
+        money_with_currency_in_emails_format = VALUES(money_with_currency_in_emails_format), 
+        restapi_json = VALUES(restapi_json), 
+        updated_at = VALUES(updated_at),
+        app_install_date = NOW()";
+
+        $conn = DB::getInstance();
+        $stmt = $conn->prepare($query);
+        $stmt->bind_param("sssssssssssssssssssssssssssssss", 
+        $shop, $domain, $access_token, $shopify_id, $store_name, $shop_owner, $email, $phone, 
+        $plan_display_name, $plan_name, $country, $currency, $timezone, $iana_timezone, 
+        $country_code, $country_name, $address1, $address2, $city, $zip, $province, 
+        $province_code, $primary_locale, $money_format, $money_with_currency_format, 
+        $money_in_emails_format, $money_with_currency_in_emails_format, 
+        $restapi_json, $created_at, $updated_at, $app_install_date
+        );
+        $stmt->execute();
+
+
+exit;
+
         $query = "INSERT INTO stores 
           (shop, store_name, store_domain, access_token, email, phone, current_plan, country, currency, timezone, iana_timezone, country_code, country_name, created_at, updated_at,status) 
           VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)

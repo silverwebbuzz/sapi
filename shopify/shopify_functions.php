@@ -77,65 +77,6 @@ function getShopDetailsRestAPI($shop,$access_token){
     return $shopDetailsResponse_json;
 }
 
-function getShopTax($shop, $access_token) {
-    // GraphQL query for fetching logo (from active theme) and tax metafields
-    $query = [
-        'query' => '{
-            shop {
-                metafields(namespace: "global", first: 10) {
-                    edges {
-                        node {
-                            key
-                            value
-                        }
-                    }
-                }
-            }
-        }'
-    ];
-
-    $url = "https://{$shop}/admin/api/" . SHOPIFY_API_VERSION . "/graphql.json";   
-    $ch = curl_init();
-    curl_setopt($ch, CURLOPT_URL, $url);
-    curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
-    curl_setopt($ch, CURLOPT_POST, true);
-    curl_setopt($ch, CURLOPT_POSTFIELDS, json_encode($query));
-    curl_setopt($ch, CURLOPT_HTTPHEADER, [
-        'X-Shopify-Access-Token: ' . $access_token,
-        'Content-Type: application/json',
-        'Accept: application/json'
-    ]);
-    $response = curl_exec($ch);
-    curl_close($ch);
-
-    $data = json_decode($response, true);
-    $shop_data = $data['data']['shop'] ?? [];
-
-    // Extract tax-related metafields
-    $tax_settings = [];
-    $gstin = '';
-
-    if (!empty($shop_data['metafields']['edges'])) {
-        foreach ($shop_data['metafields']['edges'] as $edge) {
-            $node = $edge['node'];
-
-            // Capture GSTIN for Indian stores
-            if ($node['key'] === 'gstin') {
-                $gstin = $node['value'];
-            }
-
-            // Capture other tax-related metafields
-            if (strpos($node['key'], 'tax_') === 0 || strpos($node['key'], 'vat_') === 0) {
-                $tax_settings[$node['key']] = $node['value'];
-            }
-        }
-    }
-    return [
-        'gstin' => $gstin,
-        'tax_settings' => json_encode($tax_settings)
-    ];
-}
-
 function getShopLogo($shop, $access_token) {
     $url = "https://$shop/admin/api/" . SHOPIFY_API_VERSION . "/themes.json";
 
