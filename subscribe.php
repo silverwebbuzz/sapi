@@ -57,7 +57,8 @@ if ($subscription_result->num_rows > 0) {
         `created_at` timestamp NULL DEFAULT current_timestamp(),
         `payment_method` varchar(50) DEFAULT NULL,  -- Added payment method
         `order_status` ENUM('pending','paid','failed','refunded') DEFAULT 'pending',
-        `products` LONGTEXT DEFAULT NULL 
+        `products` LONGTEXT DEFAULT NULL,
+         UNIQUE KEY (`order_id`)  -- Ensuring order_id remains unique
     ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;";
 
     if ($conn->query($create_table_query) === TRUE) {
