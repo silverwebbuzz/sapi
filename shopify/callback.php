@@ -62,23 +62,23 @@ if (isset($access_token)) {
         $restapi_json                           = $shopDetailsResponse_json;
         $created_at                             = $shopDetailsResponse['shop']['created_at'] ?? '';
         $updated_at                             = $shopDetailsResponse['shop']['updated_at'] ?? '';
-        exit;
 
         // Step 4: Insert or Update Store Information
         $query = "INSERT INTO stores 
-        (shop, domain, access_token, shopify_id, store_name, shop_owner, email, phone, 
+        (shop, domain, access_token, shopify_id, store_name, shop_owner, logo_url, email, phone, 
          plan_display_name, plan_name, country, currency, timezone, iana_timezone, 
          country_code, country_name, address1, address2, city, zip, province, 
          province_code, primary_locale, money_format, money_with_currency_format, 
          money_in_emails_format, money_with_currency_in_emails_format, 
          restapi_json, created_at, updated_at, app_install_date) 
-        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, NOW())
         ON DUPLICATE KEY UPDATE 
         domain = VALUES(domain),
         access_token = VALUES(access_token), 
         shopify_id = VALUES(shopify_id),
         store_name = VALUES(store_name), 
         shop_owner = VALUES(shop_owner),
+        logo_url = VALUES(logo_url),
         email = VALUES(email), 
         phone = VALUES(phone), 
         plan_display_name = VALUES(plan_display_name),
@@ -101,47 +101,19 @@ if (isset($access_token)) {
         money_in_emails_format = VALUES(money_in_emails_format), 
         money_with_currency_in_emails_format = VALUES(money_with_currency_in_emails_format), 
         restapi_json = VALUES(restapi_json), 
-        updated_at = VALUES(updated_at),
-        app_install_date = NOW()";
+        updated_at = VALUES(updated_at)";
 
         $conn = DB::getInstance();
         $stmt = $conn->prepare($query);
-        $stmt->bind_param("sssssssssssssssssssssssssssssss", 
-        $shop, $domain, $access_token, $shopify_id, $store_name, $shop_owner, $email, $phone, 
+        $stmt->bind_param("ssssssssssssssssssssssssssssssss", 
+        $shop, $domain, $access_token, $shopify_id, $store_name, $shop_owner, $logo_url, $email, $phone, 
         $plan_display_name, $plan_name, $country, $currency, $timezone, $iana_timezone, 
         $country_code, $country_name, $address1, $address2, $city, $zip, $province, 
         $province_code, $primary_locale, $money_format, $money_with_currency_format, 
         $money_in_emails_format, $money_with_currency_in_emails_format, 
-        $restapi_json, $created_at, $updated_at, $app_install_date
+        $restapi_json, $created_at, $updated_at
         );
         $stmt->execute();
-
-
-exit;
-
-        $query = "INSERT INTO stores 
-          (shop, store_name, store_domain, access_token, email, phone, current_plan, country, currency, timezone, iana_timezone, country_code, country_name, created_at, updated_at,status) 
-          VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
-          ON DUPLICATE KEY UPDATE 
-          store_name = VALUES(store_name), 
-          store_domain = VALUES(store_domain), 
-          access_token = VALUES(access_token), 
-          email = VALUES(email), 
-          phone = VALUES(phone), 
-          current_plan = VALUES(current_plan), 
-          country = VALUES(country), 
-          currency = VALUES(currency), 
-          timezone = VALUES(timezone), 
-          iana_timezone = VALUES(iana_timezone), 
-          country_code = VALUES(country_code), 
-          country_name = VALUES(country_name), 
-          updated_at = NOW(),
-          status=VALUES(status)";
-
-    $conn = DB::getInstance();
-    $stmt = $conn->prepare($query);
-    $stmt->bind_param("ssssssssssssssss", $shop, $store_name, $store_domain, $access_token, $email, $phone, $current_plan, $country, $currency, $timezone, $iana_timezone, $country_code, $country_name, $created_at, $updated_at, $status);
-    $stmt->execute();
 
     // Create webhook
 
