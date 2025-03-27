@@ -19,12 +19,15 @@ if (isset($access_token)) {
     // Step 2: Fetch Store Details via shopify Rest API
         $shopDetailsResponse_json = getShopDetailsRestAPI($shop,$access_token); //return value in json
         $shopDetailsResponse = json_decode($shopDetailsResponse_json, true);
-
         if (!isset($shopDetailsResponse['shop'])) {
             die("Error: Failed to retrieve shop details.");
         }
+        echo "<pre>";
+        print_r($shopDetailsResponse);
+        //Fetch Store logo and tax details via shopify Graphql
+        $logotax = getShopLogoAndTax($shop,$access_token);
         print_r($shopDetailsResponse); exit;
-        
+
         // Step 3: Extract Data
         $shop                                   = $shopDetailsResponse['shop']['myshopify_domain'];
         $domain                                 = $shopDetailsResponse['shop']['domain'] ?? $shop;
