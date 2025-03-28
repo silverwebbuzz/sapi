@@ -15,7 +15,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['save_email_settings']
         'username' => $_POST['smtp_user'],
         'password' => $_POST['smtp_pass'],
         'subject' => $_POST['email_subject'],
-        'body' => sanitizeHtml$_POST['email_body'])
+        'body' => sanitizeHtml($_POST['email_body'])
     ];
     
     $json_settings = json_encode($smtp_settings);
