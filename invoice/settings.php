@@ -60,20 +60,55 @@ if ($result->num_rows > 0) {
         }
     }
 }
+
+// Handle form submission
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['save_email_settings'])) {
+    $smtp_settings = [
+        'host' => $_POST['smtp_host'],
+        'port' => $_POST['smtp_port'],
+        'username' => $_POST['smtp_user'],
+        'password' => $_POST['smtp_pass'],
+        'subject' => $_POST['email_subject'],
+        'body' => $_POST['email_body']
+    ];
+    
+    $json_settings = json_encode($smtp_settings);
+    
+    $update_stmt = $conn->prepare("UPDATE stores SET smtp_settings = ? WHERE id = ?");
+    $update_stmt->bind_param("ss", $json_settings, $shop_id);
+    
+    if ($update_stmt->execute()) {
+        $success_message = "Email settings saved successfully!";
+    } else {
+        $error_message = "Failed to save email settings: " . $conn->error;
+    }
+}
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['save_general_settings'])) {
+    $auto_invoice_customer = isset($_POST['auto_invoice_customer']) ? 'Yes' : 'No';
+    $auto_invoice_personal = isset($_POST['auto_invoice_personal']) ? 'Yes' : 'No';
+    $email_invoice = $_POST['email_invoice'] ?? '';
+    
+    // Update database
+    $stmt = $conn->prepare("UPDATE stores SET auto_invoice_customer = ?, auto_invoice_personal = ?, email_invoice = ? WHERE id = ?");
+    $stmt->bind_param("ssss", $auto_invoice_customer, $auto_invoice_personal, $email_invoice, $shop_id);
+    
+    if ($stmt->execute()) {
+        $success_message = 'General settings saved successfully!';
+    } else {
+        $error_message = 'Failed to save general settings';
+    }
+}
 ?>
 <main class="main-content">
     <div class="settings-container">
         <h2>Settings</h2>
 
         <!-- Display messages -->
-        <?php if (isset($_SESSION['success_message'])): ?>
-            <div class="alert alert-success"><?= htmlspecialchars($_SESSION['success_message']) ?></div>
-            <?php unset($_SESSION['success_message']); // Clear the message after displaying ?>
+        <?php if (isset($success_message)): ?>
+            <div class="alert alert-success"><?= htmlspecialchars($success_message) ?></div>
         <?php endif; ?>
-
-        <?php if (isset($_SESSION['error_message'])): ?>
-            <div class="alert alert-error"><?= htmlspecialchars($_SESSION['error_message']) ?></div>
-            <?php unset($_SESSION['error_message']); // Clear the message after displaying ?>
+        <?php if (isset($error_message)): ?>
+            <div class="alert alert-error"><?= htmlspecialchars($error_message) ?></div>
         <?php endif; ?>
 
         <!-- Tab Navigation -->
@@ -89,7 +124,8 @@ if ($result->num_rows > 0) {
             <!-- General Settings -->
             <section id="general" class="settings-section active">
                 <h3>General Settings</h3>
-                <form class="general-settings-form" data-section="general">
+                <form method="POST" class="general-settings-form">
+                <input type="hidden" name="save_general_settings" value="1">
                     <div class="form-group">
                         <label>
                             <input type="checkbox" name="auto_invoice_customer" <?= $settings['auto_invoice_customer'] === 'Yes' ? 'checked' : '' ?>>
@@ -112,7 +148,8 @@ if ($result->num_rows > 0) {
             <!-- Email Settings -->
             <section id="email" class="settings-section">
                 <h3>Email Settings</h3>
-                <form method="POST" action="save_smtp_settings.php" class="email-settings-form">
+                <form method="POST" class="settings-form">
+                    <input type="hidden" name="save_email_settings" value="1">
                     <div class="form-group">
                         <label>SMTP Host</label>
                         <input type="text" name="smtp_host" class="form-input"  value="<?= htmlspecialchars($smtp_settings['host']) ?>"  placeholder="smtp.example.com" required>

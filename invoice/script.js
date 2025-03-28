@@ -50,51 +50,7 @@ $(document).ready(function() {
         $(this).addClass('selected');
     });
 
-    // Settings Form Submission
-    $('.general-settings-form').on('submit', function(e) {
-        e.preventDefault();
-        const form = $(this);
-        const section = form.closest('.settings-section');
-        const sectionName = section.attr('id');
-        const formData = form.serialize();
-        
-        // Show loading state
-        const submitBtn = form.find('.btn-save');
-        submitBtn.prop('disabled', true).html('<i class="icon-spinner"></i> Saving...');
-        
-        $.ajax({
-            url: 'save_settings.php',
-            type: 'POST',
-            data: formData + '&section=' + sectionName,
-            dataType: 'json',
-            success: function(response) {
-                if (response.success) {
-                    showAlert('success', response.message);
-                } else {
-                    showAlert('error', response.message || 'Failed to save settings');
-                }
-            },
-            error: function(xhr) {
-                showAlert('error', 'An error occurred while saving settings');
-            },
-            complete: function() {
-                submitBtn.prop('disabled', false).text('Save ' + sectionName.charAt(0).toUpperCase() + sectionName.slice(1) + ' Settings');
-            }
-        });
-    });
-
-    function showAlert(type, message) {
-        const alertHtml = `<div class="alert alert-${type}">${message}</div>`;
-        $('.settings-container').prepend(alertHtml);
-        
-        // Remove alert after 5 seconds
-        setTimeout(() => {
-            $('.alert').fadeOut(500, function() {
-                $(this).remove();
-            });
-        }, 5000);
-    }
-
+    
     // Plan Upgrade Buttons
     $('.btn-upgrade').on('click', function() {
         if (!$(this).hasClass('current')) {
