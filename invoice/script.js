@@ -77,7 +77,7 @@ $(document).ready(function() {
             alert('Subscription cancelled!');
         }
     });
-    
+
     // Handle window resize
     $(window).on('resize', function() {
         if ($(window).width() > 992) {
@@ -89,4 +89,40 @@ $(document).ready(function() {
 
     // Initialize tooltips if needed
     $('[data-toggle="tooltip"]').tooltip();
+
+
+    // Tab Functionality
+    $('.settings-tab').on('click', function(e) {
+        e.preventDefault();
+        
+        // Remove active class from all tabs and sections
+        $('.settings-tab').removeClass('active');
+        $('.settings-section').removeClass('active');
+        
+        // Add active class to clicked tab
+        $(this).addClass('active');
+        
+        // Show corresponding section
+        const target = $(this).attr('href');
+        $(target).addClass('active');
+    });
+
+    // Activate tab based on URL hash
+    function activateTabFromHash() {
+        const hash = window.location.hash;
+        if (hash) {
+            const tab = $(`.settings-tab[href="${hash}"]`);
+            if (tab.length) {
+                $('.settings-tab').removeClass('active');
+                $('.settings-section').removeClass('active');
+                tab.addClass('active');
+                $(hash).addClass('active');
+            }
+        }
+    }
+
+    // Run on page load and hash change
+    $(window).on('load hashchange', activateTabFromHash);
+
 });
+

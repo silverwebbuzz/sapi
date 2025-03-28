@@ -498,17 +498,55 @@ td {
 }
 
 /* Settings Page Styles */
+.settings-tabs {
+    display: flex;
+    border-bottom: 1px solid var(--border);
+    margin-bottom: 20px;
+}
+
+.settings-tab {
+    padding: 12px 20px;
+    margin-right: 5px;
+    text-decoration: none;
+    color: var(--text-light);
+    font-weight: 500;
+    border-radius: 4px 4px 0 0;
+    display: flex;
+    align-items: center;
+    transition: all 0.3s ease;
+}
+
+.settings-tab i {
+    margin-right: 8px;
+    font-size: 16px;
+}
+
+.settings-tab:hover {
+    background: rgba(92, 106, 196, 0.1);
+    color: var(--primary);
+}
+
+.settings-tab.active {
+    background: var(--text);
+    color: var(--whi
+}
+
 .settings-container {
     max-width: 1200px;
     margin: 0 auto;
 }
 
+/* Tab Content */
+.tab-content {
+    position: relative;
+}
 .settings-section {
-    background: var(--white);
-    border-radius: 8px;
-    padding: 20px;
-    margin-bottom: 30px;
-    box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+    display: none;
+    animation: fadeIn 0.3s ease;
+}
+
+.settings-section.active {
+    display: block;
 }
 
 .settings-section h3 {
@@ -522,6 +560,11 @@ td {
 .settings-section h3 i {
     margin-right: 10px;
     color: var(--primary);
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(10px); }
+    to { opacity: 1; transform: translateY(0); }
 }
 
 .form-group {
