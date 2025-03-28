@@ -7,6 +7,39 @@
     # Allow access to static files (CSS, JS, images, fonts)
     RewriteCond %{REQUEST_URI} !\.(css|js|png|jpg|jpeg|gif|ico|svg|woff|woff2|ttf|eot|otf)$ [NC]
 
+# Remove trailing slashes (except for directories)
+RewriteCond %{REQUEST_FILENAME} !-d
+RewriteRule ^(.*)/$ /$1 [L,R=301]
+
+# 1. Handle root URL with parameters
+RewriteCond %{REQUEST_URI} ^/?$
+RewriteRule ^(index\.php)?$ /index.php [L,QSA]
+
+# 2. Handle standard pages (aboutus, contact, etc.)
+RewriteCond %{REQUEST_FILENAME} !-f
+RewriteCond %{REQUEST_FILENAME} !-d
+RewriteCond %{DOCUMENT_ROOT}/$1.php -f
+RewriteRule ^([a-z0-9-]+)/?$ $1.php [L,QSA]
+
+# 3. Handle subdirectory index files (shopify/, admin/, etc.)
+RewriteCond %{REQUEST_FILENAME} !-f
+RewriteCond %{REQUEST_FILENAME} !-d
+RewriteCond %{DOCUMENT_ROOT}/$1/index.php -f
+RewriteRule ^([a-z0-9-]+)/?$ $1/index.php [L,QSA]
+
+# 4. Handle subdirectory pages (shopify/callback, admin/users, etc.)
+RewriteCond %{REQUEST_FILENAME} !-f
+RewriteCond %{REQUEST_FILENAME} !-d
+RewriteCond %{DOCUMENT_ROOT}/$1/$2.php -f
+RewriteRule ^([a-z0-9-]+)/([a-z0-9-]+)/?$ $1/$2.php [L,QSA]
+
+# Final 404 for unmatched requests
+RewriteCond %{REQUEST_FILENAME} !-f
+RewriteCond %{REQUEST_FILENAME} !-d
+RewriteRule ^ - [R=404,L]
+
+
+
     # Handle client route (Embedded app)
     RewriteCond %{REQUEST_URI} ^/client$
     RewriteRule ^ client.php [QSA,L]
