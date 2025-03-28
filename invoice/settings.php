@@ -34,16 +34,15 @@ $result = $table_query->get_result();
 $settings = [
     'auto_invoice_customer' => 'No',
     'auto_invoice_personal' => 'No',
-    'email_invoice' => '',
-    'smtp' => [
-        'host' => '',
-        'port' => '587',
-        'username' => '',
-        'password' => '',
-        'subject' => $default_subject,
-        'body' => $default_body
-    ]
-    
+    'email_invoice' => ''
+];
+$smtp_settings = [
+    'host' => '',
+    'port' => '587',
+    'username' => '',
+    'password' => '',
+    'subject' => $default_subject,
+    'body' => $default_body
 ];
 if ($result->num_rows > 0) {
     $row = $result->fetch_assoc();
