@@ -1,6 +1,44 @@
 <?php include 'header.php'; 
 include 'nav.php'; 
 
+// Handle form submission
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['save_email_settings'])) {
+    $smtp_settings = [
+        'host' => $_POST['smtp_host'],
+        'port' => $_POST['smtp_port'],
+        'username' => $_POST['smtp_user'],
+        'password' => $_POST['smtp_pass'],
+        'subject' => $_POST['email_subject'],
+        'body' => $_POST['email_body']
+    ];
+    
+    $json_settings = json_encode($smtp_settings);
+    
+    $update_stmt = $conn->prepare("UPDATE stores SET smtp_settings = ? WHERE id = ?");
+    $update_stmt->bind_param("ss", $json_settings, $shop_id);
+    
+    if ($update_stmt->execute()) {
+        $success_message = "Email settings saved successfully!";
+    } else {
+        $error_message = "Failed to save email settings: " . $conn->error;
+    }
+}
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['save_general_settings'])) {
+    $auto_invoice_customer = isset($_POST['auto_invoice_customer']) ? 'Yes' : 'No';
+    $auto_invoice_personal = isset($_POST['auto_invoice_personal']) ? 'Yes' : 'No';
+    $email_invoice = $_POST['email_invoice'] ?? '';
+    
+    // Update database
+    $stmt = $conn->prepare("UPDATE stores SET auto_invoice_customer = ?, auto_invoice_personal = ?, email_invoice = ? WHERE id = ?");
+    $stmt->bind_param("ssss", $auto_invoice_customer, $auto_invoice_personal, $email_invoice, $shop_id);
+    
+    if ($stmt->execute()) {
+        $success_message = 'General settings saved successfully!';
+    } else {
+        $error_message = 'Failed to save general settings';
+    }
+}
+
 // Default email template
 $default_subject = "Invoice #{invoice_number} from Your Store";
 $default_body = '
@@ -56,46 +94,8 @@ if ($result->num_rows > 0) {
     if (!empty($row['smtp_settings'])) {
         $smtp_settings = json_decode($row['smtp_settings'], true);
         if ($smtp_settings) {
-            $settings['smtp'] = array_merge($settings['smtp'], $smtp_settings);
+            $settings['smtp'] = array_merge($smtp_settings['smtp'], $smtp_settings);
         }
-    }
-}
-
-// Handle form submission
-if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['save_email_settings'])) {
-    $smtp_settings = [
-        'host' => $_POST['smtp_host'],
-        'port' => $_POST['smtp_port'],
-        'username' => $_POST['smtp_user'],
-        'password' => $_POST['smtp_pass'],
-        'subject' => $_POST['email_subject'],
-        'body' => $_POST['email_body']
-    ];
-    
-    $json_settings = json_encode($smtp_settings);
-    
-    $update_stmt = $conn->prepare("UPDATE stores SET smtp_settings = ? WHERE id = ?");
-    $update_stmt->bind_param("ss", $json_settings, $shop_id);
-    
-    if ($update_stmt->execute()) {
-        $success_message = "Email settings saved successfully!";
-    } else {
-        $error_message = "Failed to save email settings: " . $conn->error;
-    }
-}
-if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['save_general_settings'])) {
-    $auto_invoice_customer = isset($_POST['auto_invoice_customer']) ? 'Yes' : 'No';
-    $auto_invoice_personal = isset($_POST['auto_invoice_personal']) ? 'Yes' : 'No';
-    $email_invoice = $_POST['email_invoice'] ?? '';
-    
-    // Update database
-    $stmt = $conn->prepare("UPDATE stores SET auto_invoice_customer = ?, auto_invoice_personal = ?, email_invoice = ? WHERE id = ?");
-    $stmt->bind_param("ssss", $auto_invoice_customer, $auto_invoice_personal, $email_invoice, $shop_id);
-    
-    if ($stmt->execute()) {
-        $success_message = 'General settings saved successfully!';
-    } else {
-        $error_message = 'Failed to save general settings';
     }
 }
 ?>
