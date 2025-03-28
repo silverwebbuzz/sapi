@@ -2,7 +2,7 @@
  require_once '../config.php'; 
  require_once '../db.php';
 
- if (!isset($_SESSION['authenticated']) {
+ if (!isset($_SESSION['authenticated'])) {
     header('Location: login.php');
     exit;
 }
