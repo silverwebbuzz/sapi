@@ -1,5 +1,11 @@
-<?php include 'header.php'; ?>
-<?php include 'nav.php'; ?>
+<?php include 'header.php';
+include 'nav.php'; 
+$shop_id = 1;
+$store['shop'] = 'silverwebbuzzapp.myshopify.com';
+//fetch invoices
+$invoice_table = "invoices_" . preg_replace('/[^a-zA-Z0-9_]/', '_', strtolower($store['shop']));
+$invoices_query = $conn->query("SELECT * FROM `$invoice_table` ORDER BY created_at DESC");
+?>
 
 <main class="main-content">
     <div class="page-header">
@@ -24,6 +30,21 @@
                 </tr>
             </thead>
             <tbody>
+            <?php while ($invoice = $invoices_query->fetch_assoc()): ?>
+                <tr>
+                    <td><?= $invoice['order_number'] ?></td>
+                    <td><?= $invoice['created_at'] ?></td>
+                    <td><?= htmlspecialchars($invoice['customer_name']) ?></td>
+                    <td>$<?= number_format($invoice['total_price'], 2) ?></td>
+                    <td><span class="status completed"><?= ucfirst($invoice['invoice_status']) ?></span></td>
+                    <td><a href="<?= BASE_URL ?>/generatepdf?shop_id=<?= $shop_id ?>&order_id<?= $invoice['order_id'] ?>" class="view-invoice">View</a></td>
+                    <td>
+                        <button class="btn-action resend">Resend</button>
+                        <button class="btn-action download">Download</button>
+                    </td>
+                </tr>
+                
+            <?php endwhile; ?>
                 <tr>
                     <td>1001</td>
                     <td>2025-03-28 10:30:45</td>

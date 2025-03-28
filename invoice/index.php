@@ -1,5 +1,11 @@
-<?php include 'header.php'; ?>
-<?php include 'nav.php'; ?>
+<?php include 'header.php';
+include 'nav.php'; 
+$shop_id = 1;
+$store['shop'] = 'silverwebbuzzapp.myshopify.com';
+//fetch invoices
+$invoice_table = "invoices_" . preg_replace('/[^a-zA-Z0-9_]/', '_', strtolower($store['shop']));
+$invoices_query = $conn->query("SELECT * FROM `$invoice_table` ORDER BY created_at DESC");
+?>
 
 <main class="main-content">
     <!-- Stats Cards -->
@@ -76,6 +82,16 @@
                 </tr>
             </thead>
             <tbody>
+            <?php while ($invoice = $invoices_query->fetch_assoc()): ?>
+                <tr>
+                    <td><?= $invoice['order_number'] ?></td>
+                    <td><?= $invoice['created_at'] ?></td>
+                    <td><?= htmlspecialchars($invoice['customer_name']) ?></td>
+                    <td>$<?= number_format($invoice['total_price'], 2) ?></td>
+                    <td><span class="status completed"><?= ucfirst($invoice['invoice_status']) ?></span></td>
+                    <td><a href="<?= BASE_URL ?>/generatepdf?shop_id=<?= $shop_id ?>&order_id<?= $invoice['order_id'] ?>" target="_blank">Send</a></td>
+                </tr>
+            <?php endwhile; ?>
                 <tr>
                     <td>1006</td>
                     <td>2025-03-27 13:55:50</td>
@@ -89,40 +105,8 @@
                     <td>2025-03-27 13:55:50</td>
                     <td>Bhavik Koradiya</td>
                     <td>$10.00</td>
-                    <td><span class="status pending">Pending</span></td>
+                    <td><span class="status completed">Comeplete</span></td>
                     <td><a href="https://sapi.silverwebbuzz.com/generatepdf?shop_id=1&order_id6265004294444" target="_blank">View</a></td>
-                </tr>
-                <tr>
-                    <td>1008</td>
-                    <td>2025-03-27 13:55:50</td>
-                    <td>Bhavik Koradiya</td>
-                    <td>$29.44</td>
-                    <td><span class="status pending">Pending</span></td>
-                    <td><a href="https://sapi.silverwebbuzz.com/generatepdf?shop_id=1&order_id6265006293292" target="_blank">View</a></td>
-                </tr>
-                <tr>
-                    <td>1009</td>
-                    <td>2025-03-27 13:55:50</td>
-                    <td>Bhavik Koradiya</td>
-                    <td>$1,685.42</td>
-                    <td><span class="status pending">Pending</span></td>
-                    <td><a href="https://sapi.silverwebbuzz.com/generatepdf?shop_id=1&order_id6265017794860" target="_blank">View</a></td>
-                </tr>
-                <tr>
-                    <td>1010</td>
-                    <td>2025-03-27 13:55:50</td>
-                    <td>Bhavik Koradiya</td>
-                    <td>$861.34</td>
-                    <td><span class="status pending">Pending</span></td>
-                    <td><a href="https://sapi.silverwebbuzz.com/generatepdf?shop_id=1&order_id6265029853484" target="_blank">View</a></td>
-                </tr>
-                <tr>
-                    <td>1011</td>
-                    <td>2025-03-27 13:55:50</td>
-                    <td>Bhavik Koradiya</td>
-                    <td>$884.94</td>
-                    <td><span class="status pending">Pending</span></td>
-                    <td><a href="https://sapi.silverwebbuzz.com/generatepdf?shop_id=1&order_id6266005750060" target="_blank">View</a></td>
                 </tr>
             </tbody>
         </table>
