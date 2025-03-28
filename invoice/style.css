@@ -610,32 +610,35 @@ td {
     cursor: pointer;
 }
 
-.template-selector {
-    margin-top: 20px;
-}
-
+/* Template Selector */
 .template-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
     gap: 20px;
     margin: 20px 0;
 }
 
 .template-card {
+    position: relative;
     border: 1px solid var(--border);
     border-radius: 8px;
     overflow: hidden;
-    cursor: pointer;
     transition: all 0.3s ease;
-}
-
-.template-card:hover {
-    border-color: var(--primary);
 }
 
 .template-card.selected {
     border: 2px solid var(--primary);
     box-shadow: 0 0 0 3px rgba(92, 106, 196, 0.2);
+}
+
+.template-card input[type="radio"] {
+    position: absolute;
+    opacity: 0;
+}
+
+.template-card label {
+    display: block;
+    cursor: pointer;
 }
 
 .template-card img {
@@ -644,10 +647,25 @@ td {
     display: block;
 }
 
+.template-placeholder {
+    padding: 40px 20px;
+    background: var(--bg-light);
+    text-align: center;
+    font-weight: 500;
+}
+
 .template-name {
     padding: 10px;
     text-align: center;
     font-weight: 500;
+    border-top: 1px solid var(--border);
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+    .template-grid {
+        grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+    }
 }
 
 /* Billing Page Styles */

@@ -45,6 +45,20 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['save_general_settings
     }
 }
 
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['save_invoice_settings'])) {
+    $template_id = (int)($_POST['template_id'] ?? 1);
+    
+    // Update database
+    $stmt = $conn->prepare("UPDATE stores SET invoice_templates_id = ? WHERE id = ?");
+    $stmt->bind_param("is", $template_id, $shop_id);
+    
+    if ($stmt->execute()) {
+        $success_message = 'Invoice settings saved successfully!';
+    } else {
+        $error_message = 'Failed to save Invoice settings';
+    }
+}
+
 // Default email template
 $default_subject = "Invoice #{invoice_number} from Your Store";
 $default_body = '
@@ -117,7 +131,6 @@ if ($result->num_rows > 0) {
         <?php endif; ?>
 
         <!-- Tab Navigation -->
-
         <div class="settings-tabs">
             <a href="#general" class="settings-tab active"><i class="icon-gear"></i> General</a>
             <a href="#email" class="settings-tab"><i class="icon-email"></i> Email</a>
@@ -194,36 +207,49 @@ if ($result->num_rows > 0) {
             <!-- Invoice Settings -->
             <section id="invoice" class="settings-section">
                 <h3>Invoice Settings</h3>
-                <div class="template-selector">
-                    <h4>Choose a Template</h4>
-                    <div class="template-grid">
-                        <div class="template-card selected">
-                            <img src="templates/template1.jpg" alt="Template 1">
-                            <div class="template-name">Modern</div>
+                <form method="POST" class="settings-form">
+                    <input type="hidden" name="save_invoice_settings" value="1">
+                    <div class="template-selector">
+                        <h4>Choose a Template</h4>
+                        <div class="template-grid">
+
+                        <?php
+                            // Fetch all templates
+                            $template_stmt = $conn->prepare("SELECT * FROM invoice_templates ORDER BY id");
+                            $template_stmt->execute();
+                            $templates = $template_stmt->get_result();
+                            
+                            // Get current template ID from store
+                            $store_stmt = $conn->prepare("SELECT invoice_templates_id FROM stores WHERE id = ?");
+                            $store_stmt->bind_param("s", $_SESSION['shop_id']);
+                            $store_stmt->execute();
+                            $current_template_id = $store_stmt->get_result()->fetch_assoc()['invoice_templates_id'] ?? 1;
+                        
+                            while ($template = $templates->fetch_assoc()):
+                                $is_selected = $template['id'] == $current_template_id;
+                        ?>
+                            <div class="template-card <?= $is_selected ? 'selected' : '' ?>">
+                                <input type="radio" name="template_id" value="<?= $template['id'] ?>" id="template_<?= $template['id'] ?>" <?= $is_selected ? 'checked' : '' ?>>
+                                <label for="template_<?= $template['id'] ?>">
+                                    <?php if ($template['preview_image']): ?>
+                                        <img src="<?= htmlspecialchars($template['preview_image']) ?>" alt="<?= htmlspecialchars($template['template_name']) ?>">
+                                    <?php else: ?>
+                                        <div class="template-placeholder">
+                                            <?= htmlspecialchars($template['template_name']) ?>
+                                        </div>
+                                    <?php endif; ?>
+                                    <div class="template-name"><?= htmlspecialchars($template['template_name']) ?></div>
+                                </label>
+                            </div>
+
+                        <?php 
+                            endwhile; 
+                        ?>
+                            
                         </div>
-                        <div class="template-card">
-                            <img src="templates/template2.jpg" alt="Template 2">
-                            <div class="template-name">Classic</div>
-                        </div>
-                        <div class="template-card">
-                            <img src="templates/template3.jpg" alt="Template 3">
-                            <div class="template-name">Minimal</div>
-                        </div>
-                        <div class="template-card">
-                            <img src="templates/template4.jpg" alt="Template 4">
-                            <div class="template-name">Elegant</div>
-                        </div>
-                        <div class="template-card">
-                            <img src="templates/template5.jpg" alt="Template 5">
-                            <div class="template-name">Professional</div>
-                        </div>
-                        <div class="template-card">
-                            <img src="templates/template6.jpg" alt="Template 6">
-                            <div class="template-name">Creative</div>
-                        </div>
+                        <button type="submit" class="btn-save">Save Template</button>
                     </div>
-                    <button class="btn-save">Save Template</button>
-                </div>
+                </form>    
             </section>
         </div>
     </div>

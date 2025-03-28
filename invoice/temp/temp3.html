@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <title>Detailed Invoice</title>
+</head>
+<body style="font-family: Arial, sans-serif; font-size: 14px; margin: 20px;">
+  <!-- Header -->  
+  <table width="100%" style="border-collapse: collapse;">
+    <tr>
+      <td style="border: none; text-align: left;">{{ Company_Logo }}</td>
+      <td style="border: none; text-align: right; font-size: 20px; font-weight: bold;">Invoice #: {{ Order_Number }}</td>
+    </tr>
+    <tr>
+      <td style="border: none;">From: {{ Company_Name }}<br>{{ Company_Address }}<br>{{ Company_Email }} | {{ Company_Phone }}</td>
+      <td style="border: none; text-align: right;">To: {{ Billing_Name }}<br>{{ Billing_Address1 }}, {{ Billing_City }}, {{ Billing_Country }}</td>
+    </tr>
+    <tr>
+      <td style="border: none;">Invoice Date: {{ Invoice_Date }}</td>
+      <td style="border: none; text-align: right;">Due Date: {{ Due_Date }}</td>
+    </tr>
+  </table>
+  <br>
+  <!-- Items Table -->  
+  <table width="100%" style="border-collapse: collapse;" border="1" cellpadding="5">
+    <tr style="background-color: #e8e8e8;">
+      <th style="text-align: left;">Item</th>
+      <th style="text-align: left;">Description</th>
+      <th style="text-align: center;">Qty</th>
+      <th style="text-align: right;">Unit Price</th>
+      <th style="text-align: right;">Tax</th>
+      <th style="text-align: right;">Total</th>
+    </tr>
+    {{ Order_Items }}
+    <tr>
+      <td colspan="5" style="text-align: right; font-weight: bold;">Subtotal:</td>
+      <td style="text-align: right;">{{ Subtotal }}</td>
+    </tr>
+    <tr>
+      <td colspan="5" style="text-align: right; font-weight: bold;">Tax:</td>
+      <td style="text-align: right;">{{ Tax_Amount }}</td>
+    </tr>
+    <tr>
+      <td colspan="5" style="text-align: right; font-weight: bold;">Discount:</td>
+      <td style="text-align: right;">{{ Discount_Amount }}</td>
+    </tr>
+    <tr>
+      <td colspan="5" style="text-align: right; font-weight: bold;">Grand Total:</td>
+      <td style="text-align: right; font-weight: bold;">{{ Total_Amount }}</td>
+    </tr>
+  </table>
+  <br>
+  <!-- Payment Details -->  
+  <table width="100%" style="border-collapse: collapse;" border="0" cellpadding="5">
+    <tr>
+      <td style="border: none;"><strong>Payment Method:</strong> {{ Payment_Method }}</td>
+      <td style="border: none; text-align: right;"><strong>Payment Status:</strong> {{ Payment_Status }}</td>
+    </tr>
+  </table>
+  <!-- Footer -->  
+  <p style="text-align: center; margin-top: 20px; font-style: italic;">Thank you for your business!</p>
+</body>
+</html>
