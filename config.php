@@ -4,7 +4,6 @@ define('BASE_URL', 'https://sapi.silverwebbuzz.com');
 define('BASE_TEMPLATE_URL', 'https://sapi.silverwebbuzz.com/template/');
 define('BASE_SHOPIFY_AF_URL', 'https://sapi.silverwebbuzz.com/shopifyclient/');
 
-
 define('PUBLIC_URL', BASE_URL);
 
 // Database Configuration

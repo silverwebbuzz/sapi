@@ -26,50 +26,39 @@ $default_body = '
 ';
 
 // Fetch existing settings
-$table_query = $conn->prepare("SELECT smtp_settings FROM stores WHERE id = ?");
+$table_query = $conn->prepare("SELECT smtp_settings,auto_invoice_customer, auto_invoice_personal, email_invoice, email  FROM stores WHERE id = ?");
 $table_query->bind_param("s", $shop_id);
 $table_query->execute();
 $result = $table_query->get_result();
 
-$smtp_settings = [
-    'host' => '',
-    'port' => '587',
-    'username' => '',
-    'password' => '',
-    'subject' => $default_subject,
-    'body' => $default_body
+$settings = [
+    'auto_invoice_customer' => 'No',
+    'auto_invoice_personal' => 'No',
+    'email_invoice' => '',
+    'smtp' => [
+        'host' => '',
+        'port' => '587',
+        'username' => '',
+        'password' => '',
+        'subject' => $default_subject,
+        'body' => $default_body
+    ]
+    
 ];
-
 if ($result->num_rows > 0) {
-    $shop_data = $result->fetch_assoc();
-    if (!empty($shop_data['smtp_settings'])) {
-        $stored_settings = json_decode($shop_data['smtp_settings'], true);
-        if ($stored_settings) {
-            $smtp_settings = array_merge($smtp_settings, $stored_settings);
+    $row = $result->fetch_assoc();
+    
+    // General settings
+    $settings['auto_invoice_customer'] = $row['auto_invoice_customer'] ?? 'No';
+    $settings['auto_invoice_personal'] = $row['auto_invoice_personal'] ?? 'No';
+    $settings['email_invoice'] = $row['email_invoice'] ?? $row['email'];
+    
+    // SMTP settings
+    if (!empty($row['smtp_settings'])) {
+        $smtp_settings = json_decode($row['smtp_settings'], true);
+        if ($smtp_settings) {
+            $settings['smtp'] = array_merge($settings['smtp'], $smtp_settings);
         }
-    }
-}
-
-// Handle form submission
-if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['save_email_settings'])) {
-    $smtp_settings = [
-        'host' => $_POST['smtp_host'],
-        'port' => $_POST['smtp_port'],
-        'username' => $_POST['smtp_user'],
-        'password' => $_POST['smtp_pass'],
-        'subject' => $_POST['email_subject'],
-        'body' => $_POST['email_body']
-    ];
-    
-    $json_settings = json_encode($smtp_settings);
-    
-    $update_stmt = $conn->prepare("UPDATE stores SET smtp_settings = ? WHERE id = ?");
-    $update_stmt->bind_param("ss", $json_settings, $shop_id);
-    
-    if ($update_stmt->execute()) {
-        $success_message = "Email settings saved successfully!";
-    } else {
-        $error_message = "Failed to save email settings: " . $conn->error;
     }
 }
 ?>
@@ -79,12 +68,16 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['save_email_settings']
         <h2>Settings</h2>
 
         <!-- Display messages -->
-        <?php if (isset($success_message)): ?>
-            <div class="alert alert-success"><?= htmlspecialchars($success_message) ?></div>
+        <?php if (isset($_SESSION['success_message'])): ?>
+            <div class="alert alert-success"><?= htmlspecialchars($_SESSION['success_message']) ?></div>
+            <?php unset($_SESSION['success_message']); // Clear the message after displaying ?>
         <?php endif; ?>
-        <?php if (isset($error_message)): ?>
-            <div class="alert alert-error"><?= htmlspecialchars($error_message) ?></div>
+
+        <?php if (isset($_SESSION['error_message'])): ?>
+            <div class="alert alert-error"><?= htmlspecialchars($_SESSION['error_message']) ?></div>
+            <?php unset($_SESSION['error_message']); // Clear the message after displaying ?>
         <?php endif; ?>
+
         <!-- Tab Navigation -->
 
         <div class="settings-tabs">
@@ -98,33 +91,35 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['save_email_settings']
             <!-- General Settings -->
             <section id="general" class="settings-section active">
                 <h3>General Settings</h3>
-                <div class="settings-form">
+                <form class="general-settings-form" data-section="general">
                     <div class="form-group">
                         <label>
-                            <input type="checkbox" name="auto_invoice" checked> 
+                            <input type="checkbox" name="auto_invoice_customer" 
+                                <?= $settings['auto_invoice_customer'] === 'Yes' ? 'checked' : '' ?>>
                             Automatic invoices to customers
                         </label>
                         <p class="description">Enable/disable sending invoices to customers automatically</p>
                     </div>
-                    
                     <div class="form-group">
                         <label>
-                            <input type="checkbox" name="auto_copy" checked> 
+                            <input type="checkbox" name="auto_invoice_personal" 
+                                <?= $settings['auto_invoice_personal'] === 'Yes' ? 'checked' : '' ?>>
                             Automatic personal copy
                         </label>
                         <p class="description">Receive a copy of every invoice automatically</p>
-                        <input type="email" name="copy_email" placeholder="your-email@example.com" class="form-input">
+                        <input type="email" name="email_invoice" 
+                            value="<?= htmlspecialchars($settings['email_invoice']) ?>" 
+                            placeholder="your-email@example.com" class="form-input">
                     </div>
-                    
-                    <button class="btn-save">Save General Settings</button>
-                </div>
+                    <button type="submit" class="btn-save">Save General Settings</button>
+                </form>
             </section>
             
             <!-- Email Settings -->
             <section id="email" class="settings-section">
                 <h3>Email Settings</h3>
-                <form method="POST" class="settings-form">
-                    <input type="hidden" name="save_email_settings" value="1">
+                <form method="POST" action="smtp_settings_handler.php" class="email-settings-form">
+                    <input type="hidden" name="csrf_token" value="<?= $_SESSION['csrf_token'] ?? '' ?>">
                     
                     <div class="form-group">
                         <label>SMTP Host</label>
