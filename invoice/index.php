@@ -10,40 +10,42 @@
 </head>
 <body>
     <div class="dashboard-container">
-        <!-- Sidebar -->
-        <div class="sidebar">
+        <!-- Vertical Sidebar -->
+        <div class="vertical-sidebar">
             <div class="sidebar-header">
                 <h2>SWB Auto PDF</h2>
             </div>
-            <ul class="sidebar-menu">
-                <li class="active">
-                    <a href="#"><i class="icon-dashboard"></i> Dashboard</a>
-                </li>
-                <li>
-                    <a href="#"><i class="icon-analytics"></i> Website Analytics</a>
-                </li>
-                <li class="has-submenu">
-                    <a href="#"><i class="icon-apps"></i> Apps <i class="icon-chevron"></i></a>
-                    <ul class="submenu">
-                        <li><a href="#">PDF Generator</a></li>
-                        <li><a href="#">Email Notifications</a></li>
-                    </ul>
-                </li>
-                <li class="has-submenu">
-                    <a href="#"><i class="icon-settings"></i> Settings <i class="icon-chevron"></i></a>
-                    <ul class="submenu">
-                        <li><a href="#">Application Settings</a></li>
-                        <li><a href="#">Email Settings</a></li>
-                        <li><a href="#">Invoice Settings</a></li>
-                    </ul>
-                </li>
-                <li>
-                    <a href="#"><i class="icon-invoice"></i> Invoices</a>
-                </li>
-                <li>
-                    <a href="#"><i class="icon-email"></i> Email</a>
-                </li>
-            </ul>
+            <nav class="vertical-menu">
+                <ul>
+                    <li class="active">
+                        <a href="#"><i class="icon-dashboard"></i> Dashboard</a>
+                    </li>
+                    <li>
+                        <a href="#"><i class="icon-analytics"></i> Analytics</a>
+                    </li>
+                    <li class="menu-item-has-children">
+                        <a href="#"><i class="icon-apps"></i> Apps <i class="icon-chevron"></i></a>
+                        <ul class="sub-menu">
+                            <li><a href="#">PDF Generator</a></li>
+                            <li><a href="#">Email Notifications</a></li>
+                        </ul>
+                    </li>
+                    <li class="menu-item-has-children">
+                        <a href="#"><i class="icon-settings"></i> Settings <i class="icon-chevron"></i></a>
+                        <ul class="sub-menu">
+                            <li><a href="#">Application</a></li>
+                            <li><a href="#">Email</a></li>
+                            <li><a href="#">Invoice</a></li>
+                        </ul>
+                    </li>
+                    <li>
+                        <a href="#"><i class="icon-invoice"></i> Invoices</a>
+                    </li>
+                    <li>
+                        <a href="#"><i class="icon-email"></i> Email</a></li>
+                    </li>
+                </ul>
+            </nav>
         </div>
 
         <!-- Main Content -->

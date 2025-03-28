@@ -31,78 +31,111 @@ body {
     min-height: 100vh;
 }
 
-/* Sidebar Styles */
-.sidebar {
-    width: 240px;
-    background-color: var(--bg-dark);
-    color: var(--white);
-    padding: 20px 0;
+/* Vertical Menu Styles */
+.vertical-sidebar {
+    width: 260px;
     height: 100vh;
     position: fixed;
+    left: 0;
+    top: 0;
+    background: #1e293b;
+    color: #fff;
+    transition: all 0.3s ease;
+    z-index: 1000;
+    overflow-y: auto;
 }
 
-.sidebar-header {
-    padding: 0 20px 20px;
-    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+.vertical-menu {
+    padding: 20px 0;
 }
 
-.sidebar-header h2 {
-    font-size: 18px;
-    font-weight: 600;
-}
-
-.sidebar-menu {
+.vertical-menu ul {
     list-style: none;
-    margin-top: 20px;
+    padding: 0;
+    margin: 0;
 }
 
-.sidebar-menu li {
+.vertical-menu li {
     position: relative;
 }
 
-.sidebar-menu li a {
+.vertical-menu li a {
     display: flex;
     align-items: center;
     padding: 12px 20px;
-    color: var(--white);
+    color: rgba(255, 255, 255, 0.8);
     text-decoration: none;
     font-size: 14px;
     font-weight: 500;
     transition: all 0.3s ease;
-    opacity: 0.8;
+    border-left: 3px solid transparent;
 }
 
-.sidebar-menu li a:hover {
-    opacity: 1;
-    background-color: rgba(255, 255, 255, 0.1);
+.vertical-menu li a:hover {
+    color: #fff;
+    background: rgba(255, 255, 255, 0.05);
 }
 
-.sidebar-menu li.active a {
-    opacity: 1;
-    background-color: var(--primary);
+.vertical-menu li.active > a {
+    color: #fff;
+    background: rgba(255, 255, 255, 0.1);
+    border-left: 3px solid #5c6ac4;
 }
 
-.sidebar-menu li a i {
-    margin-right: 10px;
-    width: 20px;
-    text-align: center;
+.vertical-menu li a i {
+    margin-right: 12px;
+    font-size: 16px;
 }
 
-.has-submenu .submenu {
-    list-style: none;
+/* Submenu Styles */
+.sub-menu {
     max-height: 0;
     overflow: hidden;
     transition: max-height 0.3s ease;
-    background-color: rgba(0, 0, 0, 0.2);
+    background: rgba(0, 0, 0, 0.2);
 }
 
-.has-submenu.active .submenu {
+.menu-item-has-children.active .sub-menu {
     max-height: 500px;
 }
 
-.submenu li a {
-    padding-left: 40px !important;
+.sub-menu li a {
+    padding-left: 50px !important;
     font-size: 13px;
+}
+
+/* Chevron Icon */
+.icon-chevron {
+    margin-left: auto;
+    transition: transform 0.3s ease;
+}
+
+.menu-item-has-children.active .icon-chevron {
+    transform: rotate(90deg);
+}
+
+/* Main Content Adjustments */
+.main-content-wrapper {
+    margin-left: 260px;
+    transition: margin-left 0.3s ease;
+}
+
+/* Mobile Menu Toggle (hidden by default) */
+.menu-toggle {
+    display: none;
+    background: none;
+    border: none;
+    padding: 10px;
+    cursor: pointer;
+    margin-right: 15px;
+}
+
+.menu-toggle span {
+    display: block;
+    width: 22px;
+    height: 2px;
+    background: #333;
+    margin-bottom: 4px;
 }
 
 /* Main Content Styles */
