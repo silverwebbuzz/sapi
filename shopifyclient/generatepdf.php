@@ -170,6 +170,12 @@ $body = "
     </body>
     </html>
 ";
+//When sending an email, you would replace the variables like this:
+/*$email_body = str_replace(
+    ['{invoice_number}', '{customer_name}', '{total_price}', '{currency}', '{created_at}'],
+    [$invoice['order_number'], $customer_name, $invoice['total_price'], $invoice['currency'], $invoice['created_at']],
+    $smtp_settings['body']
+);*/
 
         // Send email with attachment
         $email_sent = sendEmailWithAttachment(

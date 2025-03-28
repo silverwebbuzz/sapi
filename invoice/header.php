@@ -5,7 +5,12 @@ ini_set('display_startup_errors', 1);
 
 require_once '../config.php'; 
 require_once '../db.php';
+// Database connection
 $conn = DB::getInstance();
+
+// Get current shop ID (you'll need to set this based on your authentication)
+$shop_id = 1; // This should come from your session/auth system
+$store['shop'] = 'silverwebbuzzapp.myshopify.com';
 ?>
 <!DOCTYPE html>
 <html lang="en">
