@@ -9,11 +9,12 @@ $invoices_query = $conn->query("SELECT * FROM `$invoice_table` ORDER BY created_
 
 <main class="main-content">
     <div class="page-header">
-        <h2>Orders List</h2>
-        <div class="actions">
+        <h2>Shopify Orders List</h2>
+        <h3>Display All Shopify Orders with all invoice and email status.</h3>
+        <!--div class="actions">
             <button class="btn-export">Export CSV</button>
             <button class="btn-filter">Filter Orders</button>
-        </div>
+        </div-->
     </div>
 
     <div class="orders-card">
@@ -26,7 +27,7 @@ $invoices_query = $conn->query("SELECT * FROM `$invoice_table` ORDER BY created_
                     <th>AMOUNT</th>
                     <th>STATUS</th>
                     <th>INVOICE</th>
-                    <th>ACTIONS</th>
+                    <th>EMAIL</th>
                 </tr>
             </thead>
             <tbody>
@@ -37,10 +38,9 @@ $invoices_query = $conn->query("SELECT * FROM `$invoice_table` ORDER BY created_
                     <td><?= htmlspecialchars($invoice['customer_name']) ?></td>
                     <td>$<?= number_format($invoice['total_price'], 2) ?></td>
                     <td><span class="status completed"><?= ucfirst($invoice['invoice_status']) ?></span></td>
-                    <td><a href="<?= BASE_URL ?>/generatepdf?shop_id=<?= $shop_id ?>&order_id<?= $invoice['order_id'] ?>" class="view-invoice">View</a></td>
+                    <td><button class="btn-action download">Generate</button><a href="<?= BASE_URL ?>/generatepdf?shop_id=<?= $shop_id ?>&order_id<?= $invoice['order_id'] ?>" class="view-invoice">View</a></td>
                     <td>
                         <button class="btn-action resend">Resend</button>
-                        <button class="btn-action download">Download</button>
                     </td>
                 </tr>
                 
