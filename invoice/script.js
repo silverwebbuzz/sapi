@@ -1,9 +1,8 @@
 $(document).ready(function() {
-    // Initialize DataTable
-    $('#ordersTable').DataTable({
+    // Initialize DataTables
+    $('#ordersTable, .billing-table').DataTable({
         "pageLength": 10,
         "lengthMenu": [10, 25, 50, 100],
-        "order": [[0, "desc"]],
         "language": {
             "search": "Search:",
             "lengthMenu": "Show _MENU_ entries",
@@ -45,6 +44,40 @@ $(document).ready(function() {
         }
     });
 
+    // Template Selection
+    $('.template-card').on('click', function() {
+        $('.template-card').removeClass('selected');
+        $(this).addClass('selected');
+    });
+
+    // Settings Form Submission
+    $('.btn-save').on('click', function() {
+        const section = $(this).closest('.settings-section');
+        const sectionName = section.attr('id');
+        
+        // Here you would typically make an AJAX call to save settings
+        alert(`${sectionName} settings saved!`);
+    });
+
+    // Plan Upgrade Buttons
+    $('.btn-upgrade').on('click', function() {
+        if (!$(this).hasClass('current')) {
+            const planName = $(this).closest('.plan-card').find('h4').text();
+            if (confirm(`Are you sure you want to upgrade to ${planName} plan?`)) {
+                // Here you would typically redirect to payment page or make an AJAX call
+                alert(`Upgraded to ${planName} plan!`);
+            }
+        }
+    });
+
+    // Cancel Subscription Button
+    $('.btn-cancel').on('click', function() {
+        if (confirm('Are you sure you want to cancel your subscription?')) {
+            // Here you would typically make an AJAX call to cancel subscription
+            alert('Subscription cancelled!');
+        }
+    });
+    
     // Handle window resize
     $(window).on('resize', function() {
         if ($(window).width() > 992) {
