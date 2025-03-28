@@ -3,7 +3,7 @@ include 'nav.php';
 
 // Simple HTML Purifier Alternative (basic sanitization)
 function sanitizeHtml($html) {
-    $allowed_tags = '<p><br><strong><em><ul><ol><li><h1><h2><h3><h4><h5><h6>';
+    $allowed_tags = '<html><head><style><body><<p><br><strong><em><ul><ol><li><h1><h2><h3><h4><h5><h6>';
     return strip_tags($html, $allowed_tags);
 }
 
