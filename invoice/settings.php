@@ -61,7 +61,6 @@ if ($result->num_rows > 0) {
     }
 }
 ?>
-
 <main class="main-content">
     <div class="settings-container">
         <h2>Settings</h2>
@@ -93,22 +92,18 @@ if ($result->num_rows > 0) {
                 <form class="general-settings-form" data-section="general">
                     <div class="form-group">
                         <label>
-                            <input type="checkbox" name="auto_invoice_customer" 
-                                <?= $settings['auto_invoice_customer'] === 'Yes' ? 'checked' : '' ?>>
+                            <input type="checkbox" name="auto_invoice_customer" <?= $settings['auto_invoice_customer'] === 'Yes' ? 'checked' : '' ?>>
                             Automatic invoices to customers
                         </label>
                         <p class="description">Enable/disable sending invoices to customers automatically</p>
                     </div>
                     <div class="form-group">
                         <label>
-                            <input type="checkbox" name="auto_invoice_personal" 
-                                <?= $settings['auto_invoice_personal'] === 'Yes' ? 'checked' : '' ?>>
+                            <input type="checkbox" name="auto_invoice_personal"  <?= $settings['auto_invoice_personal'] === 'Yes' ? 'checked' : '' ?>>
                             Automatic personal copy
                         </label>
                         <p class="description">Receive a copy of every invoice automatically</p>
-                        <input type="email" name="email_invoice" 
-                            value="<?= htmlspecialchars($settings['email_invoice']) ?>" 
-                            placeholder="your-email@example.com" class="form-input">
+                        <input type="email" name="email_invoice" value="<?= htmlspecialchars($settings['email_invoice']) ?>"  placeholder="your-email@example.com" class="form-input">
                     </div>
                     <button type="submit" class="btn-save">Save General Settings</button>
                 </form>
@@ -118,49 +113,35 @@ if ($result->num_rows > 0) {
             <section id="email" class="settings-section">
                 <h3>Email Settings</h3>
                 <form method="POST" action="smtp_settings_handler.php" class="email-settings-form">
-                    <input type="hidden" name="csrf_token" value="<?= $_SESSION['csrf_token'] ?? '' ?>">
-                    
                     <div class="form-group">
                         <label>SMTP Host</label>
-                        <input type="text" name="smtp_host" class="form-input" 
-                               value="<?= htmlspecialchars($smtp_settings['host']) ?>" 
-                               placeholder="smtp.example.com" required>
+                        <input type="text" name="smtp_host" class="form-input"  value="<?= htmlspecialchars($smtp_settings['host']) ?>"  placeholder="smtp.example.com" required>
                     </div>
                     
                     <div class="form-group">
                         <label>SMTP Port</label>
-                        <input type="number" name="smtp_port" class="form-input" 
-                               value="<?= htmlspecialchars($smtp_settings['port']) ?>" 
-                               placeholder="587" required>
+                        <input type="number" name="smtp_port" class="form-input" value="<?= htmlspecialchars($smtp_settings['port']) ?>"  placeholder="587" required>
                     </div>
                     
                     <div class="form-group">
                         <label>SMTP Username</label>
-                        <input type="text" name="smtp_user" class="form-input" 
-                               value="<?= htmlspecialchars($smtp_settings['username']) ?>" 
-                               placeholder="your-email@example.com" required>
+                        <input type="text" name="smtp_user" class="form-input" value="<?= htmlspecialchars($smtp_settings['username']) ?>" placeholder="your-email@example.com" required>
                     </div>
                     
                     <div class="form-group">
                         <label>SMTP Password</label>
-                        <input type="password" name="smtp_pass" class="form-input" 
-                               value="<?= htmlspecialchars($smtp_settings['password']) ?>" 
-                               placeholder="••••••••" required>
+                        <input type="password" name="smtp_pass" class="form-input"  value="<?= htmlspecialchars($smtp_settings['password']) ?>" placeholder="••••••••" required>
                     </div>
                     
                     <div class="form-group">
                         <label>Email Subject</label>
-                        <input type="text" name="email_subject" class="form-input" 
-                               value="<?= htmlspecialchars($smtp_settings['subject']) ?>" 
-                               placeholder="Invoice Notification" required>
+                        <input type="text" name="email_subject" class="form-input" value="<?= htmlspecialchars($smtp_settings['subject']) ?>" placeholder="Invoice Notification" required>
                         <p class="description">Available variables: {invoice_number}, {customer_name}, {total_price}, {currency}, {created_at}</p>
                     </div>
                     
                     <div class="form-group">
                         <label>Email Body (HTML)</label>
-                        <textarea name="email_body" class="form-input" rows="12" required><?= 
-                            htmlspecialchars($smtp_settings['body']) 
-                        ?></textarea>
+                        <textarea name="email_body" class="form-input" rows="12" required><?= htmlspecialchars($smtp_settings['body']) ?></textarea>
                         <p class="description">Available variables: {invoice_number}, {customer_name}, {total_price}, {currency}, {created_at}</p>
                     </div>
                     

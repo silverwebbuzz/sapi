@@ -2,11 +2,6 @@
  require_once '../config.php'; 
  require_once '../db.php';
 
- if (!isset($_SESSION['authenticated'])) {
-    header('Location: login.php');
-    exit;
-}
-
  // Database connection
  $conn = DB::getInstance();
  
@@ -14,12 +9,7 @@ $shop_id = 1; // Should come from your session/auth system
 
 // Handle form submission
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-    // Validate CSRF token
-    if (!isset($_POST['csrf_token']) || $_POST['csrf_token'] !== $_SESSION['csrf_token']) {
-        die("Invalid CSRF token");
-    }
-
-    // Validate inputs
+     // Validate inputs
     $required = ['smtp_host', 'smtp_port', 'smtp_user', 'smtp_pass', 'email_subject', 'email_body'];
     foreach ($required as $field) {
         if (empty($_POST[$field])) {
