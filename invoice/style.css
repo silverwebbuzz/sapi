@@ -506,16 +506,12 @@ td {
     display: flex;
     border-bottom: 1px solid var(--border);
     margin-bottom: 20px;
-}
-
-.settings-tab {
     padding: 12px 20px;
     margin-right: 5px;
     text-decoration: none;
     color: var(--text-light);
     font-weight: 500;
     border-radius: 4px 4px 0 0;
-    display: flex;
     align-items: center;
     transition: all 0.3s ease;
 }
@@ -538,6 +534,10 @@ td {
 .settings-container {
     max-width: 1200px;
     margin: 0 auto;
+    background-color: var(--white);
+    border-radius: 8px;
+    padding: 20px;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.1);
 }
 
 /* Tab Content */
