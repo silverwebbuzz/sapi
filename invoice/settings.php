@@ -1,6 +1,12 @@
 <?php include 'header.php'; 
 include 'nav.php'; 
 
+// Simple HTML Purifier Alternative (basic sanitization)
+function sanitizeHtml($html) {
+    $allowed_tags = '<p><br><strong><em><ul><ol><li><h1><h2><h3><h4><h5><h6>';
+    return strip_tags($html, $allowed_tags);
+}
+
 // Handle form submission
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['save_email_settings'])) {
     $smtp_settings = [
@@ -9,7 +15,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['save_email_settings']
         'username' => $_POST['smtp_user'],
         'password' => $_POST['smtp_pass'],
         'subject' => $_POST['email_subject'],
-        'body' => $_POST['email_body']
+        'body' => sanitizeHtml$_POST['email_body'])
     ];
     
     $json_settings = json_encode($smtp_settings);
