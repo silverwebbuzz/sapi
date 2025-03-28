@@ -121,8 +121,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['save_email_settings']
             </section>
             
             <!-- Email Settings -->
-            <!-- Email Settings -->
-            <section id="email" class="settings-section active">
+            <section id="email" class="settings-section">
                 <h3>Email Settings</h3>
                 <form method="POST" class="settings-form">
                     <input type="hidden" name="save_email_settings" value="1">
