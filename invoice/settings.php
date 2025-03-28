@@ -112,7 +112,7 @@ if ($result->num_rows > 0) {
             <!-- Email Settings -->
             <section id="email" class="settings-section">
                 <h3>Email Settings</h3>
-                <form method="POST" action="smtp_settings_handler.php" class="email-settings-form">
+                <form method="POST" action="save_smtp_settings.php" class="email-settings-form">
                     <div class="form-group">
                         <label>SMTP Host</label>
                         <input type="text" name="smtp_host" class="form-input"  value="<?= htmlspecialchars($smtp_settings['host']) ?>"  placeholder="smtp.example.com" required>
