@@ -528,7 +528,7 @@ td {
 
 .settings-tab.active {
     background: var(--text);
-    color: var(--whi
+    color: var(--white);
 }
 
 .settings-container {

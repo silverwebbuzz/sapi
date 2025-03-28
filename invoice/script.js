@@ -90,6 +90,8 @@ $(document).ready(function() {
     // Initialize tooltips if needed
     $('[data-toggle="tooltip"]').tooltip();
 
+});
+
 
     // Tab Functionality
     $('.settings-tab').on('click', function(e) {
@@ -123,6 +125,3 @@ $(document).ready(function() {
 
     // Run on page load and hash change
     $(window).on('load hashchange', activateTabFromHash);
-
-});
-
