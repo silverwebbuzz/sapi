@@ -90,11 +90,10 @@ if ($result->num_rows > 0) {
     $settings['auto_invoice_personal'] = $row['auto_invoice_personal'] ?? 'No';
     $settings['email_invoice'] = $row['email_invoice'] ?? $row['email'];
     
-    // SMTP settings
     if (!empty($row['smtp_settings'])) {
-        $smtp_settings = json_decode($row['smtp_settings'], true);
-        if ($smtp_settings) {
-            $settings['smtp'] = array_merge($smtp_settings['smtp'], $smtp_settings);
+        $stored_settings = json_decode($row['smtp_settings'], true);
+        if ($stored_settings) {
+            $smtp_settings = array_merge($smtp_settings, $stored_settings);
         }
     }
 }
