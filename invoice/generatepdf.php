@@ -134,7 +134,7 @@ if ($result->num_rows > 0) {
 
         // Set document information
         $pdf->SetCreator(PDF_CREATOR);
-        $pdf->SetAuthor($company_name);
+        $pdf->SetAuthor($shop_data['store_name']);
         $pdf->SetTitle('Invoice '.$invoice['order_number']);
         $pdf->SetSubject('Invoice');
 
