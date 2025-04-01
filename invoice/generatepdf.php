@@ -35,15 +35,6 @@ if ($result->num_rows > 0) {
     $shop_name = preg_replace('/[^a-zA-Z0-9_]/', '_', strtolower($shop_data['shop']));
     $invoice_table = "invoices_" . $shop_name;
 
-    $template_id = $shop_data['invoice_templates_id'];
-    // Fetch template details
-    $stmt_temp = $conn->prepare("SELECT * FROM `invoice_templates` WHERE id = ?");
-    $stmt_temp->bind_param("s", $template_id);
-    $stmt_temp->execute();
-    $template_result = $stmt_temp->get_result();
-    $template_html = $template_result->fetch_assoc();
-    echo $template_html['template_file'];
-    exit;
     
     // Fetch invoice details
     $stmt = $conn->prepare("SELECT * FROM `$invoice_table` WHERE order_id = ?");
@@ -60,10 +51,10 @@ if ($result->num_rows > 0) {
         $products = json_decode($invoice['products'], true);
 
         // Prepare company information
-        $company_name = "Silver WebBuzz Pvt. Ltd.";
-        $company_address = "1109, Satyamev Eminence, Science City Road, Sola, Ahmedabad, Gujarat 380060";
-        $company_phone = "+91 1234567890";
-        $company_email = "accounts@silverwebbuzz.com";
+        //$company_name = "Silver WebBuzz Pvt. Ltd.";
+        //$company_address = "1109, Satyamev Eminence, Science City Road, Sola, Ahmedabad, Gujarat 380060";
+        //$company_phone = "+91 1234567890";
+        //$company_email = "accounts@silverwebbuzz.com";
         
         // Prepare order items HTML
         $items_html = '';
@@ -93,11 +84,11 @@ if ($result->num_rows > 0) {
 
         // Prepare replacements array
         $replacements = [
-            //'{{Company_Logo}}' => $shop_data['logo'] ? '<img src="'.$shop_data['logo'].'" class="logo">' : '',
-            '{{Company_Name}}' => $company_name,
-            '{{Company_Address}}' => $company_address,
-            '{{Company_Phone}}' => $company_phone,
-            '{{Company_Email}}' => $company_email,
+            '{{Company_Logo}}' => $shop_data['logo'] ? '<img src="'.$shop_data['logo'].'" class="logo">' : '',
+            '{{Company_Name}}' => $shop_data['store_name'],
+            '{{Company_Address}}' => $shop_data['address1']."<br/>".$shop_data['address2']."<br/>".$shop_data['city']." ".$shop_data['province']." ".$shop_data['province_code']." ".$shop_data['zip']."<br/>".$shop_data['country_name'] ,
+            '{{Company_Phone}}' => $shop_data['phone'],
+            '{{Company_Email}}' => $shop_data['email'],
             '{{Company_GSTIN}}' => $shop_data['gstin'] ?? '',
             '{{Order_Number}}' => $invoice['order_number'],
             '{{Invoice_Date}}' => date('d/m/Y', strtotime($invoice['created_at'])),
@@ -128,7 +119,14 @@ if ($result->num_rows > 0) {
         ];
 
         // Load HTML template
-        $template = file_get_contents('Invoice_Temp/invoice3.html');
+        $template_id = $shop_data['invoice_templates_id'];
+        // Fetch template details
+        $stmt_temp = $conn->prepare("SELECT * FROM `invoice_templates` WHERE id = ?");
+        $stmt_temp->bind_param("s", $template_id);
+        $stmt_temp->execute();
+        $template_result = $stmt_temp->get_result();
+        $template_html = $template_result->fetch_assoc();
+        $template = file_get_contents('temp/'.$template_html['template_file']);
         $html = str_replace(array_keys($replacements), array_values($replacements), $template);
 
         // Create new PDF document
@@ -151,7 +149,7 @@ if ($result->num_rows > 0) {
         $pdf->writeHTML($html, true, false, true, false, '');
 
         // Close and output PDF document
-        //$pdf->Output('invoice_'.$invoice['order_number'].'.pdf', 'I'); exit;
+        $pdf->Output('invoice_'.$invoice['order_number'].'.pdf', 'I'); exit;
         $pdf_content = $pdf->Output('', 'S');
         $encoded_pdf = base64_encode($pdf_content); // Encode PDF for storage
 
