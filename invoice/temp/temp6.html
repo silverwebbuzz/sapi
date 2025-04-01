@@ -42,14 +42,31 @@
   <table width="100%" style="border-collapse: collapse;" border="1" cellpadding="5">
     <tr style="background-color:#eaeaea; font-weight:bold;">
       <th style="text-align:left;">Item</th>
+      <th style="text-align: left;">Description</th>
       <th style="text-align:center;">Qty</th>
       <th style="text-align:right;">Unit Price</th>
       <th style="text-align:right;">Total</th>
     </tr>
     {{ Order_Items }} <!-- Dynamic rows will be inserted here, each row should follow similar inline styling --> 
     <tr>
-      <td colspan="3" style="text-align:right; font-weight:bold;">Total:</td>
-      <td style="text-align:right; font-weight:bold;">{{ Total_Amount }}</td>
+      <td colspan="5" style="text-align: right; font-weight: bold;">Subtotal:</td>
+      <td style="text-align: right; font-weight:bold;">{{ Subtotal }}</td>
+    </tr>
+    <tr>
+      <td colspan="5" style="text-align: right; font-weight: bold;">Tax:</td>
+      <td style="text-align: right; font-weight:bold;">{{ Tax_Amount }}</td>
+    </tr>
+    <tr>
+      <td colspan="5" style="text-align: right; font-weight: bold;">Discount:</td>
+      <td style="text-align: right;">- {{ Discount_Amount }}</td>
+    </tr>
+    <tr>
+      <td colspan="5" style="text-align: right; font-weight: bold;">Shipping:</td>
+      <td style="text-align: right; font-weight:bold;">{{ Shipping_Cost }}</td>
+    </tr>
+    <tr>
+      <td colspan="5" style="text-align: right; font-weight: bold;">Total:</td>
+      <td style="text-align: right; font-weight:bold;">{{ Total_Amount }}</td>
     </tr>
   </table>
   
