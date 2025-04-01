@@ -101,6 +101,8 @@ if ($result->num_rows > 0) {
             '{{ Billing_Zip }}' => $billing_address['zip'] ?? '',
             '{{ Billing_Country }}' => $billing_address['country'] ?? '',
             '{{ Billing_GSTIN }}' => '', // Add GSTIN if available
+            '{{ Billing_Email }}' => $billing_address['email'] ?? '',
+            '{{ Billing_Phone }}' => $billing_address['phone'] ?? '',
             '{{ Shipping_Name }}' => isset($shipping_address['name']) ? $shipping_address['name'] : ($billing_address['name'] ?? ''),
             '{{ Shipping_Address1 }}' => isset($shipping_address['address1']) ? $shipping_address['address1'] : ($billing_address['address1'] ?? ''),
             '{{ Shipping_Address2 }}' => isset($shipping_address['address2']) ? $shipping_address['address2'] : ($billing_address['address2'] ?? ''),
