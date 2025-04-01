@@ -35,6 +35,16 @@ if ($result->num_rows > 0) {
     $shop_name = preg_replace('/[^a-zA-Z0-9_]/', '_', strtolower($shop_data['shop']));
     $invoice_table = "invoices_" . $shop_name;
 
+    $template_id = $shop_data['invoice_templates_id'];
+    // Fetch template details
+    $stmt_temp = $conn->prepare("SELECT * FROM `invoice_templates` WHERE id = ?");
+    $stmt_temp->bind_param("s", $template_id);
+    $stmt_temp->execute();
+    $template_result = $stmt_temp->get_result();
+    $template_html = $template_result->fetch_assoc();
+    echo $template_html['template_file'];
+    exit;
+    
     // Fetch invoice details
     $stmt = $conn->prepare("SELECT * FROM `$invoice_table` WHERE order_id = ?");
     $stmt->bind_param("s", $order_id);
