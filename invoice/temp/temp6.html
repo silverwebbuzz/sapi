@@ -44,33 +44,37 @@
       <th style="text-align:left;">Item</th>
       <th style="text-align:center;">Qty</th>
       <th style="text-align:right;">Unit Price</th>
-      <th style="text-align:right;">Tax Rate</th>
-      <th style="text-align:right;">Tax Price</th>
       <th style="text-align:right;">Total</th>
     </tr>
     {{ Order_Items }} <!-- Dynamic rows will be inserted here, each row should follow similar inline styling --> 
     <tr>
-      <td colspan="5" style="text-align: right; font-weight: bold;">Subtotal:</td>
+      <td colspan="3" style="text-align: right; font-weight: bold;">Subtotal:</td>
       <td style="text-align: right; font-weight:bold;">{{ Subtotal }}</td>
     </tr>
     <tr>
-      <td colspan="5" style="text-align: right; font-weight: bold;">Tax:</td>
+      <td colspan="3" style="text-align: right; font-weight: bold;">Tax:</td>
       <td style="text-align: right; font-weight:bold;">{{ Tax_Amount }}</td>
     </tr>
     <tr>
-      <td colspan="5" style="text-align: right; font-weight: bold;">Discount:</td>
+      <td colspan="3" style="text-align: right; font-weight: bold;">Discount:</td>
       <td style="text-align: right;">- {{ Discount_Amount }}</td>
     </tr>
     <tr>
-      <td colspan="5" style="text-align: right; font-weight: bold;">Shipping:</td>
+      <td colspan="3" style="text-align: right; font-weight: bold;">Shipping:</td>
       <td style="text-align: right; font-weight:bold;">{{ Shipping_Cost }}</td>
     </tr>
     <tr>
-      <td colspan="5" style="text-align: right; font-weight: bold;">Total:</td>
+      <td colspan="3" style="text-align: right; font-weight: bold;">Total:</td>
       <td style="text-align: right; font-weight:bold;">{{ Total_Amount }}</td>
     </tr>
   </table>
-  
+  <!-- Payment Details -->  
+  <table width="100%" style="border-collapse: collapse;" border="0" cellpadding="5">
+    <tr>
+      <td style="border: none;"><strong>Payment Method:</strong> {{ Payment_Method }}</td>
+      <td style="border: none; text-align: right;"><strong>Payment Status:</strong> {{ Payment_Status }}</td>
+    </tr>
+  </table>
   <!-- Footer Section -->
   <p style="text-align:center; margin-top:20px; font-size:12px; color:#777;">
     This is a computer-generated proforma invoice. No signature is required.

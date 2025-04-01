@@ -73,8 +73,8 @@ if ($result->num_rows > 0) {
             $items_html .= '<td>'.$item['name'].'</td>';
             $items_html .= '<td>'.$item['quantity'].'</td>';
             $items_html .= '<td class="text-right">'.$invoice['currency'].' '.number_format($item['price'], 2).'</td>';
-            $items_html .= '<td class="text-right">'.$tax_rate.'%</td>';
-            $items_html .= '<td class="text-right">'.$invoice['currency'].' '.number_format($tax_amount, 2).'</td>';
+            //$items_html .= '<td class="text-right">'.$tax_rate.'%</td>';
+            //$items_html .= '<td class="text-right">'.$invoice['currency'].' '.number_format($tax_amount, 2).'</td>';
             $items_html .= '<td class="text-right">'.$invoice['currency'].' '.number_format($item['price'] * $item['quantity'], 2).'</td>';
             $items_html .= '</tr>';
             $counter++;
