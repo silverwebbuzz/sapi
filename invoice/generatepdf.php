@@ -84,7 +84,7 @@ if ($result->num_rows > 0) {
 
         // Prepare replacements array
         $replacements = [
-            '{{Company_Logo}}' => $shop_data['logo'] ? '<img src="'.$shop_data['logo'].'" class="logo">' : '',
+            '{{Company_Logo}}' => $shop_data['logo_url'] ? '<img src="'.$shop_data['logo_url'].'" class="logo">' : '',
             '{{Company_Name}}' => $shop_data['store_name'],
             '{{Company_Address}}' => $shop_data['address1']."<br/>".$shop_data['address2']."<br/>".$shop_data['city']." ".$shop_data['province']." ".$shop_data['province_code']." ".$shop_data['zip']."<br/>".$shop_data['country_name'] ,
             '{{Company_Phone}}' => $shop_data['phone'],
