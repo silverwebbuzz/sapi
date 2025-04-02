@@ -40,6 +40,8 @@ $invoices_query = $conn->query("SELECT * FROM `$invoice_table` ORDER BY created_
             ss.start_date,
             ss.end_date,
             ss.status,
+            ss.order_used,
+            ss.email_used,
             p.name AS plan_name,
             p.price,
             p.order_limit AS plan_order_limit,
@@ -97,8 +99,15 @@ $invoices_query = $conn->query("SELECT * FROM `$invoice_table` ORDER BY created_
             </div>
             <div class="package-usage">
                 <div class="usage-info">
-                    <span>Used: 10</span>
-                    <span>Remaining: 10</span>
+                    <span>Invoice Used: <?= htmlspecialchars($currentPlan['order_used'])?></span>
+                    <span>Invoice Remaining: <?= (htmlspecialchars($currentPlan['plan_order_limit']) - htmlspecialchars($currentPlan['order_used']))?></span>
+                </div>
+                <div class="usage-bar">
+                    <div class="usage-progress" style="width: 50%"></div>
+                </div>
+                <div class="usage-info">
+                    <span>Email Used: <?= htmlspecialchars($currentPlan['email_used'])?></span>
+                    <span>Email Remaining: <?= (htmlspecialchars($currentPlan['email_limit']) - htmlspecialchars($currentPlan['email_used']))?></span>
                 </div>
                 <div class="usage-bar">
                     <div class="usage-progress" style="width: 50%"></div>
