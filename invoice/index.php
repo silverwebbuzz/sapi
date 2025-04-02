@@ -48,12 +48,12 @@ $invoices_query = $conn->query("SELECT * FROM `$invoice_table` ORDER BY created_
             p.description
         FROM store_subscriptions ss
         JOIN plans p ON ss.plan_id = p.id
-        WHERE ss.store_id = :store_id AND ss.status = 'active'
+        WHERE ss.store_id = ? AND ss.status = 'active'
         ORDER BY ss.start_date DESC
         LIMIT 1
     ";
     $stmt = $conn->prepare($sql);
-    $stmt->bindParam(':store_id', $shop_id);
+    $stmt->bindParam('s', $shop_id);
     $stmt->execute();
     $currentPlan = $stmt->fetch_assoc();
     echo "<h2>Current Plan for Store ID {$currentPlan['store_id']}</h2>";
