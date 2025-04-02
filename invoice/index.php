@@ -70,14 +70,15 @@ $invoices_query = $conn->query("SELECT * FROM `$invoice_table` ORDER BY created_
     <div class="orders-card">
         <h3>Recent Orders</h3>
         <table id="ordersTable" class="display">
-            <thead>
+        <thead>
                 <tr>
                     <th>ORDER ID</th>
                     <th>DATE</th>
                     <th>CUSTOMER</th>
-                    <th>TOTAL PRICE</th>
+                    <th>AMOUNT</th>
                     <th>INVOICE</th>
                     <th>EMAIL</th>
+                    <th>ACTION</th>
                 </tr>
             </thead>
             <tbody>
@@ -88,8 +89,11 @@ $invoices_query = $conn->query("SELECT * FROM `$invoice_table` ORDER BY created_
                     <td><?= htmlspecialchars($invoice['customer_name']) ?></td>
                     <td><?= $invoice['currency']?> <?= number_format($invoice['total_price'], 2) ?></td>
                     <td><span class="status completed"><?= ucfirst($invoice['invoice_status']) ?></span></td>
+                    <td><span class="status completed"><?= ucfirst($invoice['email_status']) ?></span></td>
                     <td>
-                    <a target="_blank" href="<?= BASE_URL ?>/invoice/generatepdf.php?shop_id=<?= $shop_id ?>&order_id=<?= $invoice['order_id'] ?>&status=<?= $invoice['invoice_status'] ?>" class="view-invoice"><?= ($invoice['invoice_status'] == 'pending') ? 'Generate' : 'View';?></a></td>
+                        <a target="_blank" href="<?= BASE_URL ?>/invoice/generatepdf.php?shop_id=<?= $shop_id ?>&order_id=<?= $invoice['order_id'] ?>&invoicestatus=<?= $invoice['invoice_status'] ?>" class="view-invoice"><?= ($invoice['invoice_status'] == 'pending') ? 'Generate' : 'View';?></a>
+                        <a target="_blank" href="<?= BASE_URL ?>/invoice/sendemail.php?shop_id=<?= $shop_id ?>&order_id=<?= $invoice['order_id'] ?>&emailstatus=<?= $invoice['email_status'] ?>" class="view-invoice"><?= ($invoice['email_status'] == 'pending') ? 'Send' : 'Resend';?></a>
+                    </td>
                 </tr>
             <?php endwhile; ?>
             </tbody>
