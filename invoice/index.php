@@ -2,11 +2,11 @@
 include 'nav.php'; 
 
 //Fetch Plans
-$plans_query = $conn->query("SELECT * FROM `plans` ORDER BY id");
+$plans_query = $conn->query("SELECT * FROM `plans` where price != '0.00'  ORDER BY id");
 
 //fetch invoices
 $invoice_table = "invoices_" . preg_replace('/[^a-zA-Z0-9_]/', '_', strtolower($store['shop']));
-$invoices_query = $conn->query("SELECT * FROM `$invoice_table` where price != '0.00' ORDER BY created_at DESC");
+$invoices_query = $conn->query("SELECT * FROM `$invoice_table` ORDER BY created_at DESC");
 ?>
 
 <main class="main-content">
