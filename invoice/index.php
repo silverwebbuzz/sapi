@@ -55,7 +55,8 @@ $invoices_query = $conn->query("SELECT * FROM `$invoice_table` ORDER BY created_
     $stmt = $conn->prepare($sql);
     $stmt->bind_param('s', $shop_id);
     $stmt->execute();
-    $currentPlan = $stmt->fetch_assoc();
+    $curr_result = $stmt->get_result();
+    $currentPlan = $curr_result->fetch_assoc();
     echo "<h2>Current Plan for Store ID {$currentPlan['store_id']}</h2>";
         echo "<p>Plan Name: " . htmlspecialchars($currentPlan['plan_name']) . "</p>";
         echo "<p>Price: $" . htmlspecialchars($currentPlan['price']) . "</p>";
