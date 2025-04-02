@@ -57,7 +57,7 @@ $invoices_query = $conn->query("SELECT * FROM `$invoice_table` ORDER BY created_
     $stmt->execute();
     $curr_result = $stmt->get_result();
     $currentPlan = $curr_result->fetch_assoc();
-    echo "<h2>Current Plan for Store ID {$currentPlan['store_id']}</h2>";
+        /*echo "<h2>Current Plan for Store ID {$currentPlan['store_id']}</h2>";
         echo "<p>Plan Name: " . htmlspecialchars($currentPlan['plan_name']) . "</p>";
         echo "<p>Price: $" . htmlspecialchars($currentPlan['price']) . "</p>";
         echo "<p>Order Limit (Plan): " . htmlspecialchars($currentPlan['plan_order_limit']) . "</p>";
@@ -66,15 +66,16 @@ $invoices_query = $conn->query("SELECT * FROM `$invoice_table` ORDER BY created_
         echo "<p>Subscription Order Limit: " . htmlspecialchars($currentPlan['subscription_order_limit']) . "</p>";
         echo "<p>Subscription Status: " . htmlspecialchars($currentPlan['status']) . "</p>";
         echo "<p>Start Date: " . htmlspecialchars($currentPlan['start_date']) . "</p>";
-        echo "<p>End Date: " . htmlspecialchars($currentPlan['end_date']) . "</p>";
+        echo "<p>End Date: " . htmlspecialchars($currentPlan['end_date']) . "</p>";*/
    
     ?>
     <div class="package-card">
         <h3>Current Subscription Package</h3>
         <div class="package-details">
             <div class="package-info">
-                <div class="package-name"><?= $sub_plan['']?></div>
-                <div class="package-price">$9.99/month</div>
+                <div class="package-name"><?= htmlspecialchars($currentPlan['plan_name'])?></div>
+                <div class="package-price">$<?= htmlspecialchars($currentPlan['price'])?>/month</div>
+                <div><?= htmlspecialchars($currentPlan['description']); ?></div>
             </div>
             <div class="package-stats">
                 <div class="package-stat">
@@ -83,20 +84,20 @@ $invoices_query = $conn->query("SELECT * FROM `$invoice_table` ORDER BY created_
                 </div>
                 <div class="package-stat">
                     <span>Next Billing Date</span>
-                    <strong>2025-04-28</strong>
+                    <strong><?= htmlspecialchars($currentPlan['end_date'])?></strong>
                 </div>
                 <div class="package-stat">
                     <span>Invoices Allowed</span>
-                    <strong>300/month</strong>
+                    <strong><?= htmlspecialchars($currentPlan['plan_order_limit'])?>/month</strong>
                 </div>
             </div>
             <div class="package-usage">
                 <div class="usage-info">
-                    <span>Used: 100</span>
-                    <span>Remaining: 200</span>
+                    <span>Used: 10</span>
+                    <span>Remaining: 10</span>
                 </div>
                 <div class="usage-bar">
-                    <div class="usage-progress" style="width: 33.33%"></div>
+                    <div class="usage-progress" style="width: 50%"></div>
                 </div>
             </div>
             <button class="btn-upgrade">Upgrade Plan</button>
