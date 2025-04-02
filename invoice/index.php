@@ -6,7 +6,7 @@ $plans_query = $conn->query("SELECT * FROM `plans` ORDER BY id");
 
 //fetch invoices
 $invoice_table = "invoices_" . preg_replace('/[^a-zA-Z0-9_]/', '_', strtolower($store['shop']));
-$invoices_query = $conn->query("SELECT * FROM `$invoice_table` ORDER BY created_at DESC");
+$invoices_query = $conn->query("SELECT * FROM `$invoice_table` where price != '0.00' ORDER BY created_at DESC");
 ?>
 
 <main class="main-content">
@@ -29,11 +29,50 @@ $invoices_query = $conn->query("SELECT * FROM `$invoice_table` ORDER BY created_
     </div>
 
     <!-- Subscription Package -->
+    <?php 
+    //Fetch store plan.
+    $sql = "
+        SELECT 
+            ss.store_id,
+            ss.plan_id,
+            ss.order_limit AS subscription_order_limit,
+            ss.features AS subscription_features,
+            ss.start_date,
+            ss.end_date,
+            ss.status,
+            p.name AS plan_name,
+            p.price,
+            p.order_limit AS plan_order_limit,
+            p.email_limit,
+            p.features AS plan_features,
+            p.description
+        FROM store_subscriptions ss
+        JOIN plans p ON ss.plan_id = p.id
+        WHERE ss.store_id = :store_id AND ss.status = 'active'
+        ORDER BY ss.start_date DESC
+        LIMIT 1
+    ";
+    $stmt = $conn->prepare($sql);
+    $stmt->bindParam(':store_id', $shop_id);
+    $stmt->execute();
+    $currentPlan = $stmt->fetch_assoc();
+    echo "<h2>Current Plan for Store ID {$currentPlan['store_id']}</h2>";
+        echo "<p>Plan Name: " . htmlspecialchars($currentPlan['plan_name']) . "</p>";
+        echo "<p>Price: $" . htmlspecialchars($currentPlan['price']) . "</p>";
+        echo "<p>Order Limit (Plan): " . htmlspecialchars($currentPlan['plan_order_limit']) . "</p>";
+        echo "<p>Email Limit: " . htmlspecialchars($currentPlan['email_limit']) . "</p>";
+        echo "<p>Description: " . htmlspecialchars($currentPlan['description']) . "</p>";
+        echo "<p>Subscription Order Limit: " . htmlspecialchars($currentPlan['subscription_order_limit']) . "</p>";
+        echo "<p>Subscription Status: " . htmlspecialchars($currentPlan['status']) . "</p>";
+        echo "<p>Start Date: " . htmlspecialchars($currentPlan['start_date']) . "</p>";
+        echo "<p>End Date: " . htmlspecialchars($currentPlan['end_date']) . "</p>";
+   
+    ?>
     <div class="package-card">
-        <h3>Subscription Package</h3>
+        <h3>Current Subscription Package</h3>
         <div class="package-details">
             <div class="package-info">
-                <div class="package-name">Basic Plan</div>
+                <div class="package-name"><?= $sub_plan['']?></div>
                 <div class="package-price">$9.99/month</div>
             </div>
             <div class="package-stats">
