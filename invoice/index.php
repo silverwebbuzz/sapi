@@ -105,6 +105,7 @@ $invoices_query = $conn->query("SELECT * FROM `$invoice_table` ORDER BY created_
                 </div>
             </div>
             <button class="btn-upgrade">Upgrade Plan</button>
+            <button class="btn-cancel">Cancel Plan</button>
         </div>
     </div>
 
