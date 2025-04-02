@@ -75,7 +75,7 @@ $invoices_query = $conn->query("SELECT * FROM `$invoice_table` ORDER BY created_
             <div class="package-info">
                 <div class="package-name"><?= htmlspecialchars($currentPlan['plan_name'])?></div>
                 <div class="package-price">$<?= htmlspecialchars($currentPlan['price'])?>/month</div>
-                <div><?= htmlspecialchars($currentPlan['description']); ?></div>
+                <div><span><?= htmlspecialchars($currentPlan['description']); ?></span></div>
             </div>
             <div class="package-stats">
                 <div class="package-stat">
@@ -87,8 +87,12 @@ $invoices_query = $conn->query("SELECT * FROM `$invoice_table` ORDER BY created_
                     <strong><?= htmlspecialchars($currentPlan['end_date'])?></strong>
                 </div>
                 <div class="package-stat">
-                    <span>Invoices Allowed</span>
+                    <span>PDF Invoice Limit</span>
                     <strong><?= htmlspecialchars($currentPlan['plan_order_limit'])?>/month</strong>
+                </div>
+                <div class="package-stat">
+                    <span>Email Sent Limit</span>
+                    <strong><?= htmlspecialchars($currentPlan['email_limit'])?>/month</strong>
                 </div>
             </div>
             <div class="package-usage">
