@@ -45,6 +45,18 @@ if ($result->num_rows > 0) {
     if ($invoice_result->num_rows > 0) {
         $invoice = $invoice_result->fetch_assoc();
 
+        if( $_GET['invoicestatus']=='generated')
+        {
+            $decoded_pdf = base64_decode($invoice['pdf_invoice']);
+            ?>
+                 <object data="data:application/pdf;base64,<?= $decoded_pdf; ?>" type="application/pdf" width="100%" height="600px">
+                    <p>Your browser cannot display PDF files.</p>
+                </object>
+            <?php
+            exit;
+        }
+
+
         // Decode JSON data
         $billing_address = json_decode($invoice['billing_address'], true);
         $shipping_address = json_decode($invoice['shipping_address'], true);
