@@ -88,25 +88,9 @@ $invoices_query = $conn->query("SELECT * FROM `$invoice_table` ORDER BY created_
                     <td><?= htmlspecialchars($invoice['customer_name']) ?></td>
                     <td>$<?= number_format($invoice['total_price'], 2) ?></td>
                     <td><span class="status completed"><?= ucfirst($invoice['invoice_status']) ?></span></td>
-                    <td><a href="<?= BASE_URL ?>/generatepdf?shop_id=<?= $shop_id ?>&order_id<?= $invoice['order_id'] ?>" target="_blank">Send</a></td>
+                    <td><a target="_blank" href="<?= BASE_URL ?>/invoice/generatepdf.php?shop_id=<?= $shop_id ?>&order_id=<?= $invoice['order_id'] ?>" class="view-invoice"><button class="btn-action download">Generate</button></a></td>
                 </tr>
             <?php endwhile; ?>
-                <tr>
-                    <td>1006</td>
-                    <td>2025-03-27 13:55:50</td>
-                    <td>Bhavik Koradiya</td>
-                    <td>$884.94</td>
-                    <td><span class="status pending">Pending</span></td>
-                    <td><a href="https://sapi.silverwebbuzz.com/generatepdf?shop_id=1&order_id6264994267436" target="_blank">View</a></td>
-                </tr>
-                <tr>
-                    <td>1007</td>
-                    <td>2025-03-27 13:55:50</td>
-                    <td>Bhavik Koradiya</td>
-                    <td>$10.00</td>
-                    <td><span class="status completed">Comeplete</span></td>
-                    <td><a href="https://sapi.silverwebbuzz.com/generatepdf?shop_id=1&order_id6265004294444" target="_blank">View</a></td>
-                </tr>
             </tbody>
         </table>
     </div>
