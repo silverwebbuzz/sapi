@@ -46,64 +46,26 @@ if ($result->num_rows > 0) {
         $invoice = $invoice_result->fetch_assoc();
         
         $decoded_pdf = base64_decode($invoice['pdf_invoice']);
-
+        $billing_address = json_decode($invoice['billing_address'], true);
 
         $smtp_settings = json_decode($shop_data['smtp_settings'], true);
 
-        echo "<pre>";
-        print_r($smtp_settings);
-        exit;
-
         $to_email = $invoice['customer_email'];
         $to_name = $invoice['customer_name'];
-        $subject = "Invoice #{$invoice['order_number']} from Your Store";
-        $body = "
-            <html>
-            <head>
-                <style>
-                    body { font-family: Arial, sans-serif; line-height: 1.6; }
-                    .header { color: #333366; }
-                    .footer { margin-top: 20px; font-size: 12px; color: #666; }
-                </style>
-            </head>
-            <body>
-                <h2 class=\"header\">Dear {$to_name},</h2>
-                <p>Thank you for your order! Please find your invoice #{$invoice['order_number']} attached.</p>
-                <p><strong>Order Total:</strong> {$invoice['currency']} {$invoice['total_price']}</p>
-                <p><strong>Date:</strong> {$invoice['created_at']}</p>
-                <div class=\"footer\">
-                    <p>If you have any questions, please contact our support team.</p>
-                    <p>Thank you for your business!</p>
-                </div>
-            </body>
-            </html>
-        ";
+        $subject = $smtp_settings['subject']; //"Invoice #{$invoice['order_number']} from Your Store";
+        $body = $smtp_settings['body'];
         //When sending an email, you would replace the variables like this:
-        /*$email_body = str_replace(
+        $email_body = str_replace(
             ['{invoice_number}', '{customer_name}', '{total_price}', '{currency}', '{created_at}'],
-            [$invoice['order_number'], $customer_name, $invoice['total_price'], $invoice['currency'], $invoice['created_at']],
-            $smtp_settings['body']
-        );*/
-
-        // Send email with attachment
-        $email_sent = sendEmailWithAttachment(
-            $to_email,
-            $to_name,
-            $subject,
-            $body,
-            $decoded_pdf,
-            "invoice_{$invoice['order_number']}.pdf"
+            [$invoice['order_number'], $invoice['customer_name'], $invoice['total_price'], $invoice['currency'], $invoice['created_at']],
+            $body
         );
 
-        // Single database update for both PDF and email status
-        $update_stmt = $conn->prepare("UPDATE `$invoice_table` 
-        SET 
-            invoice_status = 'generated',
-            pdf_invoice = ?,
-            email_status = ?
-        WHERE order_id = ?
-        ");
+        // Send email with attachment
+        $email_sent = sendEmailWithAttachment( $to_email,$to_name, $subject, $body, $decoded_pdf, "invoice_{$invoice['order_number']}.pdf");
 
+        // Single database update for both PDF and email status
+        $update_stmt = $conn->prepare("UPDATE `$invoice_table` SET invoice_status = 'generated', pdf_invoice = ?, email_status = ? WHERE order_id = ? ");
         $email_status = $email_sent ? 'sent' : 'failed';
         $update_stmt->bind_param("sss", $encoded_pdf, $email_status, $order_id);
         $update_stmt->execute();
