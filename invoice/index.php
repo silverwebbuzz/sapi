@@ -103,14 +103,27 @@ $invoices_query = $conn->query("SELECT * FROM `$invoice_table` ORDER BY created_
                     <span>Invoice Remaining: <?= (htmlspecialchars($currentPlan['plan_order_limit']) - htmlspecialchars($currentPlan['order_used']))?></span>
                 </div>
                 <div class="usage-bar">
-                    <div class="usage-progress" style="width: 50%"></div>
+                    <?php 
+                    // Calculate percentage
+                        $percentageUsed = ($currentPlan['order_used'] / $currentPlan['plan_order_limit']) * 100;
+                        // Optionally round the value
+                        $percentageUsed = round($percentageUsed, 2); 
+                    ?>
+                    <div class="usage-progress" style="width: <?= $percentageUsed;?>%"></div>
                 </div>
+                <br/>
                 <div class="usage-info">
                     <span>Email Used: <?= htmlspecialchars($currentPlan['email_used'])?></span>
                     <span>Email Remaining: <?= (htmlspecialchars($currentPlan['email_limit']) - htmlspecialchars($currentPlan['email_used']))?></span>
                 </div>
                 <div class="usage-bar">
-                    <div class="usage-progress" style="width: 50%"></div>
+                <?php 
+                    // Calculate percentage
+                        $percentageUsedemail = ($currentPlan['email_used'] / $currentPlan['email_limit']) * 100;
+                        // Optionally round the value
+                        $percentageUsedemail = round($percentageUsedemail, 2); 
+                    ?>
+                    <div class="usage-progress" style="width: <?= $percentageUsedemail;?>%"></div>
                 </div>
             </div>
             <div class="package-stats">
