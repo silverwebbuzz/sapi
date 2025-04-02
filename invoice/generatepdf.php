@@ -158,7 +158,7 @@ if ($result->num_rows > 0) {
         $update_stmt = $conn->prepare("UPDATE `$invoice_table` SET  invoice_status = 'generated', pdf_invoice = ? WHERE order_id = ? ");
         $update_stmt->bind_param("ss", $encoded_pdf, $order_id);
         $update_stmt->execute();
-
+        header("location:javascript://history.go(-1)");
     } else {
         die("No invoice found with the specified order ID.");
     }

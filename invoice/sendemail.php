@@ -69,7 +69,7 @@ if ($result->num_rows > 0) {
         $email_status = $email_sent ? 'sent' : 'failed';
         $update_stmt->bind_param("ss", $email_status, $order_id);
         $update_stmt->execute();
-
+        header("location:javascript://history.go(-1)");
     } else {
         die("No invoice found with the specified order ID.");
     }
