@@ -14,15 +14,15 @@ $invoices_query = $conn->query("SELECT * FROM `$invoice_table` ORDER BY created_
     <div class="stats-row">
     <?php while ($plan = $plans_query->fetch_assoc()): ?>
         <div class="stat-card">
-            <div class="stat-title"><?= $plan['name'] ?></div>
-            <div class="stat-value">$<?= $plan['price'] ?>/month</div>
+            <div class="stat-title"><?= $plan['name'] ?> (Monhtly)</div>
+            <div class="stat-value">$<?= $plan['price'] ?></div>
             <div class="package-stat">
                     <span>Invoice</span>
-                    <strong><?= $plan['order_limit'] ?>/month</strong>
+                    <strong><?= $plan['order_limit'] ?></strong>
             </div>
             <div class="package-stat">
                     <span>Email</span>
-                    <strong><?= $plan['email_limit'] ?>/month</strong>
+                    <strong><?= $plan['email_limit'] ?></strong>
             </div>
             <div class="stat-trend up"><?= $plan['description'] ?></div>
             <button class="btn-upgrade">Upgrade Plan</button>
