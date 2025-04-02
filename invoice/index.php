@@ -53,7 +53,7 @@ $invoices_query = $conn->query("SELECT * FROM `$invoice_table` ORDER BY created_
         LIMIT 1
     ";
     $stmt = $conn->prepare($sql);
-    $stmt->bindParam('s', $shop_id);
+    $stmt->bind_param('s', $shop_id);
     $stmt->execute();
     $currentPlan = $stmt->fetch_assoc();
     echo "<h2>Current Plan for Store ID {$currentPlan['store_id']}</h2>";
