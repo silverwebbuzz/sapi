@@ -75,7 +75,7 @@ $invoices_query = $conn->query("SELECT * FROM `$invoice_table` ORDER BY created_
             <div class="package-info">
                 <div class="package-name"><?= htmlspecialchars($currentPlan['plan_name'])?></div>
                 <div class="package-price">$<?= htmlspecialchars($currentPlan['price'])?>/month</div>
-                <div><span><?= htmlspecialchars($currentPlan['description']); ?></span></div>
+                <div class="package-stat"><span><?= htmlspecialchars($currentPlan['description']); ?></span></div>
             </div>
             <div class="package-stats">
                 <div class="package-stat">
