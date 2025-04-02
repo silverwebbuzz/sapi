@@ -282,6 +282,7 @@ body {
 .package-stat {
     display: flex;
     flex-direction: column;
+    gap: 10px;
 }
 
 .package-stat span {
