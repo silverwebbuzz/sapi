@@ -65,9 +65,9 @@ if ($result->num_rows > 0) {
         $email_sent = sendEmailWithAttachment( $to_email,$to_name, $subject, $email_body, $decoded_pdf, "invoice_{$invoice['order_number']}.pdf");
 
         // Single database update for both PDF and email status
-        $update_stmt = $conn->prepare("UPDATE `$invoice_table` SET invoice_status = 'generated', pdf_invoice = ?, email_status = ? WHERE order_id = ? ");
+        $update_stmt = $conn->prepare("UPDATE `$invoice_table` SET email_status = ? WHERE order_id = ? ");
         $email_status = $email_sent ? 'sent' : 'failed';
-        $update_stmt->bind_param("sss", $encoded_pdf, $email_status, $order_id);
+        $update_stmt->bind_param("ss", $email_status, $order_id);
         $update_stmt->execute();
 
     } else {
