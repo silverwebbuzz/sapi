@@ -17,15 +17,13 @@ $invoices_query = $conn->query("SELECT * FROM `$invoice_table` ORDER BY created_
             <div class="stat-title"><?= $plan['name'] ?> (Monhtly)</div>
             <div class="stat-value">$<?= $plan['price'] ?></div>
             <div class="package-stat">
-                    <span>Invoice</span>
-                    <strong><?= $plan['order_limit'] ?></strong>
+                    <span>PDF Invoice Limit : <?= $plan['order_limit'] ?> </span>
             </div>
             <div class="package-stat">
-                    <span>Email</span>
-                    <strong><?= $plan['email_limit'] ?></strong>
+                    <span>Email Sent Limit: <?= $plan['email_limit'] ?></span>
             </div>
             <div class="stat-trend up"><?= $plan['description'] ?></div>
-            <button class="btn-upgrade">Upgrade Plan</button>
+            <div><button class="btn-upgrade">Upgrade Plan</button></div>
         </div>
     <?php endwhile; ?>
     </div>
