@@ -49,9 +49,7 @@ if ($result->num_rows > 0) {
         {
             $decoded_pdf = base64_decode($invoice['pdf_invoice']);
             ?>
-                 <object data="data:application/pdf;base64,<?= $decoded_pdf; ?>" type="application/pdf" width="100%" height="600px">
-                    <p>Your browser cannot display PDF files.</p>
-                </object>
+            <embed src="data:application/pdf;base64,<?= $decoded_pdf; ?>" type="application/pdf" width="100%" height="600px" />
             <?php
             exit;
         }
