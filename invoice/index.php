@@ -1,6 +1,9 @@
 <?php include 'header.php';
 include 'nav.php'; 
 
+//Fetch Plans
+$plans_query = $conn->query("SELECT * FROM `plans` ORDER BY id");
+
 //fetch invoices
 $invoice_table = "invoices_" . preg_replace('/[^a-zA-Z0-9_]/', '_', strtolower($store['shop']));
 $invoices_query = $conn->query("SELECT * FROM `$invoice_table` ORDER BY created_at DESC");
@@ -9,6 +12,22 @@ $invoices_query = $conn->query("SELECT * FROM `$invoice_table` ORDER BY created_
 <main class="main-content">
     <!-- Stats Cards -->
     <div class="stats-row">
+    <?php while ($plan = $plans_query->fetch_assoc()): ?>
+        <div class="stat-card">
+            <div class="stat-title"><?= $invoice['name'] ?></div>
+            <div class="stat-value">$<?= $invoice['price'] ?>/month</div>
+            <div class="package-stat">
+                    <span>Invoice</span>
+                    <strong><?= $invoice['order_limit'] ?>/month</strong>
+            </div>
+            <div class="package-stat">
+                    <span>Email</span>
+                    <strong><?= $invoice['email_limit'] ?>/month</strong>
+            </div>
+            <div class="stat-trend up"><?= $invoice['description'] ?></div>
+            <button class="btn-upgrade">Upgrade Plan</button>
+        </div>
+    <?php endwhile; ?>
         <div class="stat-card">
             <div class="stat-title">Conversion Rate</div>
             <div class="stat-value">28.5%</div>
