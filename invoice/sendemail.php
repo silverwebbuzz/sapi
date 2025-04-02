@@ -52,7 +52,7 @@ if ($result->num_rows > 0) {
 
         $to_email = $invoice['customer_email'];
         $to_name = $invoice['customer_name'];
-        $subject = $smtp_settings['subject']; //"Invoice #{$invoice['order_number']} from Your Store";
+        $subject = str_replace('{invoice_number}',$invoice['order_number'],$smtp_settings['subject']);
         $body = $smtp_settings['body'];
         //When sending an email, you would replace the variables like this:
         $email_body = str_replace(
@@ -62,7 +62,7 @@ if ($result->num_rows > 0) {
         );
 
         // Send email with attachment
-        $email_sent = sendEmailWithAttachment( $to_email,$to_name, $subject, $body, $decoded_pdf, "invoice_{$invoice['order_number']}.pdf");
+        $email_sent = sendEmailWithAttachment( $to_email,$to_name, $subject, $email_body, $decoded_pdf, "invoice_{$invoice['order_number']}.pdf");
 
         // Single database update for both PDF and email status
         $update_stmt = $conn->prepare("UPDATE `$invoice_table` SET invoice_status = 'generated', pdf_invoice = ?, email_status = ? WHERE order_id = ? ");

@@ -86,7 +86,7 @@ $invoices_query = $conn->query("SELECT * FROM `$invoice_table` ORDER BY created_
                     <td><?= $invoice['order_number'] ?></td>
                     <td><?= $invoice['created_at'] ?></td>
                     <td><?= htmlspecialchars($invoice['customer_name']) ?></td>
-                    <td>$<?= number_format($invoice['total_price'], 2) ?></td>
+                    <td><?= $invoice['currency']?> <?= number_format($invoice['total_price'], 2) ?></td>
                     <td><span class="status completed"><?= ucfirst($invoice['invoice_status']) ?></span></td>
                     <td><a target="_blank" href="<?= BASE_URL ?>/invoice/generatepdf.php?shop_id=<?= $shop_id ?>&order_id=<?= $invoice['order_id'] ?>" class="view-invoice"><button class="btn-action download">Generate</button></a></td>
                 </tr>
