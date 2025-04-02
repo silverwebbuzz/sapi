@@ -28,26 +28,6 @@ $invoices_query = $conn->query("SELECT * FROM `$invoice_table` ORDER BY created_
             <button class="btn-upgrade">Upgrade Plan</button>
         </div>
     <?php endwhile; ?>
-        <div class="stat-card">
-            <div class="stat-title">Conversion Rate</div>
-            <div class="stat-value">28.5%</div>
-            <div class="stat-trend up">↑ 2.5% from last month</div>
-        </div>
-        <div class="stat-card">
-            <div class="stat-title">Total Sales This Month</div>
-            <div class="stat-value">$28,450</div>
-            <div class="stat-trend up">↑ $4,210 from last month</div>
-        </div>
-        <div class="stat-card">
-            <div class="stat-title">Sales Overview</div>
-            <div class="stat-value">$42.5k</div>
-            <div class="stat-trend down">↓ $1,150 from last month</div>
-        </div>
-        <div class="stat-card">
-            <div class="stat-title">Visits</div>
-            <div class="stat-value">12,749</div>
-            <div class="stat-trend up">↑ 25.5% from last month</div>
-        </div>
     </div>
 
     <!-- Subscription Package -->
