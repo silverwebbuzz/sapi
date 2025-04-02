@@ -149,7 +149,7 @@ if ($result->num_rows > 0) {
         $pdf->writeHTML($html, true, false, true, false, '');
 
         // Close and output PDF document
-        $pdf->Output('invoice_'.$invoice['order_number'].'.pdf', 'I'); exit;
+        //$pdf->Output('invoice_'.$invoice['order_number'].'.pdf', 'I'); exit;
         $pdf_content = $pdf->Output('', 'S');
         $encoded_pdf = base64_encode($pdf_content); // Encode PDF for storage
 
