@@ -25,9 +25,9 @@ $invoices_query = $conn->query("SELECT * FROM `$invoice_table` ORDER BY created_
                     <th>DATE</th>
                     <th>CUSTOMER</th>
                     <th>AMOUNT</th>
-                    <th>STATUS</th>
                     <th>INVOICE</th>
                     <th>EMAIL</th>
+                    <th>ACTION</th>
                 </tr>
             </thead>
             <tbody>
@@ -39,8 +39,9 @@ $invoices_query = $conn->query("SELECT * FROM `$invoice_table` ORDER BY created_
                     <td><?= htmlspecialchars($invoice['customer_name']) ?></td>
                     <td><?= $invoice['currency']?> <?= number_format($invoice['total_price'], 2) ?></td>
                     <td><span class="status completed"><?= ucfirst($invoice['invoice_status']) ?></span></td>
-                    <td><button class="btn-action download">Generate</button><a target="_blank" href="<?= BASE_URL ?>/invoice/generatepdf.php?shop_id=<?= $shop_id ?>&order_id=<?= $invoice['order_id'] ?>" class="view-invoice">View</a></td>
+                    <td><a target="_blank" href="<?= BASE_URL ?>/invoice/generatepdf.php?shop_id=<?= $shop_id ?>&order_id=<?= $invoice['order_id'] ?>" class="view-invoice">View</a></td>
                     <td>
+                        <a target="_blank" href="<?= BASE_URL ?>/invoice/generatepdf.php?shop_id=<?= $shop_id ?>&order_id=<?= $invoice['order_id'] ?>&status=<?= $invoice['invoice_status'] ?>" class="view-invoice"><?= ($invoice['invoice_status'] == 'pending') ? 'Generate' : 'View';?></a>
                         <button class="btn-action resend">Resend</button>
                     </td>
                 </tr>
