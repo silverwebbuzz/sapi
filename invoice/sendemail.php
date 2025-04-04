@@ -63,12 +63,17 @@ if ($result->num_rows > 0) {
 
         // Send email with attachment
         $email_sent = sendEmailWithAttachment( $to_email,$to_name, $subject, $email_body, $decoded_pdf, "invoice_{$invoice['order_number']}.pdf");
+        $email_status = $email_sent ? 'sent' : 'failed';
 
         // Single database update for both PDF and email status
         $update_stmt = $conn->prepare("UPDATE `$invoice_table` SET email_status = ? WHERE order_id = ? ");
-        $email_status = $email_sent ? 'sent' : 'failed';
         $update_stmt->bind_param("ss", $email_status, $order_id);
         $update_stmt->execute();
+
+        $up_sub_stmt = $conn->prepare("UPDATE `store_subscriptions` SET  email_used = email_used+1  WHERE store_id = ? ");
+        $up_sub_stmt->bind_param("s", $shop_id );
+        $up_sub_stmt->execute();
+
         header("location:javascript://history.go(-1)");
     } else {
         die("No invoice found with the specified order ID.");
