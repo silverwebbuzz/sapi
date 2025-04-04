@@ -101,6 +101,7 @@ if (isset($access_token)) {
     money_in_emails_format = VALUES(money_in_emails_format), 
     money_with_currency_in_emails_format = VALUES(money_with_currency_in_emails_format), 
     restapi_json = VALUES(restapi_json), 
+    status = 'installed',
     updated_at = NOW(),
     app_install_date = NOW(),
     id = LAST_INSERT_ID(id)";
