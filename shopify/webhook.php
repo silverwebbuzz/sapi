@@ -20,12 +20,15 @@ $cdate = date("Y-m-d H:i:s");
 
 $conn = DB::getInstance();
 
+// webhook logs.
 $insertSql = "INSERT INTO webhook (shop, topic, orders, cdate) VALUES (?, ?, ?, ?)";
 $stmt = $conn->prepare($insertSql);
-
-if (!$stmt) {
-    die("Prepare failed: " . $conn->error);
+// Bind parameters: 'shop' and 'topic' are strings, 'orders' is a string, and 'cdate' is a string representation of datetime.
+$stmt->bind_param("ssss", $shop, $topic, $orders, $cdate);
+if (!$stmt->execute()) {
+    die("SQL Error: " . $stmt->error);
 }
+// webhook logs end.
 
 if ($topic === 'app/uninstalled') {
     // Handle App Uninstall
