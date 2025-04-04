@@ -4,7 +4,8 @@
  */
 function handleDirectAccess() {
     $shopifyLoginUrl = 'https://www.shopify.com/login';
-    $installUrl = SHOPIFY_APP_URL . '?shop=' . (isset($_GET['shop']) ? htmlspecialchars($_GET['shop']) : SHOPIFY_APP_HANDLE;
+    $shopParam = isset($_GET['shop']) ? htmlspecialchars($_GET['shop'], ENT_QUOTES, 'UTF-8') : SHOPIFY_APP_HANDLE;
+    $installUrl = SHOPIFY_APP_URL . '?shop=' . urlencode($shopParam);
     
     echo <<<HTML
 <!DOCTYPE html>
