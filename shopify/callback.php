@@ -168,7 +168,7 @@ if (isset($access_token)) {
     $create_table_query = "CREATE TABLE IF NOT EXISTS `$invoice_table` (
         `id` int(11) NOT NULL AUTO_INCREMENT PRIMARY KEY,
         `order_id` varchar(50) NOT NULL,  -- Changed from BIGINT to VARCHAR
-        `order_number` varchar(16) DEFAULT NULL,
+        `order_number` varchar(64) DEFAULT NULL,
         `customer_name` varchar(255) DEFAULT NULL,
         `customer_email` varchar(255) DEFAULT NULL,
         `billing_address` LONGTEXT DEFAULT NULL,  -- Changed to LONGTEXT for larger JSON data

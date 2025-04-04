@@ -13,7 +13,7 @@ if (!hash_equals($hmac, $calculated_hmac)) {
 }
 
 // Decode webhook data
-$payload = json_decode($data, true);
+$orders = json_decode($data, true);
 $shop = $_SERVER['HTTP_X_SHOPIFY_SHOP_DOMAIN'];
 $topic = $_SERVER['HTTP_X_SHOPIFY_TOPIC']; // Get webhook topic
 
@@ -40,77 +40,74 @@ if ($topic === 'app/uninstalled') {
         die("Invoice table not found for store.");
     }
 
-    // Extract order details from webhook payload
-    $order_id = $payload['id'];
-    $order_number = $payload['order_number'] ?? '';
-    $customer_name = trim(($payload['customer']['first_name'] ?? '') . ' ' . ($payload['customer']['last_name'] ?? ''));
-    $customer_email = $payload['customer']['email'] ?? '';
-    $currency = $payload['currency'] ?? '';
-    $subtotal_price = $payload['subtotal_price'] ?? 0.00;
-    $total_price = $payload['total_price'] ?? 0.00;
-    $tax_amount = $payload['total_tax'] ?? 0.00;
-    $discount_amount = $payload['total_discounts'] ?? 0.00;
-    $shipping_cost = $payload['total_shipping_price_set']['shop_money']['amount'] ?? 0.00;
-
-    $billing_address = json_encode($payload['billing_address'] ?? []);
-    $shipping_address = json_encode($payload['shipping_address'] ?? []);
-    $payment_method = $payload['payment_gateway_names'][0] ?? 'Unknown'; 
-    $order_status = $payload['financial_status'] ?? 'pending';
-
-    // Extract products from line items
-    $products = [];
-    if (!empty($payload['line_items'])) {
-        foreach ($payload['line_items'] as $item) {
-            $products[] = [
-                'product_id' => $item['product_id'] ?? '',
-                'name' => $item['name'] ?? '',
-                'price' => $item['price'] ?? 0.00,
-                'quantity' => $item['quantity'] ?? 1
-            ];
-        }
-    }
-    $products_json = json_encode($products);
-
-    // Store order in invoices table
-    // Insert or update order in invoices table
-    $stmt = $conn->prepare(" 
+    // Insert orders into the database
+    $stmt = $conn->prepare("
     INSERT INTO `$invoice_table` 
     (order_id, order_number, customer_name, customer_email, billing_address, shipping_address, currency, subtotal_price, total_price, tax_amount, discount_amount, shipping_cost, invoice_status, email_status, payment_method, order_status, products) 
     VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 'pending', 'pending', ?, ?, ?) 
-    ON DUPLICATE KEY UPDATE
+    ON DUPLICATE KEY UPDATE 
         customer_name = VALUES(customer_name),
         customer_email = VALUES(customer_email),
         billing_address = VALUES(billing_address),
         shipping_address = VALUES(shipping_address),
+        currency = VALUES(currency),
         subtotal_price = VALUES(subtotal_price),
         total_price = VALUES(total_price),
         tax_amount = VALUES(tax_amount),
         discount_amount = VALUES(discount_amount),
         shipping_cost = VALUES(shipping_cost),
-        invoice_status = 'pending',
-        email_status = 'pending',
+        invoice_status = VALUES(invoice_status),
+        email_status = VALUES(email_status),
         payment_method = VALUES(payment_method),
         order_status = VALUES(order_status),
         products = VALUES(products)
     ");
 
-    $stmt->bind_param("ssssssssddddssssss",
-    $order_id,
-    $order_number,
-    $customer_name,
-    $customer_email,
-    $billing_address,
-    $shipping_address,
-    $currency,
-    $subtotal_price,
-    $total_price,
-    $tax_amount,
-    $discount_amount,
-    $shipping_cost,
-    $payment_method,
-    $order_status,
-    $products_json
-    );
+    if (!$stmt) {
+        die("Query Preparation Failed: " . $conn->error);
+    }
+    foreach ($orders as $order) {
+        $order_id = $order['id']; 
+        $order_number = $order['order_number'];
+        $customer_name = $order['customer']['first_name'] . ' ' . $order['customer']['last_name'];
+        $customer_email = $order['customer']['email'];
+        $currency = $order['currency'];
+        $subtotal_price = $order['subtotal_price'];
+        $total_price = $order['total_price'];
+        $tax_amount = isset($order['total_tax']) ? $order['total_tax'] : 0.00;
+        $discount_amount = isset($order['total_discounts']) ? $order['total_discounts'] : 0.00;
+        $shipping_cost = isset($order['total_shipping_price_set']['shop_money']['amount']) ? $order['total_shipping_price_set']['shop_money']['amount'] : 0.00;
+        $billing_address = json_encode($order['billing_address'] ?? []);
+        $shipping_address = json_encode($order['shipping_address'] ?? []);
+        $payment_method = $order['gateway'] ?? 'Unknown';
+        $order_status = $order['financial_status'] ?? 'pending';
+        $products = json_encode($order['line_items'], JSON_UNESCAPED_UNICODE);
+
+
+        $stmt->bind_param("sssssssdddddsss", 
+        $order_id,
+        $order_number,
+        $customer_name, 
+        $customer_email, 
+        $billing_address, 
+        $shipping_address, 
+        $currency, 
+        $subtotal_price, 
+        $total_price, 
+        $tax_amount, 
+        $discount_amount, 
+        $shipping_cost,
+        $payment_method,
+        $order_status,
+        $products
+        );
+
+        if (!$stmt->execute()) {
+            die("Query Execution Failed: " . $stmt->error);
+        } else {
+        // echo "Insert Successful for Order ID: $order_id <br>";
+        }
+    }
 
     if ($stmt->execute()) {
         error_log("Invoice created for Order ID: {$order_id}.");
