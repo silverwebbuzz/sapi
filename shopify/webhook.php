@@ -16,8 +16,16 @@ if (!hash_equals($hmac, $calculated_hmac)) {
 $orders = json_decode($data, true);
 $shop = $_SERVER['HTTP_X_SHOPIFY_SHOP_DOMAIN'];
 $topic = $_SERVER['HTTP_X_SHOPIFY_TOPIC']; // Get webhook topic
+$cdate = date("Y-m-d H:i:s");
 
 $conn = DB::getInstance();
+
+$insertSql = "INSERT INTO webhook (shop, topic, orders, cdate) VALUES (?, ?, ?, ?)";
+$stmt = $conn->prepare($insertSql);
+
+if (!$stmt) {
+    die("Prepare failed: " . $conn->error);
+}
 
 if ($topic === 'app/uninstalled') {
     // Handle App Uninstall
