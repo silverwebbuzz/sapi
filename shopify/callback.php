@@ -102,7 +102,8 @@ if (isset($access_token)) {
     money_with_currency_in_emails_format = VALUES(money_with_currency_in_emails_format), 
     restapi_json = VALUES(restapi_json), 
     updated_at = NOW(),
-    app_install_date = NOW()";
+    app_install_date = NOW(),
+    id = LAST_INSERT_ID(id)";
     
     $conn = DB::getInstance();
     $stmt = $conn->prepare($query);
@@ -117,6 +118,170 @@ if (isset($access_token)) {
 
     if (!$stmt->execute()) {
         die("SQL Error: " . $stmt->error);
+    }
+    $shop_id = $conn->insert_id;
+    
+    //create free subscription. 
+    $stmt = $conn->prepare("SELECT id FROM store_subscriptions WHERE store_id = ? AND status = 'active'");
+    $stmt->bind_param("i", $shop_id);
+    $stmt->execute();
+    $subscription_result = $stmt->get_result();
+
+    if ($subscription_result->num_rows < 1) {
+         // Assuming the free plan is identified by the name 'Free'
+        $planSql = "SELECT * FROM plans WHERE name = 'Free' LIMIT 1";
+        $stmt = $conn->prepare($planSql);
+        $stmt->execute();
+        $freePlan = $stmt->get_result();
+
+        // You might set start_date to the current datetime and end_date as needed (e.g., one year later).
+        $start_date = date("Y-m-d H:i:s");
+        // For demonstration, we set the end_date to one year from now.
+        $end_date = date("Y-m-d H:i:s", strtotime("+1 year"));
+        
+
+        $insertSql = "INSERT INTO store_subscriptions 
+    (store_id, plan_id, order_limit, email_limit, order_used, email_used, features, start_date, end_date, status)
+    VALUES (?, ?, ?, ?, 0, 0, ?, ?, ?, 'active')";
+
+        $stmt = $conn->prepare($insertSql);
+        $stmt->bind_param(
+            "iiiisss",
+            $shop_id,
+            $freePlan['id'],
+            $freePlan['order_limit'],
+            $freePlan['email_limit'],
+            $freePlan['features'],
+            $start_date,
+            $end_date
+        );
+
+        if (!$stmt->execute()) {
+            die("SQL Error: " . $stmt->error);
+        }
+
+    }
+
+    //Create Invoice Table.
+    $shop_table_name = preg_replace('/[^a-zA-Z0-9_]/', '_', strtolower($shop)); // Sanitize table name
+    $invoice_table = "invoices_" . $shop_table_name;
+
+    // ✅ Create Dynamic Invoice Table for the Store
+    $create_table_query = "CREATE TABLE IF NOT EXISTS `$invoice_table` (
+        `id` int(11) NOT NULL AUTO_INCREMENT PRIMARY KEY,
+        `order_id` varchar(50) NOT NULL,  -- Changed from BIGINT to VARCHAR
+        `order_number` varchar(16) DEFAULT NULL,
+        `customer_name` varchar(255) DEFAULT NULL,
+        `customer_email` varchar(255) DEFAULT NULL,
+        `billing_address` LONGTEXT DEFAULT NULL,  -- Changed to LONGTEXT for larger JSON data
+        `shipping_address` LONGTEXT DEFAULT NULL, -- Changed to LONGTEXT
+        `currency` varchar(10) DEFAULT NULL,
+        `subtotal_price` decimal(10,2) DEFAULT NULL,
+        `total_price` decimal(10,2) DEFAULT NULL,
+        `tax_amount` decimal(10,2) DEFAULT NULL,
+        `discount_amount` decimal(10,2) DEFAULT NULL,
+        `shipping_cost` decimal(10,2) DEFAULT NULL,
+        `created_at` timestamp NULL DEFAULT current_timestamp(),
+        `payment_method` varchar(50) DEFAULT NULL,  -- Added payment method
+        `order_status` ENUM('pending','paid','failed','refunded') DEFAULT 'pending',
+        `products` LONGTEXT DEFAULT NULL,
+        `invoice_status` enum('pending','generated') DEFAULT 'pending',
+        `email_status` enum('pending','sent') DEFAULT 'pending',
+        `pdf_invoice` LONGTEXT DEFAULT NULL,
+         UNIQUE KEY (`order_id`)  -- Ensuring order_id remains unique
+    ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;";
+
+    if ($conn->query($create_table_query) === TRUE) {
+       // echo "Subscription activated, and invoice table `$invoice_table` created successfully.";
+    } else {
+        echo "Error creating table: " . $conn->error;
+    }
+    // Fetch last 20 paid orders from Shopify
+    $api_url = "https://{$shop}/admin/api/" . SHOPIFY_API_VERSION . "/orders.json?financial_status=paid&limit=20";
+    $ch = curl_init($api_url);
+    curl_setopt_array($ch, [
+        CURLOPT_RETURNTRANSFER => true,
+        CURLOPT_HTTPHEADER => [
+            "X-Shopify-Access-Token: $access_token"
+        ]
+    ]);
+
+    $response = curl_exec($ch);
+    $http_code = curl_getinfo($ch, CURLINFO_HTTP_CODE);
+    curl_close($ch);
+    if ($http_code != 200) {
+        die("Shopify API error: HTTP Code $http_code - Response: " . $response);
+    }
+
+    $orders = json_decode($response, true)['orders'] ?? [];
+
+    // Insert orders into the database
+    $stmt = $conn->prepare("
+    INSERT INTO `$invoice_table` 
+    (order_id, order_number, customer_name, customer_email, billing_address, shipping_address, currency, subtotal_price, total_price, tax_amount, discount_amount, shipping_cost, invoice_status, email_status, payment_method, order_status, products) 
+    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 'pending', 'pending', ?, ?, ?) 
+    ON DUPLICATE KEY UPDATE 
+        customer_name = VALUES(customer_name),
+        customer_email = VALUES(customer_email),
+        billing_address = VALUES(billing_address),
+        shipping_address = VALUES(shipping_address),
+        currency = VALUES(currency),
+        subtotal_price = VALUES(subtotal_price),
+        total_price = VALUES(total_price),
+        tax_amount = VALUES(tax_amount),
+        discount_amount = VALUES(discount_amount),
+        shipping_cost = VALUES(shipping_cost),
+        invoice_status = VALUES(invoice_status),
+        email_status = VALUES(email_status),
+        payment_method = VALUES(payment_method),
+        order_status = VALUES(order_status),
+        products = VALUES(products)
+    ");
+
+    if (!$stmt) {
+        die("Query Preparation Failed: " . $conn->error);
+    }
+    foreach ($orders as $order) {
+        $order_id = $order['id']; 
+        $order_number = $order['order_number'];
+        $customer_name = $order['customer']['first_name'] . ' ' . $order['customer']['last_name'];
+        $customer_email = $order['customer']['email'];
+        $currency = $order['currency'];
+        $subtotal_price = $order['subtotal_price'];
+        $total_price = $order['total_price'];
+        $tax_amount = isset($order['total_tax']) ? $order['total_tax'] : 0.00;
+        $discount_amount = isset($order['total_discounts']) ? $order['total_discounts'] : 0.00;
+        $shipping_cost = isset($order['total_shipping_price_set']['shop_money']['amount']) ? $order['total_shipping_price_set']['shop_money']['amount'] : 0.00;
+        $billing_address = json_encode($order['billing_address'] ?? []);
+        $shipping_address = json_encode($order['shipping_address'] ?? []);
+        $payment_method = $order['gateway'] ?? 'Unknown';
+        $order_status = $order['financial_status'] ?? 'pending';
+        $products = json_encode($order['line_items'], JSON_UNESCAPED_UNICODE);
+
+
+        $stmt->bind_param("sssssssdddddsss", 
+        $order_id,
+        $order_number,
+        $customer_name, 
+        $customer_email, 
+        $billing_address, 
+        $shipping_address, 
+        $currency, 
+        $subtotal_price, 
+        $total_price, 
+        $tax_amount, 
+        $discount_amount, 
+        $shipping_cost,
+        $payment_method,
+        $order_status,
+        $products
+        );
+
+        if (!$stmt->execute()) {
+            die("Query Execution Failed: " . $stmt->error);
+        } else {
+        // echo "Insert Successful for Order ID: $order_id <br>";
+        }
     }
 
     // Create webhook
