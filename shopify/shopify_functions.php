@@ -1,4 +1,58 @@
 <?php
+/**
+ * Handles direct access to the root URL
+ */
+function handleDirectAccess() {
+    $shopifyLoginUrl = 'https://www.shopify.com/login';
+    $installUrl = SHOPIFY_APP_URL . '?shop=' . (isset($_GET['shop']) ? htmlspecialchars($_GET['shop']) : SHOPIFY_APP_HANDLE;
+    
+    echo <<<HTML
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Install App</title>
+</head>
+<body>
+    <h1>Please install this app via Shopify Admin</h1>
+    <p>If you're a store owner, please <a href="$shopifyLoginUrl" target="_blank">login to Shopify</a> 
+    and install this app from your admin dashboard.</p>
+    <p>If you're being redirected from Shopify Admin, <a href="$installUrl">click here</a> to continue installation.</p>
+</body>
+</html>
+HTML;
+    exit;
+}
+
+/**
+ * Handles OAuth request from Shopify Admin
+ */
+function handleOAuthRequest() {
+    // Validate HMAC
+    if (!validateHmac($_GET)) {
+        die('Invalid HMAC');
+    }
+
+    $shop = $_GET['shop'];
+    
+    // Initial install - redirect to Shopify OAuth
+    $install_url = getInstallUrl($shop, SHOPIFY_APP_SCOPES, SHOPIFY_APP_URL . '/shopify/callback');
+    header("Location: $install_url");
+    exit();
+
+}
+/**
+ * Validates HMAC signature from Shopify
+ */
+function validateHmac($params) {
+    $hmac = $params['hmac'];
+    unset($params['hmac']);
+    
+    ksort($params);
+    $computedHmac = hash_hmac('sha256', http_build_query($params), SHOPIFY_API_SECRET);
+    
+    return hash_equals($hmac, $computedHmac);
+}
+
 // Verify HMAC
 function verifyHmac(array $params) {
     if (empty($params['hmac'])) {

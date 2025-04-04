@@ -97,7 +97,7 @@ if ($result->num_rows > 0) {
             '{{ Company_Phone }}' => $shop_data['phone'],
             '{{ Company_Email }}' => $shop_data['email'],
             '{{ Company_GSTIN }}' => $shop_data['gstin'] ?? '',
-            '{{ Order_Number }}' => $invoice['order_number'],
+            '{{ Order_Number }}' => $invoice['order_name'],
             '{{ Invoice_Date }}' => date('d/m/Y', strtotime($invoice['created_at'])),
             '{{ Due_Date }}' => date('d/m/Y', strtotime($invoice['created_at'].' +15 days')),
             '{{ Billing_Name }}' => $billing_address['name'] ?? '',
@@ -144,7 +144,7 @@ if ($result->num_rows > 0) {
         // Set document information
         $pdf->SetCreator(PDF_CREATOR);
         $pdf->SetAuthor($shop_data['store_name']);
-        $pdf->SetTitle('Invoice '.$invoice['order_number']);
+        $pdf->SetTitle('Invoice '.$invoice['order_name']);
         $pdf->SetSubject('Invoice');
 
         // Remove default header/footer
@@ -158,7 +158,7 @@ if ($result->num_rows > 0) {
         $pdf->writeHTML($html, true, false, true, false, '');
 
         // Close and output PDF document
-        $pdf_content = $pdf->Output('invoice_'.$invoice['order_number'].'.pdf', 'I');
+        $pdf_content = $pdf->Output('invoice_'.$invoice['order_name'].'.pdf', 'I');
         //$pdf_content = $pdf->Output('', 'S');
         $encoded_pdf = base64_encode($pdf_content); // Encode PDF for storage
 

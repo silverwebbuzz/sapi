@@ -151,7 +151,7 @@ $invoices_query = $conn->query("SELECT * FROM `$invoice_table` ORDER BY created_
             <tbody>
             <?php while ($invoice = $invoices_query->fetch_assoc()): ?>
                 <tr>
-                    <td><?= $invoice['order_number'] ?></td>
+                    <td><?= $invoice['order_name'] ?></td>
                     <td><?= $invoice['created_at'] ?></td>
                     <td><?= htmlspecialchars($invoice['customer_name']) ?></td>
                     <td><?= $invoice['currency']?> <?= number_format($invoice['total_price'], 2) ?></td>

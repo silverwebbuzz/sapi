@@ -52,17 +52,17 @@ if ($result->num_rows > 0) {
 
         $to_email = $invoice['customer_email'];
         $to_name = $invoice['customer_name'];
-        $subject = str_replace('{invoice_number}',$invoice['order_number'],$smtp_settings['subject']);
+        $subject = str_replace('{invoice_number}',$invoice['order_name'],$smtp_settings['subject']);
         $body = $smtp_settings['body'];
         //When sending an email, you would replace the variables like this:
         $email_body = str_replace(
             ['{invoice_number}', '{customer_name}', '{total_price}', '{currency}', '{created_at}'],
-            [$invoice['order_number'], $invoice['customer_name'], $invoice['total_price'], $invoice['currency'], $invoice['created_at']],
+            [$invoice['order_name'], $invoice['customer_name'], $invoice['total_price'], $invoice['currency'], $invoice['created_at']],
             $body
         );
 
         // Send email with attachment
-        $email_sent = sendEmailWithAttachment( $to_email,$to_name, $subject, $email_body, $decoded_pdf, "invoice_{$invoice['order_number']}.pdf");
+        $email_sent = sendEmailWithAttachment( $to_email,$to_name, $subject, $email_body, $decoded_pdf, "invoice_{$invoice['order_name']}.pdf");
         $email_status = $email_sent ? 'sent' : 'failed';
 
         // Single database update for both PDF and email status

@@ -15,7 +15,8 @@ $code = $_GET['code'];
 $access_token = getAccessToken($shop, $code); 
 
 if (isset($access_token)) {
-
+    $_SESSION['shop'] = $shop;
+    $_SESSION['access_token'] = $accessToken;
     // Step 2: Fetch Store Details via shopify Rest API
     $shopDetailsResponse_json = getShopDetailsRestAPI($shop,$access_token); //return value in json
     $shopDetailsResponse = json_decode($shopDetailsResponse_json, true);
