@@ -24,7 +24,7 @@ $conn = DB::getInstance();
 $insertSql = "INSERT INTO webhook (shop, topic, orders, cdate) VALUES (?, ?, ?, ?)";
 $stmt = $conn->prepare($insertSql);
 // Bind parameters: 'shop' and 'topic' are strings, 'orders' is a string, and 'cdate' is a string representation of datetime.
-$stmt->bind_param("ssss", $shop, $topic, $orders, $cdate);
+$stmt->bind_param("ssss", $shop, $topic, $data, $cdate);
 if (!$stmt->execute()) {
     die("SQL Error: " . $stmt->error);
 }
