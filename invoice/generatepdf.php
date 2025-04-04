@@ -158,8 +158,8 @@ if ($result->num_rows > 0) {
         $pdf->writeHTML($html, true, false, true, false, '');
 
         // Close and output PDF document
-        //$pdf->Output('invoice_'.$invoice['order_number'].'.pdf', 'I'); exit;
-        $pdf_content = $pdf->Output('', 'S');
+        $pdf_content = $pdf->Output('invoice_'.$invoice['order_number'].'.pdf', 'I');
+        //$pdf_content = $pdf->Output('', 'S');
         $encoded_pdf = base64_encode($pdf_content); // Encode PDF for storage
 
 
@@ -172,7 +172,7 @@ if ($result->num_rows > 0) {
         $up_sub_stmt->bind_param("s", $shop_id );
         $up_sub_stmt->execute();
 
-        header("location:javascript://history.go(-1)");
+        //header("location:javascript://history.go(-1)");
     } else {
         die("No invoice found with the specified order ID.");
     }
