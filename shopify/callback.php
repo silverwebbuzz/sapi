@@ -132,7 +132,7 @@ if (isset($access_token)) {
         $planSql = "SELECT * FROM plans WHERE name = 'Free' LIMIT 1";
         $stmt = $conn->prepare($planSql);
         $stmt->execute();
-        $freePlan = $stmt->get_result();
+        $freePlan = $stmt->fetch_assoc();
 
         // You might set start_date to the current datetime and end_date as needed (e.g., one year later).
         $start_date = date("Y-m-d H:i:s");
