@@ -129,11 +129,9 @@ if (isset($access_token)) {
 
     if ($subscription_result->num_rows < 1) {
          // Assuming the free plan is identified by the name 'Free'
-        $planSql = "SELECT * FROM plans WHERE name = 'Free' LIMIT 1";
-        $stmt = $conn->prepare($planSql);
-        $stmt->execute();
-        $freePlan = $stmt->fetch_assoc();
-
+        $plans_query = $conn->query("SELECT * FROM `plans` where price = '0.00'  ORDER BY id");
+        $freePlan = $plans_query->fetch_assoc();
+        
         // You might set start_date to the current datetime and end_date as needed (e.g., one year later).
         $start_date = date("Y-m-d H:i:s");
         // For demonstration, we set the end_date to one year from now.
