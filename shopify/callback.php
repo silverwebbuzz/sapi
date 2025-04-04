@@ -261,7 +261,7 @@ if (isset($access_token)) {
         $products = json_encode($order['line_items'], JSON_UNESCAPED_UNICODE);
 
 
-        $stmt->bind_param("sssssssdddddsss", 
+        $stmt->bind_param("ssssssssdddddsss", 
         $order_id,
         $order_number,
         $order_name,
