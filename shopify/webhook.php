@@ -54,9 +54,10 @@ if ($topic === 'app/uninstalled') {
     // Insert orders into the database
     $stmt = $conn->prepare("
     INSERT INTO `$invoice_table` 
-    (order_id, order_number, customer_name, customer_email, billing_address, shipping_address, currency, subtotal_price, total_price, tax_amount, discount_amount, shipping_cost, invoice_status, email_status, payment_method, order_status, products) 
-    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 'pending', 'pending', ?, ?, ?) 
+    (order_id, order_number, order_name, customer_name, customer_email, billing_address, shipping_address, currency, subtotal_price, total_price, tax_amount, discount_amount, shipping_cost, invoice_status, email_status, payment_method, order_status, products) 
+    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 'pending', 'pending', ?, ?, ?) 
     ON DUPLICATE KEY UPDATE 
+        order_name = VALUES(order_name),
         customer_name = VALUES(customer_name),
         customer_email = VALUES(customer_email),
         billing_address = VALUES(billing_address),
@@ -76,6 +77,7 @@ if ($topic === 'app/uninstalled') {
 
     $order_id = $order['id']; 
     $order_number = $order['order_number'];
+    $order_name = $order['name'];
     $customer_name = $order['customer']['first_name'] . ' ' . $order['customer']['last_name'];
     $customer_email = $order['customer']['email'];
     $currency = $order['currency'];
@@ -91,9 +93,10 @@ if ($topic === 'app/uninstalled') {
     $products = json_encode($order['line_items'], JSON_UNESCAPED_UNICODE);
 
 
-    $stmt->bind_param("sssssssdddddsss", 
+    $stmt->bind_param("ssssssssdddddsss", 
     $order_id,
     $order_number,
+    $order_name,
     $customer_name, 
     $customer_email, 
     $billing_address, 

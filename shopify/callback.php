@@ -169,7 +169,8 @@ if (isset($access_token)) {
     $create_table_query = "CREATE TABLE IF NOT EXISTS `$invoice_table` (
         `id` int(11) NOT NULL AUTO_INCREMENT PRIMARY KEY,
         `order_id` varchar(50) NOT NULL,  -- Changed from BIGINT to VARCHAR
-        `order_number` varchar(64) DEFAULT NULL,
+        `order_number` varchar(32) DEFAULT NULL,
+        `order_name` varchar(64) DEFAULT NULL,
         `customer_name` varchar(255) DEFAULT NULL,
         `customer_email` varchar(255) DEFAULT NULL,
         `billing_address` LONGTEXT DEFAULT NULL,  -- Changed to LONGTEXT for larger JSON data
@@ -217,9 +218,10 @@ if (isset($access_token)) {
     // Insert orders into the database
     $stmt = $conn->prepare("
     INSERT INTO `$invoice_table` 
-    (order_id, order_number, customer_name, customer_email, billing_address, shipping_address, currency, subtotal_price, total_price, tax_amount, discount_amount, shipping_cost, invoice_status, email_status, payment_method, order_status, products) 
-    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 'pending', 'pending', ?, ?, ?) 
+    (order_id, order_number, order_name, customer_name, customer_email, billing_address, shipping_address, currency, subtotal_price, total_price, tax_amount, discount_amount, shipping_cost, invoice_status, email_status, payment_method, order_status, products) 
+    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 'pending', 'pending', ?, ?, ?) 
     ON DUPLICATE KEY UPDATE 
+        order_name = VALUES(order_name),
         customer_name = VALUES(customer_name),
         customer_email = VALUES(customer_email),
         billing_address = VALUES(billing_address),
@@ -243,6 +245,7 @@ if (isset($access_token)) {
     foreach ($orders as $order) {
         $order_id = $order['id']; 
         $order_number = $order['order_number'];
+        $order_name = $order['name'];
         $customer_name = $order['customer']['first_name'] . ' ' . $order['customer']['last_name'];
         $customer_email = $order['customer']['email'];
         $currency = $order['currency'];
@@ -261,6 +264,7 @@ if (isset($access_token)) {
         $stmt->bind_param("sssssssdddddsss", 
         $order_id,
         $order_number,
+        $order_name,
         $customer_name, 
         $customer_email, 
         $billing_address, 
