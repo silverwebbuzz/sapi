@@ -11,17 +11,8 @@ require_once '../shopify/shopify_functions.php';
 $conn = DB::getInstance();
 
 $cookieData = decryptCookie($_COOKIE['swb_auth']);
-print_r($cookieData);
-// Get current shop ID (you'll need to set this based on your authentication)
-if(isset($_GET['shop_id']))
-{
-  $_SESSION['shop_id'] = $shop_id = $_GET['shop_id']; 
-}
-else
-{
-  $shop_id = $_SESSION['shop_id'];
-}
-print_r($_SESSION);
+$shop_id = $cookieData['shop_id'];
+
     // Fetch Store details.
     $stmt = $conn->prepare("SELECT * FROM stores WHERE id = ?");
     $stmt->bind_param("s", $shop_id);
