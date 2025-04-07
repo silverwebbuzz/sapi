@@ -209,6 +209,7 @@ if ($result->num_rows > 0) {
                     if($currentPlan['price']>'0'){ ?>
                     <button type="submit" class="btn-save">Save Email Settings</button>
              <?php  }else {?>
+                <button type="submit" class="btn-save">Save Email Settings</button>
                     <p>Please activate any paid plan to get using this services.</p>
             <?php   } ?>
                 </form>
