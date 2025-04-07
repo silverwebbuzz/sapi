@@ -5,10 +5,13 @@ ini_set('display_startup_errors', 1);
 
 require_once '../config.php'; 
 require_once '../db.php';
+require_once '../shopify/shopify_functions.php';
 
 // Database connection
 $conn = DB::getInstance();
 
+$cookieData = decryptCookie($_COOKIE['swb_auth']);
+print_r($cookieData);
 // Get current shop ID (you'll need to set this based on your authentication)
 if(isset($_GET['shop_id']))
 {

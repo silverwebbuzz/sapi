@@ -24,4 +24,7 @@ define('SHOPIFY_APP_SCOPES', 'read_products,read_orders,read_customers,read_assi
 define('SHOPIFY_APP_REDIRECT', true);
 define('ADMIN_URL_FORMAT', 'https://admin.shopify.com/store/%s/apps/%s');
 
+define('COOKIE_KEY', 'abcdefghijklmnopqrstuvwxyz123456'); // 32-character random key
+
+
 session_start();

@@ -46,7 +46,26 @@ if (isset($_GET['hmac']) && isset($_GET['shop']) && isset($_GET['timestamp'])) {
     if ($result->num_rows > 0) {
         // Store is subscribed, show plan details
         $subscription = $result->fetch_assoc();
-        $_SESSION['shop_id'] = $subscription['store_id'];
+       
+        // After getting $accessToken successfully:
+        $cookieData = [
+            'shop_id' => $subscription['store_id'],
+            'expires' => time() + (86400 * 30) // 30 days
+        ];
+        $encryptedCookie = encryptCookie($cookieData);
+        setcookie(
+            'swb_auth',
+            $encryptedCookie,
+            [
+                'expires' => time() + (86400 * 30),
+                'path' => '/',
+                'domain' => '.silverwebbuzz.com', // Allow subdomains
+                'secure' => true,
+                'httponly' => true,
+                'samesite' => 'None' // Required for Shopify iframe
+            ]
+        );
+
         $dashboard_redirect = "invoice/index.php?shop_id=".$subscription['store_id'];
         header("Location: $dashboard_redirect ");
     }
