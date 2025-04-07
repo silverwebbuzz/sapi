@@ -117,6 +117,19 @@ if ($topic === 'app/uninstalled') {
     } else {
         error_log("Error inserting invoice: " . $stmt->error);
     }
+
+    // Fetch Store details.
+    $stmt = $conn->prepare("SELECT * FROM stores WHERE shop = ?");
+    $stmt->bind_param("s", $shop);
+    $stmt->execute();
+    $result = $stmt->get_result();
+    $store = $result->fetch_assoc();
+    // Retrieve GET parameters
+    $_GET['shop_id'] = $store['id'];
+    $_GET['order_id']= $order_id;
+    require_once '../invoice/generatepdf.php';
+    require_once '../invoice/sendemail.php';
+
 } else {
     error_log("Unhandled webhook topic: {$topic}");
 }
