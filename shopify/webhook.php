@@ -4,6 +4,11 @@ require_once '../db.php';
 require_once '../vendor/tecnickcom/tcpdf/tcpdf.php';
 require_once '../vendor/autoload.php';
 
+ // Import PHPMailer classes
+ use PHPMailer\PHPMailer\PHPMailer;
+ use PHPMailer\PHPMailer\SMTP;
+ use PHPMailer\PHPMailer\Exception;
+
 // Verify webhook HMAC
 $hmac = $_SERVER['HTTP_X_SHOPIFY_HMAC_SHA256'];
 $data = file_get_contents('php://input');
@@ -119,11 +124,6 @@ if ($topic === 'app/uninstalled') {
     } else {
         error_log("Error inserting invoice: " . $stmt->error);
     }
-    
-    // Import PHPMailer classes
-    use PHPMailer\PHPMailer\PHPMailer;
-    use PHPMailer\PHPMailer\SMTP;
-    use PHPMailer\PHPMailer\Exception;
 
     $table_query = $conn->prepare("SELECT * FROM stores WHERE shop = ?");
     $table_query->bind_param("s", $shop);
@@ -344,8 +344,7 @@ if ($topic === 'app/uninstalled') {
             
         }
     }
-
-
+    
 } else {
     error_log("Unhandled webhook topic: {$topic}");
 }
