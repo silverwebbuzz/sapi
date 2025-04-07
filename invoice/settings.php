@@ -159,7 +159,12 @@ if ($result->num_rows > 0) {
                         <p class="description">Receive a copy of every invoice automatically</p>
                         <input type="email" name="email_invoice" value="<?= htmlspecialchars($settings['email_invoice']) ?>"  placeholder="your-email@example.com" class="form-input">
                     </div>
+                    <?php 
+                    if($currentPlan['price']>'0'){ ?>
                     <button type="submit" class="btn-save">Save General Settings</button>
+             <?php  }else {?>
+                    <p>Please activate any paid plan to get using this services.</p>
+            <?php   } ?>
                 </form>
             </section>
             
@@ -200,7 +205,12 @@ if ($result->num_rows > 0) {
                         <p class="description">Available variables: {invoice_number}, {customer_name}, {total_price}, {currency}, {created_at}</p>
                     </div>
                     
+                    <?php 
+                    if($currentPlan['price']>'0'){ ?>
                     <button type="submit" class="btn-save">Save Email Settings</button>
+             <?php  }else {?>
+                    <p>Please activate any paid plan to get using this services.</p>
+            <?php   } ?>
                 </form>
             </section>
             

@@ -5,12 +5,7 @@ ini_set('display_startup_errors', 1);
 
 require_once '../config.php'; 
 require_once '../db.php';
-require_once '../shopify/shopify_functions.php';
 
-// Handle direct access to the root URL
-if ($_SERVER['REQUEST_METHOD'] === 'GET' && empty($_GET)) {
-    handleDirectAccess();
-}
 // Database connection
 $conn = DB::getInstance();
 
@@ -23,13 +18,44 @@ else
 {
     $shop_id = $_SESSION['shop_id'];
 }
-    // This should come from your session/auth system
+    // Fetch Store details.
     $stmt = $conn->prepare("SELECT * FROM stores WHERE id = ?");
     $stmt->bind_param("s", $shop_id);
     $stmt->execute();
     $result = $stmt->get_result();
     $store = $result->fetch_assoc();
     //$store['shop'] = 'silverwebbuzzapp.myshopify.com';
+
+    //Fetch store plan.
+    $sql = "
+        SELECT 
+            ss.store_id,
+            ss.plan_id,
+            ss.order_limit AS subscription_order_limit,
+            ss.features AS subscription_features,
+            ss.start_date,
+            ss.end_date,
+            ss.status,
+            ss.order_used,
+            ss.email_used,
+            p.name AS plan_name,
+            p.price,
+            p.order_limit AS plan_order_limit,
+            p.email_limit,
+            p.features AS plan_features,
+            p.description
+        FROM store_subscriptions ss
+        JOIN plans p ON ss.plan_id = p.id
+        WHERE ss.store_id = ? AND ss.status = 'active'
+        ORDER BY ss.start_date DESC
+        LIMIT 1
+    ";
+    $stmt = $conn->prepare($sql);
+    $stmt->bind_param('s', $shop_id);
+    $stmt->execute();
+    $curr_result = $stmt->get_result();
+    $currentPlan = $curr_result->fetch_assoc();
+
 ?>
 <!DOCTYPE html>
 <html lang="en">
