@@ -44,6 +44,7 @@ if (isset($_GET['hmac']) && isset($_GET['shop']) && isset($_GET['timestamp'])) {
     $result = $stmt->get_result();
 
     if ($result->num_rows > 0) {
+        $_SESSION['shop_id'] = $subscription['store_id'];
         // Store is subscribed, show plan details
         $subscription = $result->fetch_assoc();
         $dashboard_redirect = "invoice/index.php?shop_id=".$subscription['store_id'];
