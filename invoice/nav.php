@@ -14,8 +14,8 @@
                 <li><a href="settings.php#invoice">Invoice Settings</a></li>
             </ul>
         </li>
-        <li class="<?= basename($_SERVER['PHP_SELF']) == 'billing.php' ? 'active' : '' ?>">
+        <!--li class="<?= basename($_SERVER['PHP_SELF']) == 'billing.php' ? 'active' : '' ?>">
             <a href="billing.php"><i class="icon-billing"></i> Billing</a>
-        </li>
+        </li-->
     </ul>
 </nav>
