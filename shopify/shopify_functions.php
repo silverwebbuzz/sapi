@@ -1,9 +1,4 @@
-<?php require_once '../vendor/autoload.php';
- // Import PHPMailer classes
- use PHPMailer\PHPMailer\PHPMailer;
- use PHPMailer\PHPMailer\SMTP;
- use PHPMailer\PHPMailer\Exception;
- 
+<?php 
 function generatepdf($shop_id,$order_id){
     $conn = DB::getInstance();
     // Fetch the correct invoice table for this shop
