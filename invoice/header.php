@@ -1,5 +1,4 @@
 <?php // Start the session
-session_start();
 error_reporting(E_ALL);
 ini_set('display_errors', 1);
 ini_set('display_startup_errors', 1);
@@ -13,12 +12,13 @@ $conn = DB::getInstance();
 // Get current shop ID (you'll need to set this based on your authentication)
 if(isset($_GET['shop_id']))
 {
-   echo  $_SESSION['shop_id'] = $shop_id = $_GET['shop_id']; 
+  $_SESSION['shop_id'] = $shop_id = $_GET['shop_id']; 
 }
 else
 {
-   echo  $shop_id = $_SESSION['shop_id'];
+  $shop_id = $_SESSION['shop_id'];
 }
+print_r($_SESSION);
     // Fetch Store details.
     $stmt = $conn->prepare("SELECT * FROM stores WHERE id = ?");
     $stmt->bind_param("s", $shop_id);
