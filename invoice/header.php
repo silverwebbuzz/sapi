@@ -9,7 +9,7 @@ require_once '../db.php';
 $conn = DB::getInstance();
 
 // Get current shop ID (you'll need to set this based on your authentication)
-if(isset($_GET['shop']))
+if(isset($_GET['shop_id']))
 {
     $_SESSION['shop_id'] = $shop_id = $_GET['shop_id']; 
 }
