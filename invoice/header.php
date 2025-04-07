@@ -23,7 +23,6 @@ else
     $stmt->execute();
     $result = $stmt->get_result();
     $store = $result->fetch_assoc();
-    $store = $result->fetch_assoc();
     //$store['shop'] = 'silverwebbuzzapp.myshopify.com';
 ?>
 <!DOCTYPE html>
