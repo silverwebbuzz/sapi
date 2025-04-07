@@ -1,5 +1,6 @@
 <?php
 function generatepdf($shop_id,$order_id){
+    $conn = DB::getInstance();
     // Fetch the correct invoice table for this shop
     $table_query = $conn->prepare("SELECT * FROM stores WHERE id = ?");
     $table_query->bind_param("s", $shop_id);
@@ -144,6 +145,7 @@ function generatepdf($shop_id,$order_id){
 }
 
 function sendemail($shop_id,$order_id){
+    $conn = DB::getInstance();
     // Fetch the correct invoice table for this shop
     $table_query = $conn->prepare("SELECT * FROM stores WHERE id = ?");
     $table_query->bind_param("s", $shop_id);
