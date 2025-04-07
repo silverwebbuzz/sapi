@@ -11,15 +11,9 @@ require_once '../vendor/autoload.php';
  use PHPMailer\PHPMailer\Exception;
 
 
-// Decode webhook data
-$order = json_decode($data, true);
-$shop = $_SERVER['HTTP_X_SHOPIFY_SHOP_DOMAIN'];
-$topic = $_SERVER['HTTP_X_SHOPIFY_TOPIC']; // Get webhook topic
-$cdate = date("Y-m-d H:i:s");
-
 $conn = DB::getInstance();
 
-$store['shop'] = 'silverwebbuzzapp.myshopify.com';
+$shop = 'silverwebbuzzapp.myshopify.com';
 $order_id = '6303427920172';
 
     $table_query = $conn->prepare("SELECT * FROM stores WHERE shop = ?");
