@@ -5,6 +5,12 @@ ini_set('display_startup_errors', 1);
 
 require_once '../config.php'; 
 require_once '../db.php';
+require_once '../shopify/shopify_functions.php';
+
+// Handle direct access to the root URL
+if ($_SERVER['REQUEST_METHOD'] === 'GET' && empty($_GET)) {
+    handleDirectAccess();
+}
 // Database connection
 $conn = DB::getInstance();
 
