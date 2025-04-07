@@ -9,8 +9,17 @@ require_once '../db.php';
 $conn = DB::getInstance();
 
 // Get current shop ID (you'll need to set this based on your authentication)
-$shop_id = $_SESSION['shop_id']; // This should come from your session/auth system
-$store['shop'] = 'silverwebbuzzapp.myshopify.com';
+if(isset($_GET['shop']))
+{
+    $_SESSION['shop_id'] = $shop_id = $_GET['shop_id']; 
+}
+else
+{
+    $shop_id = $_SESSION['shop_id'];
+}
+    // This should come from your session/auth system
+
+    //$store['shop'] = 'silverwebbuzzapp.myshopify.com';
 ?>
 <!DOCTYPE html>
 <html lang="en">
