@@ -130,13 +130,14 @@ if ($topic === 'app/uninstalled') {
     $table_query->execute();
     $result = $table_query->get_result();
     $shop_data = $result->fetch_assoc();
+    $shop_id = $shop_data['id'];
+    
 
     // Fetch invoice details
     $stmt = $conn->prepare("SELECT * FROM `$invoice_table` WHERE order_id = ?");
     $stmt->bind_param("s", $order_id);
     $stmt->execute();
     $invoice_result = $stmt->get_result();
-
     $invoice = $invoice_result->fetch_assoc();
 
 
