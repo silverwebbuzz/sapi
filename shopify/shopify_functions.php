@@ -1,5 +1,36 @@
 <?php 
 /**
+ * Encrypt cookie data (AES-256-CBC)
+ */
+function encryptCookie($data) {
+    $iv = openssl_random_pseudo_bytes(16);
+    $encrypted = openssl_encrypt(
+        json_encode($data),
+        'AES-256-CBC',
+        COOKIE_KEY,
+        0,
+        $iv
+    );
+    return base64_encode($iv . $encrypted);
+}
+
+/**
+ * Decrypt cookie data
+ */
+function decryptCookie($cookie) {
+    $data = base64_decode($cookie);
+    $iv = substr($data, 0, 16);
+    $encrypted = substr($data, 16);
+    $decrypted = openssl_decrypt(
+        $encrypted,
+        'AES-256-CBC',
+        COOKIE_KEY,
+        0,
+        $iv
+    );
+    return json_decode($decrypted, true);
+}
+/**
  * Handles direct access to the root URL
  */
 function handleDirectAccess() {
