@@ -97,7 +97,7 @@ function generatepdf($shop_id,$order_id){
             $stmt_temp->execute();
             $template_result = $stmt_temp->get_result();
             $template_html = $template_result->fetch_assoc();
-            $template = file_get_contents('temp/'.$template_html['template_file']);
+            $template = file_get_contents('../invoice/temp/'.$template_html['template_file']);
             $html = str_replace(array_keys($replacements), array_values($replacements), $template);
 
             // Create new PDF document
@@ -136,10 +136,10 @@ function generatepdf($shop_id,$order_id){
 
             //header("location:javascript://history.go(-1)");
         } else {
-            die("No invoice found with the specified order ID.");
+            return ("No invoice found with the specified order ID.");
         }
     } else {
-        die("No shop found with the specified ID.");
+        return ("No shop found with the specified ID.");
     }
 }
 
@@ -263,7 +263,7 @@ function sendEmailWithAttachment($to_email, $to_name, $subject, $html_body, $att
          
      }
  }
- 
+
 /**
  * Encrypt cookie data (AES-256-CBC)
  */
