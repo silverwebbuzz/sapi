@@ -19,7 +19,7 @@ else
 }
     // This should come from your session/auth system
     $stmt = $conn->prepare("SELECT * FROM stores WHERE id = ?");
-    $stmt->bind_param("s", $sh$$shop_id);
+    $stmt->bind_param("s", $shop_id);
     $stmt->execute();
     $result = $stmt->get_result();
     $store = $result->fetch_assoc();
