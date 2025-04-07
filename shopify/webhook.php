@@ -1,7 +1,7 @@
 <?php
 require_once '../config.php';
 require_once '../db.php';
-require_once '../shopify/shopify_functions.php';
+require_once 'shopify_functions.php';
 require_once '../vendor/tecnickcom/tcpdf/tcpdf.php';
 require_once '../vendor/autoload.php';
 
