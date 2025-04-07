@@ -1,7 +1,7 @@
 <?php
 require_once '../config.php';
 require_once '../db.php';
-require_once 'shopify_functions.php';
+$conn = DB::getInstance();
 require_once '../vendor/tecnickcom/tcpdf/tcpdf.php';
 require_once '../vendor/autoload.php';
 
@@ -10,6 +10,8 @@ require_once '../vendor/autoload.php';
  use PHPMailer\PHPMailer\SMTP;
  use PHPMailer\PHPMailer\Exception;
 
+ require_once '../invoice/helper.php';
+ 
 // Verify webhook HMAC
 $hmac = $_SERVER['HTTP_X_SHOPIFY_HMAC_SHA256'];
 $data = file_get_contents('php://input');
