@@ -254,9 +254,7 @@ if ($topic === 'app/uninstalled') {
     $up_sub_stmt->execute();
 
 
-
-
-    $decoded_pdf = base64_decode($invoice['pdf_invoice']);
+    $decoded_pdf = $pdf_content;
     $billing_address = json_decode($invoice['billing_address'], true);
 
     $smtp_settings = json_decode($shop_data['smtp_settings'], true);
