@@ -33,7 +33,7 @@ if (isset($_GET['hmac']) && isset($_GET['shop']) && isset($_GET['timestamp'])) {
     }
 
     $stmt = $conn->prepare("
-        SELECT p.name AS plan_name, p.price, p.order_limit, s.end_date, st.id as store_id
+        SELECT p.name AS plan_name, p.price, p.order_limit, s.cancelled_on, st.id as store_id
         FROM store_subscriptions s
         JOIN stores st ON s.store_id = st.id
         JOIN plans p ON s.plan_id = p.id
