@@ -45,7 +45,7 @@ $invoices_query = $conn->query("SELECT * FROM `$invoice_table` ORDER BY created_
                 </div>
                 <div class="package-stat">
                     <span>Next Billing Date</span>
-                    <strong><?= htmlspecialchars($currentPlan['end_date'])?></strong>
+                    <strong><?= htmlspecialchars($currentPlan['cancelled_on'])?></strong>
                 </div>
                 <div class="package-stat">
                     <span>PDF Invoice Limit</span>

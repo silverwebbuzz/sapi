@@ -29,8 +29,8 @@ $shop_id = $cookieData['shop_id'];
             ss.plan_id,
             ss.order_limit AS subscription_order_limit,
             ss.features AS subscription_features,
-            ss.start_date,
-            ss.end_date,
+            ss.activated_on,
+            ss.cancelled_on,
             ss.status,
             ss.order_used,
             ss.email_used,
@@ -43,7 +43,7 @@ $shop_id = $cookieData['shop_id'];
         FROM store_subscriptions ss
         JOIN plans p ON ss.plan_id = p.id
         WHERE ss.store_id = ? AND ss.status = 'active'
-        ORDER BY ss.start_date DESC
+        ORDER BY ss.activated_on DESC
         LIMIT 1
     ";
     $stmt = $conn->prepare($sql);
