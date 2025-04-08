@@ -68,7 +68,7 @@ $shop_id = $cookieData['shop_id'];
         <header class="main-header">
             <h1>SWB Auto PDF Invoices</h1>
             <div class="user-profile">
-                <span>Admin</span>
-                <div class="avatar">A</div>
+                <span><?= $store['shop_owner']?></span>
+                <div class="avatar"><?= ucfirst(substr($store['shop_owner'],0,1))?></div>
             </div>
         </header>
