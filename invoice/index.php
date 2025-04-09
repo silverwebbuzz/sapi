@@ -2,31 +2,17 @@
 include 'nav.php'; 
 
 //Fetch Plans
-$plans_query = $conn->query("SELECT * FROM `plans` where price != '0.00'  ORDER BY id");
+//$plans_query = $conn->query("SELECT * FROM `plans` where price != '0.00'  ORDER BY id");
+
 
 //fetch invoices
-$invoice_table = "invoices_" . preg_replace('/[^a-zA-Z0-9_]/', '_', strtolower($store['shop']));
-$invoices_query = $conn->query("SELECT * FROM `$invoice_table` ORDER BY created_at DESC");
+$invoice_table = "invoices_" . preg_replace('/[^a-zA-Z0-9_]/', '_', strtolower($shop));
+//$invoices_query = $conn->query("SELECT * FROM `$invoice_table` ORDER BY created_at DESC");
+
+$invoices_query = DBHelper::select("SELECT * FROM `$invoice_table` ORDER BY created_at DESC","",[]);
 ?>
 
 <main class="main-content">
-    <!-- Stats Cards -->
-    <div class="stats-row">
-    <?php while ($plan = $plans_query->fetch_assoc()): ?>
-        <div class="stat-card">
-            <div class="stat-title"><?= $plan['name'] ?> (Monhtly)</div>
-            <div class="stat-value">$<?= $plan['price'] ?></div>
-            <div class="package-stat">
-                    <span>PDF Invoice Limit : <?= $plan['order_limit'] ?> </span>
-            </div>
-            <div class="package-stat">
-                    <span>Email Sent Limit: <?= $plan['email_limit'] ?></span>
-            </div>
-            <div class="stat-trend up"><?= $plan['description'] ?></div>
-            <div><button class="btn-upgrade">Upgrade Plan</button></div>
-        </div>
-    <?php endwhile; ?>
-    </div>
 
     <!-- Subscription Package -->
     
@@ -108,7 +94,9 @@ $invoices_query = $conn->query("SELECT * FROM `$invoice_table` ORDER BY created_
                 </tr>
             </thead>
             <tbody>
-            <?php while ($invoice = $invoices_query->fetch_assoc()): ?>
+            <?php
+            foreach($invoices_query as $invoice) :
+            //while ($invoice = $invoices_query->fetch_assoc()): ?>
                 <tr>
                     <td><?= $invoice['order_name'] ?></td>
                     <td><?= $invoice['created_at'] ?></td>
@@ -121,7 +109,7 @@ $invoices_query = $conn->query("SELECT * FROM `$invoice_table` ORDER BY created_
                     <br/><a href="<?= BASE_URL ?>/invoice/sendemail.php?shop_id=<?= $shop_id ?>&order_id=<?= $invoice['order_id'] ?>&emailstatus=<?= $invoice['email_status'] ?>" class="view-invoice"><?= ($invoice['email_status'] == 'pending') ? 'Send Email' : 'Resend Email';?></a>
                     </td>
                 </tr>
-            <?php endwhile; ?>
+            <?php endforeach; ?>
             </tbody>
         </table>
     </div>

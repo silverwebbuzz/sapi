@@ -18,7 +18,7 @@ if (isset($_GET['hmac']) && isset($_GET['shop']) && isset($_GET['timestamp'])) {
     $shop = $params['shop'];
     // fetch data from store.
     $store = DBHelper::selectOne(
-        "SELECT id, status FROM stores WHERE `shop` = ? AND `status` = ?",
+        "SELECT id, shop_owner, status FROM stores WHERE `shop` = ? AND `status` = ?",
         "ss", 
         [$shop, "installed"]
     );
@@ -32,7 +32,9 @@ if (isset($_GET['hmac']) && isset($_GET['shop']) && isset($_GET['timestamp'])) {
     else 
     {
         $cookieData = [
-            'shop_id' => $store['store_id'],
+            'shop_id' => $store['id'],
+            'shop' =>  $shop,
+            'shop_owner' => $store['shop_owner'],
             'expires' => time() + (86400 * 30) // 30 days
         ];
         $encryptedCookie =  setEncryptCookie($cookieData);
