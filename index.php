@@ -25,7 +25,7 @@ if (isset($_GET['hmac']) && isset($_GET['shop']) && isset($_GET['timestamp'])) {
 
     // If store does not exist or was uninstalled, restart installation
     if (!$store ) {
-        $install_url = getInstallUrl($shop, SHOPIFY_APP_SCOPES, SHOPIFY_APP_URL . '/shopify/callback');
+        $install_url = getInstallUrl($shop, SHOPIFY_APP_SCOPES, BASE_SHOPIFY_AF_URL . 'callback');
         header("Location: $install_url");
         exit();
     }

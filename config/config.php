@@ -2,7 +2,7 @@
 define('BASE_PATH', '/home/u843459215/domains/silverwebbuzz.com/public_html/sapi');
 define('BASE_URL', 'https://sapi.silverwebbuzz.com');
 define('BASE_TEMPLATE_URL', 'https://sapi.silverwebbuzz.com/template/');
-define('BASE_SHOPIFY_AF_URL', 'https://sapi.silverwebbuzz.com/shopifyclient/');
+define('BASE_SHOPIFY_AF_URL', 'https://sapi.silverwebbuzz.com/invoice/');
 
 define('PUBLIC_URL', BASE_URL);
 
