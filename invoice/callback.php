@@ -224,10 +224,6 @@ if (isset($access_token)) {
         products = VALUES(products)
     ";
 
-
-    if (!$stmt) {
-        die("Query Preparation Failed: " . $conn->error);
-    }
     foreach ($orders as $order) {
         $order_id = $order['id']; 
         $order_number = $order['order_number'];

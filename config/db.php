@@ -76,6 +76,7 @@ class DBHelper {
     }
 
     public static function createTable($sql) {
+        $conn = DB::getInstance();
         return $conn->query($sql);
     }
 }
