@@ -1,4 +1,19 @@
 <?php 
+function setEncryptCookie($cookieData){
+    $encryptedCookie = encryptCookie($cookieData);
+    setcookie(
+        'swb_auth',
+        $encryptedCookie,
+        [
+            'expires' => time() + (86400 * 30),
+            'path' => '/',
+            'domain' => '.silverwebbuzz.com', // Allow subdomains
+            'secure' => true,
+            'httponly' => true,
+            'samesite' => 'None' // Required for Shopify iframe
+        ]
+    );
+}
 /**
  * Encrypt cookie data (AES-256-CBC)
  */

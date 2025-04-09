@@ -16,7 +16,7 @@ if (isset($_GET['hmac']) && isset($_GET['shop']) && isset($_GET['timestamp'])) {
     if (!verifyHmac($params, SHOPIFY_API_SECRET)) die('Invalid HMAC');
 
     $shop = $params['shop'];
-
+    // fetch data from store.
     $store = DBHelper::selectOne(
         "SELECT id, status FROM stores WHERE `shop` = ? AND `status` = ?",
         "ss", 
@@ -29,39 +29,16 @@ if (isset($_GET['hmac']) && isset($_GET['shop']) && isset($_GET['timestamp'])) {
         header("Location: $install_url");
         exit();
     }
-
-
-    $subscription = DBHelper::selectOne("SELECT p.name AS plan_name, p.price, p.order_limit, s.cancelled_on, st.id as store_id
-        FROM store_subscriptions s
-        JOIN stores st ON s.store_id = st.id
-        JOIN plans p ON s.plan_id = p.id
-        WHERE st.shop = ? AND s.status = 'active'",
-        "s", 
-        [$shop]
-    );
-
-    if ($subscription) {
-        
-        // After getting $accessToken successfully:
+    else 
+    {
         $cookieData = [
-            'shop_id' => $subscription['store_id'],
+            'shop_id' => $store['store_id'],
             'expires' => time() + (86400 * 30) // 30 days
         ];
-        $encryptedCookie = encryptCookie($cookieData);
-        setcookie(
-            'swb_auth',
-            $encryptedCookie,
-            [
-                'expires' => time() + (86400 * 30),
-                'path' => '/',
-                'domain' => '.silverwebbuzz.com', // Allow subdomains
-                'secure' => true,
-                'httponly' => true,
-                'samesite' => 'None' // Required for Shopify iframe
-            ]
-        );
-
-        $dashboard_redirect = "invoice/index.php?shop_id=".$subscription['store_id'];
+        $encryptedCookie =  setEncryptCookie($cookieData);
+        
+        // redirect to invoice homepage.
+        $dashboard_redirect = "invoice/index.php";
         header("Location: $dashboard_redirect ");
     }
 
