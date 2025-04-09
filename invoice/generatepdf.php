@@ -27,7 +27,7 @@ $shop_data = DBHelper::selectOne(
     [$shop_id]
 );
 
-if (shop_data) {
+if ($shop_data) {
     $shop_name = preg_replace('/[^a-zA-Z0-9_]/', '_', strtolower($shop_data['shop']));
     $invoice_table = "invoices_" . $shop_name;
 
