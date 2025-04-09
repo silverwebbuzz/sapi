@@ -156,13 +156,13 @@ if (isset($access_token)) {
     // ✅ Create Dynamic Invoice Table for the Store
     $create_table_query = "CREATE TABLE IF NOT EXISTS `$invoice_table` (
         `id` int(11) NOT NULL AUTO_INCREMENT PRIMARY KEY,
-        `order_id` varchar(50) NOT NULL,  -- Changed from BIGINT to VARCHAR
+        `order_id` varchar(50) NOT NULL,
         `order_number` varchar(32) DEFAULT NULL,
         `order_name` varchar(64) DEFAULT NULL,
         `customer_name` varchar(255) DEFAULT NULL,
         `customer_email` varchar(255) DEFAULT NULL,
-        `billing_address` LONGTEXT DEFAULT NULL,  -- Changed to LONGTEXT for larger JSON data
-        `shipping_address` LONGTEXT DEFAULT NULL, -- Changed to LONGTEXT
+        `billing_address` LONGTEXT DEFAULT NULL,
+        `shipping_address` LONGTEXT DEFAULT NULL,
         `currency` varchar(10) DEFAULT NULL,
         `subtotal_price` decimal(10,2) DEFAULT NULL,
         `total_price` decimal(10,2) DEFAULT NULL,
@@ -170,13 +170,13 @@ if (isset($access_token)) {
         `discount_amount` decimal(10,2) DEFAULT NULL,
         `shipping_cost` decimal(10,2) DEFAULT NULL,
         `created_at` timestamp NULL DEFAULT current_timestamp(),
-        `payment_method` varchar(50) DEFAULT NULL,  -- Added payment method
+        `payment_method` varchar(50) DEFAULT NULL,
         `order_status` ENUM('pending','paid','failed','refunded') DEFAULT 'pending',
         `products` LONGTEXT DEFAULT NULL,
         `invoice_status` enum('pending','generated') DEFAULT 'pending',
         `email_status` enum('pending','sent') DEFAULT 'pending',
         `pdf_invoice` LONGTEXT DEFAULT NULL,
-         UNIQUE KEY (`order_id`)  -- Ensuring order_id remains unique
+         UNIQUE KEY (`order_id`)
     ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;";
         
     DBHelper::createTable($create_table_query);
