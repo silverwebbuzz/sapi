@@ -1,7 +1,8 @@
-<?php 
-require_once '../config.php';
-require_once '../db.php';
+<?php
+require_once '../config/config.php';
+require_once '../config/db.php';
 require_once 'shopify_functions.php';
+require_once 'helper.php';
 
 $params = $_GET;
 if (!verifyHmac($params, SHOPIFY_API_SECRET)) die('Invalid HMAC');
@@ -107,7 +108,7 @@ if (isset($access_token)) {
     app_install_date = NOW(),
     id = LAST_INSERT_ID(id)";
     
-    $conn = DB::getInstance();
+    /*$conn = DB::getInstance();
     $stmt = $conn->prepare($query);
     $stmt->bind_param("sssssssssssssssssssssssssssssss", 
         $shop, $domain, $access_token, $shopify_id, $store_name, $shop_owner, $logo_url, $email, $phone, 
@@ -116,14 +117,24 @@ if (isset($access_token)) {
         $province_code, $primary_locale, $money_format, $money_with_currency_format, 
         $money_in_emails_format, $money_with_currency_in_emails_format, 
         $restapi_json, $created_at, $updated_at
-    );
+    );*/
 
     if (!$stmt->execute()) {
         die("SQL Error: " . $stmt->error);
     }
-    $shop_id = $conn->insert_id;
+    $shop_id = DBHelper::insert($query,"sssssssssssssssssssssssssssssss",
+        [$shop, $domain, $access_token, $shopify_id, $store_name, $shop_owner, $logo_url, $email, $phone, 
+        $plan_display_name, $plan_name, $country, $currency, $timezone, $iana_timezone, 
+        $country_code, $country_name, $address1, $address2, $city, $zip, $province, 
+        $province_code, $primary_locale, $money_format, $money_with_currency_format, 
+        $money_in_emails_format, $money_with_currency_in_emails_format, 
+        $restapi_json, $created_at, $updated_at]
+    );
     
     //create free subscription. 
+    "SELECT id FROM store_subscriptions WHERE store_id = ? AND status = 'active'";
+    $subscription_result = DBHelper::selectOne($sql_currentPlan,"s", [$shop_id]);
+    
     $stmt = $conn->prepare("SELECT id FROM store_subscriptions WHERE store_id = ? AND status = 'active'");
     $stmt->bind_param("i", $shop_id);
     $stmt->execute();

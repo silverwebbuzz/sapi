@@ -2,8 +2,8 @@
 ini_set('display_errors', 1);
 ini_set('display_startup_errors', 1);
 
-require_once '../config.php';
-require_once '../db.php';
+require_once '../config/config.php';
+require_once '../config/db.php';
 require_once '../vendor/tecnickcom/tcpdf/tcpdf.php';
 require_once '../vendor/autoload.php';
 
@@ -21,30 +21,26 @@ if ($_SERVER['REQUEST_METHOD'] !== 'GET') {
 $shop_id = $_GET['shop_id'];
 $order_id = $_GET['order_id'];
 
-$conn = DB::getInstance();
+$shop_data = DBHelper::selectOne(
+    "SELECT * FROM stores WHERE `id` = ? ",
+    "s", 
+    [$shop_id]
+);
 
-// Fetch the correct invoice table for this shop
-$table_query = $conn->prepare("SELECT * FROM stores WHERE id = ?");
-$table_query->bind_param("s", $shop_id);
-$table_query->execute();
-$result = $table_query->get_result();
-
-if ($result->num_rows > 0) {
-    $shop_data = $result->fetch_assoc();
-
+if (shop_data) {
     $shop_name = preg_replace('/[^a-zA-Z0-9_]/', '_', strtolower($shop_data['shop']));
     $invoice_table = "invoices_" . $shop_name;
 
     
     // Fetch invoice details
-    $stmt = $conn->prepare("SELECT * FROM `$invoice_table` WHERE order_id = ?");
-    $stmt->bind_param("s", $order_id);
-    $stmt->execute();
-    $invoice_result = $stmt->get_result();
+    $invoice = DBHelper::selectOne(
+        "SELECT * FROM `$invoice_table` WHERE order_id = ?",
+        "s", 
+        [$order_id]
+    );
 
-    if ($invoice_result->num_rows > 0) {
-        $invoice = $invoice_result->fetch_assoc();
-
+    if ($invoice) {
+        
         if( $_GET['invoicestatus']=='generated')
         {
             ?>
@@ -52,19 +48,11 @@ if ($result->num_rows > 0) {
             <?php
             exit;
         }
-
-
         // Decode JSON data
         $billing_address = json_decode($invoice['billing_address'], true);
         $shipping_address = json_decode($invoice['shipping_address'], true);
         $products = json_decode($invoice['products'], true);
 
-        // Prepare company information
-        //$company_name = "Silver WebBuzz Pvt. Ltd.";
-        //$company_address = "1109, Satyamev Eminence, Science City Road, Sola, Ahmedabad, Gujarat 380060";
-        //$company_phone = "+91 1234567890";
-        //$company_email = "accounts@silverwebbuzz.com";
-        
         // Prepare order items HTML
         $items_html = '';
         $counter = 1;
@@ -78,20 +66,21 @@ if ($result->num_rows > 0) {
                 $tax_amount = $item['tax_lines'][0]['price'];
             }
             
-            $items_html .= '<tr>';
-            $items_html .= '<td>'.$item['name'].'</td>';
-            $items_html .= '<td>'.$item['quantity'].'</td>';
-            $items_html .= '<td class="text-right">'.$invoice['currency'].' '.number_format($item['price'], 2).'</td>';
+            $items_html .= '<tr style="font-size: 10px; border-bottom: 1px solid #ddd">';
+            $items_html .= '<td style="text-align: left">'.$item['name'].'</td>';
+            $items_html .= '<td style="text-align: left">'.$item['variant_title'].'</td>';
+            $items_html .= '<td style="text-align: left">'.$invoice['currency'].' '.number_format($item['price'], 2).'</td>';
+            $items_html .= '<td style="text-align: left">'.$item['quantity'].'</td>';
             //$items_html .= '<td class="text-right">'.$tax_rate.'%</td>';
             //$items_html .= '<td class="text-right">'.$invoice['currency'].' '.number_format($tax_amount, 2).'</td>';
-            $items_html .= '<td class="text-right">'.$invoice['currency'].' '.number_format($item['price'] * $item['quantity'], 2).'</td>';
+            $items_html .= '<td style="text-align: left">'.$invoice['currency'].' '.number_format($item['price'] * $item['quantity'], 2).'</td>';
             $items_html .= '</tr>';
             $counter++;
         }
 
         // Prepare replacements array
         $replacements = [
-            '{{ Company_Logo }}' => $shop_data['logo_url'] ? '<img src="'.$shop_data['logo_url'].'" class="logo">' : '',
+            '{{ Company_Logo }}' => $shop_data['logo_url'],
             '{{ Company_Name }}' => $shop_data['store_name'],
             '{{ Company_Address }}' => $shop_data['address1']."<br/>".$shop_data['address2']."<br/>".$shop_data['city']." ".$shop_data['province']." ".$shop_data['province_code']." ".$shop_data['zip']."<br/>".$shop_data['country_name'] ,
             '{{ Company_Phone }}' => $shop_data['phone'],
@@ -130,12 +119,13 @@ if ($result->num_rows > 0) {
         // Load HTML template
         $template_id = $shop_data['invoice_templates_id'];
         // Fetch template details
-        $stmt_temp = $conn->prepare("SELECT * FROM `invoice_templates` WHERE id = ?");
-        $stmt_temp->bind_param("s", $template_id);
-        $stmt_temp->execute();
-        $template_result = $stmt_temp->get_result();
-        $template_html = $template_result->fetch_assoc();
-        $template = file_get_contents('temp/'.$template_html['template_file']);
+        $template_html = DBHelper::selectOne(
+            "SELECT * FROM `invoice_templates` WHERE id = ?",
+            "s", 
+            [$template_id]
+        );
+        
+        $template = file_get_contents('invoice_templates/html/'.$template_html['template_file']);
         $html = str_replace(array_keys($replacements), array_values($replacements), $template);
 
         // Create new PDF document
@@ -164,13 +154,16 @@ if ($result->num_rows > 0) {
 
 
         // Single database update for both PDF and email status
-        $update_stmt = $conn->prepare("UPDATE `$invoice_table` SET  invoice_status = 'generated', pdf_invoice = ? WHERE order_id = ? ");
-        $update_stmt->bind_param("ss", $encoded_pdf, $order_id);
-        $update_stmt->execute();
-
-        $up_sub_stmt = $conn->prepare("UPDATE `store_subscriptions` SET  order_used = order_used+1  WHERE store_id = ? ");
-        $up_sub_stmt->bind_param("s", $shop_id );
-        $up_sub_stmt->execute();
+        $affectedRows = DBHelper::execute(
+            "UPDATE `$invoice_table` SET  invoice_status = 'generated', pdf_invoice = ? WHERE order_id = ? ",
+            "ss",
+            [$encoded_pdf, $order_id]
+        );
+        $affectedRows = DBHelper::execute(
+            "UPDATE `store_subscriptions` SET  order_used = order_used+1  WHERE store_id = ? ",
+            "s",
+            [$shop_id]
+        );
 
         //header("location:javascript://history.go(-1)");
     } else {

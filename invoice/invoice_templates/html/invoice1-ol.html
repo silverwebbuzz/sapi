@@ -15,14 +15,14 @@
     <table class="invoice-table" width="100%">
       <tr>
         <td>
-          <img src="{{ Company_Logo }}" style="width: 200px" alt="{{ Company_Name }}" />
+          <img src="https://www.silverwebbuzz.com/wp-content/uploads/2024/01/swb_logo.svg" style="width: 200px" alt="SAPI logo" />
         </td>
         <td></td>
         <td style="text-align: right">
           <span style="font-size: 40px; display: block">INVOICE</span>
           <br />
-          <span style="display: block">Invoice No.: {{ Order_Number }}</span>
-          <span style="display: block">Date: {{ Invoice_Date }}</span>
+          <span style="display: block">Invoice No.: #LL93784</span>
+          <span style="display: block">Date: 01.07.2022</span>
         </td>
       </tr>
       <tr>
@@ -33,19 +33,19 @@
         <td>
           <span style="display: block; font-weight: bold">INVOICE TO:</span>
           <span style="display: block; font-size: 11px">
-            {{ Company_Name }}<br />
-            {{ Company_Address }}<br />
-            {{ Company_Phone }}<br />
-            {{ Company_Email }}</span
+            Lowell H. Dominguez<br />
+            84 Spilman Street,<br />
+            London, United Kingdom<br />
+            lowell@gmail.com</span
           >
         </td>
         <td colspan="2" style="text-align: right">
           <span style="display: block; font-weight: bold">PAY TO:</span>
           <span style="display: block; font-size: 11px">
-            {{ Billing_Name }}<br />
-            {{ Billing_Address1 }},<br />
-            {{ Billing_City }}, {{ Billing_Country }}<br />
-            {{ Billing_Email }}</span
+            Laralink Ltd<br />
+            86-90 Paul Street,<br />
+            London, England EC2A 4NE<br />
+            demo@gmail.com</span
           >
         </td>
       </tr>
@@ -63,7 +63,34 @@
               <th style="background-color: #f2f2f2; font-weight: bold; border: 1px solid #ddd; text-align: left">QTY</th>
               <th style="background-color: #f2f2f2; font-weight: bold; border: 1px solid #ddd; text-align: left">TOTAL</th>
             </tr>
-            {{ Order_Items }}
+            <tr style="font-size: 10px">
+              <td style="border: 1px solid #ddd; text-align: left">1. Website Design</td>
+              <td style="border: 1px solid #ddd; text-align: left">Six web page designs and three times revision</td>
+              <td style="border: 1px solid #ddd; text-align: left">$350</td>
+              <td style="border: 1px solid #ddd; text-align: left">1</td>
+              <td style="border: 1px solid #ddd; text-align: left">$350</td>
+            </tr>
+            <tr style="font-size: 10px">
+              <td style="border: 1px solid #ddd; text-align: left">2. Web Development</td>
+              <td style="border: 1px solid #ddd; text-align: left">Convert pixel-perfect frontend and make it dynamic</td>
+              <td style="border: 1px solid #ddd; text-align: left">$600</td>
+              <td style="border: 1px solid #ddd; text-align: left">1</td>
+              <td style="border: 1px solid #ddd; text-align: left">$600</td>
+            </tr>
+            <tr style="font-size: 10px">
+              <td style="border: 1px solid #ddd; text-align: left">3. App Development</td>
+              <td style="border: 1px solid #ddd; text-align: left">Android & iOS Application Development</td>
+              <td style="border: 1px solid #ddd; text-align: left">$200</td>
+              <td style="border: 1px solid #ddd; text-align: left">2</td>
+              <td style="border: 1px solid #ddd; text-align: left">$400</td>
+            </tr>
+            <tr style="font-size: 10px">
+              <td style="border: 1px solid #ddd; text-align: left">4. Digital Marketing</td>
+              <td style="border: 1px solid #ddd; text-align: left">Facebook, YouTube, and Google</td>
+              <td style="border: 1px solid #ddd; text-align: left">$100</td>
+              <td style="border: 1px solid #ddd; text-align: left">3</td>
+              <td style="border: 1px solid #ddd; text-align: left">$300</td>
+            </tr>
           </table>
         </td>
       </tr>
@@ -71,32 +98,21 @@
         <td>
           <span style="display: block; font-weight: bold">PAYMENT INFO:</span>
           <br />
-          <span style="display: block; font-size: 11px">
-            {{ Payment_Method }} <br />
-            {{ Payment_Status }}</span
-          >
+          <span style="display: block; font-size: 11px">Credit Card: 236***********928<br />Amount: $1732</span>
         </td>
         <td colspan="2" style="font-size: 11px">
           <table cellpadding="10">
             <tr>
               <td style="font-weight: bold; border: 1px solid #ddd; text-align: right; background-color: #f2f2f2">Subtotal</td>
-              <td style="font-weight: bold; border: 1px solid #ddd; text-align: right">{{ Subtotal }}</td>
+              <td style="font-weight: bold; border: 1px solid #ddd; text-align: right">$1650</td>
             </tr>
             <tr>
-              <td style="font-weight: bold; border: 1px solid #ddd; text-align: right; background-color: #f2f2f2">Shipping</td>
-              <td style="font-weight: bold; border: 1px solid #ddd; text-align: right">{{ Shipping_Cost }}</td>
-            </tr>
-            <tr>
-              <td style="font-weight: bold; border: 1px solid #ddd; text-align: right; background-color: #f2f2f2">Discount</td>
-              <td style="font-weight: bold; border: 1px solid #ddd; text-align: right">{{ Discount_Amount }}</td>
-            </tr>
-            <tr>
-              <td style="font-weight: bold; border: 1px solid #ddd; text-align: right; background-color: #f2f2f2">Tax</td>
-              <td style="font-weight: bold; border: 1px solid #ddd; text-align: right">{{ Tax_Amount }}</td>
+              <td style="font-weight: bold; border: 1px solid #ddd; text-align: right; background-color: #f2f2f2">Tax (5%)</td>
+              <td style="font-weight: bold; border: 1px solid #ddd; text-align: right">+$82</td>
             </tr>
             <tr>
               <td style="font-weight: bold; border: 1px solid #ddd; text-align: right; background-color: #f2f2f2">Grand Total</td>
-              <td style="font-weight: bold; border: 1px solid #ddd; text-align: right; background-color: #f2f2f2">{{ Total_Amount }}</td>
+              <td style="font-weight: bold; border: 1px solid #ddd; text-align: right; background-color: #f2f2f2">$1732</td>
             </tr>
           </table>
         </td>
