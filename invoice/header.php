@@ -8,11 +8,8 @@ require_once '../config/db.php';
 require_once 'shopify_functions.php';
 require_once 'helper.php';
 
-// Database connection
-$conn = DB::getInstance();
-
 $cookieData = decryptCookie($_COOKIE['swb_auth']);
-$shop_id = $cookieData['shop_id'];
+echo $shop_id = $cookieData['shop_id']; exit;
 
     // Fetch Store details.
     $stmt = $conn->prepare("SELECT * FROM stores WHERE id = ?");
