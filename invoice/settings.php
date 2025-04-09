@@ -84,10 +84,9 @@ $default_body = '
 ';
 
 // Fetch existing settings
-$table_query = $conn->prepare("SELECT smtp_settings,auto_invoice_customer, auto_invoice_personal, email_invoice, email  FROM stores WHERE id = ?");
-$table_query->bind_param("s", $shop_id);
-$table_query->execute();
-$result = $table_query->get_result();
+
+$sql_settings = "SELECT smtp_settings,auto_invoice_customer, auto_invoice_personal, email_invoice, email, invoice_templates_id FROM stores WHERE id = ?";
+$row = DBHelper::selectOne($sql_settings,"s", [$shop_id]);
 
 $settings = [
     'auto_invoice_customer' => 'No',
@@ -102,8 +101,7 @@ $smtp_settings = [
     'subject' => $default_subject,
     'body' => $default_body
 ];
-if ($result->num_rows > 0) {
-    $row = $result->fetch_assoc();
+if ($row) {
     
     // General settings
     $settings['auto_invoice_customer'] = $row['auto_invoice_customer'] ?? 'No';
@@ -226,17 +224,13 @@ if ($result->num_rows > 0) {
 
                         <?php
                             // Fetch all templates
-                            $template_stmt = $conn->prepare("SELECT * FROM invoice_templates ORDER BY id");
-                            $template_stmt->execute();
-                            $templates = $template_stmt->get_result();
+                            $sql_template = "SELECT * FROM invoice_templates ORDER BY id";
+                            $templates = DBHelper::selectOne($sql_template);
                             
                             // Get current template ID from store
-                            $store_stmt = $conn->prepare("SELECT invoice_templates_id FROM stores WHERE id = ?");
-                            $store_stmt->bind_param("s", $_SESSION['shop_id']);
-                            $store_stmt->execute();
-                            $current_template_id = $store_stmt->get_result()->fetch_assoc()['invoice_templates_id'] ?? 1;
+                            $current_template_id = $row['invoice_templates_id'];
                         
-                            while ($template = $templates->fetch_assoc()):
+                            foreach ($templates as $template):
                                 $is_selected = $template['id'] == $current_template_id;
                         ?>
                             <div class="template-card <?= $is_selected ? 'selected' : '' ?>">
@@ -254,7 +248,7 @@ if ($result->num_rows > 0) {
                             </div>
 
                         <?php 
-                            endwhile; 
+                            endforeach; 
                         ?>
                             
                         </div>

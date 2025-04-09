@@ -7,8 +7,6 @@ include 'nav.php';
 
 //fetch invoices
 $invoice_table = "invoices_" . preg_replace('/[^a-zA-Z0-9_]/', '_', strtolower($shop));
-//$invoices_query = $conn->query("SELECT * FROM `$invoice_table` ORDER BY created_at DESC");
-
 $invoices_query = DBHelper::select("SELECT * FROM `$invoice_table` ORDER BY created_at DESC","",[]);
 ?>
 

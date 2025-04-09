@@ -4,7 +4,7 @@ $shop_id = 1;
 $store['shop'] = 'silverwebbuzzapp.myshopify.com';
 //fetch invoices
 $invoice_table = "invoices_" . preg_replace('/[^a-zA-Z0-9_]/', '_', strtolower($store['shop']));
-$invoices_query = $conn->query("SELECT * FROM `$invoice_table` ORDER BY created_at DESC");
+$invoices_query = DBHelper::select("SELECT * FROM `$invoice_table` ORDER BY created_at DESC","",[]);
 ?>
 
 <main class="main-content">
@@ -32,7 +32,7 @@ $invoices_query = $conn->query("SELECT * FROM `$invoice_table` ORDER BY created_
             </thead>
             <tbody>
                 <!-- More rows would be loaded from database -->
-            <?php while ($invoice = $invoices_query->fetch_assoc()): ?>
+            <?php foreach($invoices_query as $invoice) : ?>
                 <tr>
                     <td><?= $invoice['order_number'] ?></td>
                     <td><?= $invoice['created_at'] ?></td>
@@ -45,7 +45,7 @@ $invoices_query = $conn->query("SELECT * FROM `$invoice_table` ORDER BY created_
                     <br/><a href="<?= BASE_URL ?>/invoice/sendemail.php?shop_id=<?= $shop_id ?>&order_id=<?= $invoice['order_id'] ?>&emailstatus=<?= $invoice['email_status'] ?>" class="view-invoice"><?= ($invoice['email_status'] == 'pending') ? 'Send Email' : 'Resend Email';?></a>
                     </td>
                 </tr>
-            <?php endwhile; ?>
+            <?php endforeach; ?>
                 
                 
             </tbody>
