@@ -1,7 +1,7 @@
 <?php
-require_once 'config.php';
-require_once 'db.php';
-require_once 'shopify/shopify_functions.php';
+require_once 'config/config.php';
+require_once 'config/db.php';
+require_once 'invoice/shopify_functions.php';
 
 // Handle direct access to the root URL
 if ($_SERVER['REQUEST_METHOD'] === 'GET' && empty($_GET)) {
@@ -17,13 +17,20 @@ if (isset($_GET['hmac']) && isset($_GET['shop']) && isset($_GET['timestamp'])) {
 
     $shop = $params['shop'];
 
+    
     // Check if installed
-    $conn = DB::getInstance();
-    $stmt = $conn->prepare("SELECT id,status FROM stores WHERE shop = ?");
-    $stmt->bind_param("s", $shop);
-    $stmt->execute();
-    $result = $stmt->get_result();
-    $store = $result->fetch_assoc();
+    //$conn = DB::getInstance();
+    //$stmt = $conn->prepare("SELECT id,status FROM stores WHERE shop = ?");
+    //$stmt->bind_param("s", $shop);
+    //$stmt->execute();
+    //$result = $stmt->get_result();
+    //$store = $result->fetch_assoc();
+
+    $store = DBHelper::select(
+        "SELECT id, status FROM stores WHERE shop = ? AND status = ?",
+        "si", 
+        [$shop, 'installed']
+    );
 
     // If store does not exist or was uninstalled, restart installation
     if (!$store || $store['status'] === 'uninstalled') {
