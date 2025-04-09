@@ -225,7 +225,7 @@ if ($row) {
                         <?php
                             // Fetch all templates
                             $sql_template = "SELECT * FROM invoice_templates ORDER BY id";
-                            $templates = DBHelper::selectOne($sql_template);
+                            $templates = DBHelper::select($sql_template);
                             
                             // Get current template ID from store
                             $current_template_id = $row['invoice_templates_id'];
