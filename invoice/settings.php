@@ -30,7 +30,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['save_email_settings']
     if ($affectedRows) {
         $success_message = "Email settings saved successfully!";
     } else {
-        $error_message = "Failed to save email settings: " . $conn->error;
+        $error_message = "Failed to save email settings: ";
     }
 }
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['save_general_settings'])) {
