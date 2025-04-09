@@ -240,7 +240,7 @@ if ($row) {
                                 <input type="radio" name="template_id" value="<?= $template['id'] ?>" id="template_<?= $template['id'] ?>" <?= $is_selected ? 'checked' : '' ?>>
                                 <label for="template_<?= $template['id'] ?>">
                                     <?php if ($template['preview_image']): ?>
-                                        <img src="<?= htmlspecialchars($template['preview_image']) ?>" alt="<?= htmlspecialchars($template['template_name']) ?>">
+                                        <img src="invoice_templates/images/<?= htmlspecialchars($template['preview_image']) ?>" alt="<?= htmlspecialchars($template['template_name']) ?>">
                                     <?php else: ?>
                                         <div class="template-placeholder">
                                             <?= htmlspecialchars($template['template_name']) ?>
