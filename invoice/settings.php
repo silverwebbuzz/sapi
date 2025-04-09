@@ -19,11 +19,15 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['save_email_settings']
     ];
     
     $json_settings = json_encode($smtp_settings);
-    
-    $update_stmt = $conn->prepare("UPDATE stores SET smtp_settings = ? WHERE id = ?");
-    $update_stmt->bind_param("ss", $json_settings, $shop_id);
-    
-    if ($update_stmt->execute()) {
+
+    // Update database
+    $affectedRows = DBHelper::execute(
+        "UPDATE stores SET smtp_settings = ? WHERE id = ?",
+        "ss",
+        [$json_settings, $shop_id]
+    );
+
+    if ($affectedRows) {
         $success_message = "Email settings saved successfully!";
     } else {
         $error_message = "Failed to save email settings: " . $conn->error;
@@ -35,10 +39,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['save_general_settings
     $email_invoice = $_POST['email_invoice'] ?? '';
     
     // Update database
-    $stmt = $conn->prepare("UPDATE stores SET auto_invoice_customer = ?, auto_invoice_personal = ?, email_invoice = ? WHERE id = ?");
-    $stmt->bind_param("ssss", $auto_invoice_customer, $auto_invoice_personal, $email_invoice, $shop_id);
-    
-    if ($stmt->execute()) {
+    $affectedRows = DBHelper::execute(
+        "UPDATE stores SET auto_invoice_customer = ?, auto_invoice_personal = ?, email_invoice = ? WHERE id = ?",
+        "ssss",
+        [$auto_invoice_customer, $auto_invoice_personal, $email_invoice, $shop_id]
+    );
+
+    if ($affectedRows) {
         $success_message = 'General settings saved successfully!';
     } else {
         $error_message = 'Failed to save general settings';
@@ -47,12 +54,15 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['save_general_settings
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['save_invoice_settings'])) {
     $template_id = (int)($_POST['template_id'] ?? 1);
-    
+
     // Update database
-    $stmt = $conn->prepare("UPDATE stores SET invoice_templates_id = ? WHERE id = ?");
-    $stmt->bind_param("is", $template_id, $shop_id);
+    $affectedRows = DBHelper::execute(
+        "UPDATE stores SET invoice_templates_id = ? WHERE id = ?",
+        "is",
+        [$template_id, $shop_id]
+    );
     
-    if ($stmt->execute()) {
+    if ($affectedRows) {
         $success_message = 'Invoice settings saved successfully!';
     } else {
         $error_message = 'Failed to save Invoice settings';
@@ -202,14 +212,7 @@ if ($row) {
                         <textarea name="email_body" class="form-input" rows="12" required><?= htmlspecialchars($smtp_settings['body']) ?></textarea>
                         <p class="description">Available variables: {invoice_number}, {customer_name}, {total_price}, {currency}, {created_at}</p>
                     </div>
-                    
-                    <?php 
-                    if($currentPlan['price']>'0'){ ?>
                     <button type="submit" class="btn-save">Save Email Settings</button>
-             <?php  }else {?>
-                <button type="submit" class="btn-save">Save Email Settings</button>
-                    <p>Please activate any paid plan to get using this services.</p>
-            <?php   } ?>
                 </form>
             </section>
             
