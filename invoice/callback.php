@@ -108,20 +108,6 @@ if (isset($access_token)) {
     app_install_date = NOW(),
     id = LAST_INSERT_ID(id)";
     
-    /*$conn = DB::getInstance();
-    $stmt = $conn->prepare($query);
-    $stmt->bind_param("sssssssssssssssssssssssssssssss", 
-        $shop, $domain, $access_token, $shopify_id, $store_name, $shop_owner, $logo_url, $email, $phone, 
-        $plan_display_name, $plan_name, $country, $currency, $timezone, $iana_timezone, 
-        $country_code, $country_name, $address1, $address2, $city, $zip, $province, 
-        $province_code, $primary_locale, $money_format, $money_with_currency_format, 
-        $money_in_emails_format, $money_with_currency_in_emails_format, 
-        $restapi_json, $created_at, $updated_at
-    );*/
-
-    if (!$stmt->execute()) {
-        die("SQL Error: " . $stmt->error);
-    }
     $shop_id = DBHelper::insert($query,"sssssssssssssssssssssssssssssss",
         [$shop, $domain, $access_token, $shopify_id, $store_name, $shop_owner, $logo_url, $email, $phone, 
         $plan_display_name, $plan_name, $country, $currency, $timezone, $iana_timezone, 
@@ -148,7 +134,7 @@ if (isset($access_token)) {
         
 
         $insertSql = "INSERT INTO store_subscriptions 
-    (store_id, plan_id, order_limit, email_limit, order_used, email_used, features, start_date, end_date, status)
+    (store_id, plan_id, order_limit, email_limit, order_used, email_used, features, activated_on, cancelled_on, status)
     VALUES (?, ?, ?, ?, 0, 0, ?, ?, ?, 'active')";
 
         $subscription_id = DBHelper::insert($insertSql,"iiiisss",
