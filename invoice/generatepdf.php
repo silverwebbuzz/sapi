@@ -149,7 +149,7 @@ if ($shop_data) {
 
         // Close and output PDF document
         $pdf_content = $pdf->Output('invoice_'.$invoice['order_name'].'.pdf', 'I');
-        //$pdf_content = $pdf->Output('', 'S');
+        $pdf_content = $pdf->Output('', 'S');
         $encoded_pdf = base64_encode($pdf_content); // Encode PDF for storage
 
 
