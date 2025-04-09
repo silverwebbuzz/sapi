@@ -37,7 +37,7 @@ WHERE ss.store_id = ? AND ss.status = 'active'
 ORDER BY ss.activated_on DESC
 LIMIT 1
 ";
-$currentPlan = DBHelper::selectOne($sql_currentPlan,"s", [$shop]);
+$currentPlan = DBHelper::selectOne($sql_currentPlan,"s", [$shop_id]);
 
 ?>
 <!DOCTYPE html>
