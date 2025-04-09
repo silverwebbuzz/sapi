@@ -74,6 +74,10 @@ class DBHelper {
         $stmt->execute();
         return $stmt->affected_rows;
     }
+
+    public static function createTable($sql) {
+        return $conn->query($sql);
+    }
 }
 //Select Multiple Rows:
 /*$results = DBHelper::select(
@@ -115,4 +119,5 @@ $affectedRows = DBHelper::execute(
     "i",
     [$storeId]
 ); */
+
 ?>

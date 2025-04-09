@@ -132,19 +132,15 @@ if (isset($access_token)) {
     );
     
     //create free subscription. 
-    "SELECT id FROM store_subscriptions WHERE store_id = ? AND status = 'active'";
-    $subscription_result = DBHelper::selectOne($sql_currentPlan,"s", [$shop_id]);
+    $sql_subscription = "SELECT id FROM store_subscriptions WHERE store_id = ? AND status = 'active'";
+    $subscription_result = DBHelper::selectOne($sql_subscription,"s", [$shop_id]);
     
-    $stmt = $conn->prepare("SELECT id FROM store_subscriptions WHERE store_id = ? AND status = 'active'");
-    $stmt->bind_param("i", $shop_id);
-    $stmt->execute();
-    $subscription_result = $stmt->get_result();
 
-    if ($subscription_result->num_rows < 1) {
+    if (!$subscription_result) {
          // Assuming the free plan is identified by the name 'Free'
-        $plans_query = $conn->query("SELECT * FROM `plans` where price = '0.00'  ORDER BY id");
-        $freePlan = $plans_query->fetch_assoc();
-        
+        $plans_query = "SELECT * FROM `plans` where price = '0.00'  ORDER BY id";
+        $freePlan = DBHelper::selectOne($plans_query);
+       
         // You might set start_date to the current datetime and end_date as needed (e.g., one year later).
         $start_date = date("Y-m-d H:i:s");
         // For demonstration, we set the end_date to one year from now.
@@ -155,21 +151,15 @@ if (isset($access_token)) {
     (store_id, plan_id, order_limit, email_limit, order_used, email_used, features, start_date, end_date, status)
     VALUES (?, ?, ?, ?, 0, 0, ?, ?, ?, 'active')";
 
-        $stmt = $conn->prepare($insertSql);
-        $stmt->bind_param(
-            "iiiisss",
-            $shop_id,
-            $freePlan['id'],
-            $freePlan['order_limit'],
-            $freePlan['email_limit'],
-            $freePlan['features'],
-            $start_date,
-            $end_date
+        $subscription_id = DBHelper::insert($insertSql,"iiiisss",
+        [$shop_id,
+        $freePlan['id'],
+        $freePlan['order_limit'],
+        $freePlan['email_limit'],
+        $freePlan['features'],
+        $start_date,
+        $end_date]
         );
-
-        if (!$stmt->execute()) {
-            die("SQL Error: " . $stmt->error);
-        }
 
     }
 
@@ -202,12 +192,9 @@ if (isset($access_token)) {
         `pdf_invoice` LONGTEXT DEFAULT NULL,
          UNIQUE KEY (`order_id`)  -- Ensuring order_id remains unique
     ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;";
+        
+    DBHelper::createTable($create_table_query);
 
-    if ($conn->query($create_table_query) === TRUE) {
-       // echo "Subscription activated, and invoice table `$invoice_table` created successfully.";
-    } else {
-        echo "Error creating table: " . $conn->error;
-    }
     // Fetch last 20 paid orders from Shopify
     $api_url = "https://{$shop}/admin/api/" . SHOPIFY_API_VERSION . "/orders.json?financial_status=paid&limit=20";
     $ch = curl_init($api_url);
@@ -228,7 +215,7 @@ if (isset($access_token)) {
     $orders = json_decode($response, true)['orders'] ?? [];
 
     // Insert orders into the database
-    $stmt = $conn->prepare("
+    $invoice_qry = "
     INSERT INTO `$invoice_table` 
     (order_id, order_number, order_name, customer_name, customer_email, billing_address, shipping_address, currency, subtotal_price, total_price, tax_amount, discount_amount, shipping_cost, invoice_status, email_status, payment_method, order_status, products) 
     VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 'pending', 'pending', ?, ?, ?) 
@@ -249,7 +236,8 @@ if (isset($access_token)) {
         payment_method = VALUES(payment_method),
         order_status = VALUES(order_status),
         products = VALUES(products)
-    ");
+    ";
+
 
     if (!$stmt) {
         die("Query Preparation Failed: " . $conn->error);
@@ -272,9 +260,8 @@ if (isset($access_token)) {
         $order_status = $order['financial_status'] ?? 'pending';
         $products = json_encode($order['line_items'], JSON_UNESCAPED_UNICODE);
 
-
-        $stmt->bind_param("ssssssssdddddsss", 
-        $order_id,
+        $invoice_id = DBHelper::insert($invoice_qry,"ssssssssdddddsss",
+        [$order_id,
         $order_number,
         $order_name,
         $customer_name, 
@@ -289,14 +276,8 @@ if (isset($access_token)) {
         $shipping_cost,
         $payment_method,
         $order_status,
-        $products
+        $products]
         );
-
-        if (!$stmt->execute()) {
-            die("Query Execution Failed: " . $stmt->error);
-        } else {
-        // echo "Insert Successful for Order ID: $order_id <br>";
-        }
     }
 
     // Create webhook
