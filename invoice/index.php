@@ -104,15 +104,11 @@ $invoices_query = DBHelper::select("SELECT * FROM `$invoice_table` ORDER BY crea
                     <td><span class="status completed"><?= ucfirst($invoice['email_status']) ?></span></td>
                     <td>
                         <?php if ($invoice['pdf_invoice']!=''){ ?>
-                        <a href="#" class="view-invoice-btn" data-invoice-id="<?= $invoice['pdf_invoice']; ?>">View Invoice</a>
-                        <a href="#" onclick="sendEmail(<?= $shop_id ?>, <?= $invoice['order_id'] ?>, '<?= $invoice['email_status'] ?>'); return false;">
-                        <?= ($invoice['email_status'] == 'pending') ? 'Send Email' : 'Resend Email'; ?>
-                        </a>
-
-                        
-                        <br/><a href="<?= BASE_URL ?>/invoice/sendemail.php?shop_id=<?= $shop_id ?>&order_id=<?= $invoice['order_id'] ?>&emailstatus=<?= $invoice['email_status'] ?>"><?= ($invoice['email_status'] == 'pending') ? 'Send Email' : 'Resend Email';?></a>
+                            <a href="#" class="view-invoice-btn" data-invoice-id="<?= $invoice['pdf_invoice']; ?>">View Invoice</a>
+                            <a href="#" onclick="sendEmail(<?= $shop_id ?>, <?= $invoice['order_id'] ?>, '<?= $invoice['email_status'] ?>'); return false;">
+                            <?= ($invoice['email_status'] == 'pending') ? 'Send Email' : 'Resend Email'; ?>
+                            </a>
                         <?php } else { ?>
-                            <a href="<?= BASE_URL ?>/invoice/generatepdf.php?shop_id=<?= $shop_id ?>&order_id=<?= $invoice['order_id'] ?>&invoicestatus=<?= $invoice['invoice_status'] ?>" class="view-invoice"><?= ($invoice['invoice_status'] == 'pending') ? 'Generate Invoice' : 'View Invoice';?></a>
                             <a href="#" onclick="generateInvoice(<?= $shop_id ?>, <?= $invoice['order_id'] ?>, '<?= $invoice['invoice_status'] ?>'); return false;" class="view-invoice">
                             <?= ($invoice['invoice_status'] == 'pending') ? 'Generate Invoice' : 'View Invoice'; ?>
                             </a>
@@ -135,54 +131,3 @@ $invoices_query = DBHelper::select("SELECT * FROM `$invoice_table` ORDER BY crea
   </div>
 </div>
 <?php include 'footer.php'; ?>
-<script>
-    document.querySelectorAll('.view-invoice-btn').forEach(function(btn) {
-    btn.addEventListener('click', function(e) {
-        e.preventDefault();
-        var invoiceId = this.getAttribute('data-invoice-id');
-        var modal = document.getElementById('invoiceModal');
-        var iframe = document.getElementById('invoiceFrame');
-
-        // Load PDF via PHP file
-        iframe.src = 'data:application/pdf;base64,' + invoiceId;
-
-        modal.style.display = 'block';
-    });
-    });
-
-    function closeInvoiceModal() {
-    document.getElementById('invoiceModal').style.display = 'none';
-    document.getElementById('invoiceFrame').src = '';
-    }
-
-    function sendEmail(shopId, orderId, emailStatus) {
-    fetch(`<?= BASE_URL ?>/invoice/sendemail.php?shop_id=${shopId}&order_id=${orderId}&emailstatus=${emailStatus}`)
-        .then(response => response.text())
-        .then(data => {
-            showMessage('Email successfully sent.', 'success');
-        // You can optionally update the UI here
-        })
-        .catch(error => showMessage('Failed to send email.', 'error'));
-    }
-
-    function generateInvoice(shopId, orderId, invoiceStatus) {
-    fetch(`<?= BASE_URL ?>/invoice/generatepdf.php?shop_id=${shopId}&order_id=${orderId}&invoicestatus=${invoiceStatus}`)
-        .then(response => response.text())
-        .then(data => {
-            showMessage('Invoice processed successfully.', 'success');
-        // You can optionally update the UI here
-        })
-        .catch(error => showMessage('Failed to process invoice.', 'error'));
-    }
-
-    function showMessage(message, type = 'success') {
-        const box = document.getElementById('message-box');
-        box.innerText = message;
-        box.style.backgroundColor = (type === 'success') ? '#28a745' : '#dc3545'; // green or red
-        box.style.display = 'block';
-
-        setTimeout(() => {
-            box.style.display = 'none';
-        }, 5000); // hide after 5 seconds
-    }
-</script>

@@ -19,6 +19,65 @@ $(document).ready(function() {
         "responsive": true
     });
 
+    // 🧾 Generate Invoice Function
+    window.generateInvoice = function (shopId, orderId, invoiceStatus) {
+        fetch(`<?= BASE_URL ?>/invoice/generatepdf.php?shop_id=${shopId}&order_id=${orderId}&invoicestatus=${invoiceStatus}`)
+            .then(response => response.text())
+            .then(data => {
+                showMessage('Invoice processed successfully.', 'success');
+                $('#ordersTable').DataTable().ajax.reload(null, false);
+            })
+            .catch(error => {
+                showMessage('Failed to process invoice.', 'error');
+            });
+    };
+
+    // 📧 Send Email Function
+    window.sendEmail = function (shopId, orderId, emailStatus) {
+        fetch(`<?= BASE_URL ?>/invoice/sendemail.php?shop_id=${shopId}&order_id=${orderId}&emailstatus=${emailStatus}`)
+            .then(response => response.text())
+            .then(data => {
+                showMessage('Email successfully sent.', 'success');
+                $('#ordersTable').DataTable().ajax.reload(null, false);
+            })
+            .catch(error => {
+                showMessage('Failed to send email.', 'error');
+            });
+    };
+
+    // ✅ Show Message (success or error)
+    window.showMessage = function (message, type = 'success') {
+        var $box = $('#message-box');
+        $box.text(message)
+            .css('background-color', type === 'success' ? '#28a745' : '#dc3545')
+            .fadeIn();
+
+        setTimeout(() => {
+            $box.fadeOut();
+        }, 5000); // ⏱️ 5 seconds
+    };
+
+
+    // 📄 View Invoice Button -- Display Invoice in modal
+    $('.view-invoice-btn').on('click', function (e) {
+        e.preventDefault();
+
+        var invoiceId = $(this).data('invoice-id');
+        var $modal = $('#invoiceModal');
+        var $iframe = $('#invoiceFrame');
+
+        // Load PDF into iframe
+        $iframe.attr('src', 'data:application/pdf;base64,' + invoiceId);
+        $modal.show();
+    });
+
+    // ❌ Close Modal Function
+    window.closeInvoiceModal = function () {
+        $('#invoiceModal').hide();
+        $('#invoiceFrame').attr('src', '');
+    };
+
+
     // Mobile Menu Toggle
     $('.menu-toggle').on('click', function() {
         $(this).toggleClass('active');
