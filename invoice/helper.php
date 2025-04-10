@@ -145,7 +145,7 @@ function generatepdf($shop_id,$order_id){
             );
 
         } else {
-            return "No invoice found with the specified order ID.");
+            return "No invoice found with the specified order ID.";
         }
     } else {
         return "No shop found with the specified ID.";
