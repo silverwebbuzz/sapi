@@ -4,6 +4,7 @@ ini_set('display_startup_errors', 1);
 
 require_once '../config/config.php';
 require_once '../config/db.php';
+require_once 'helper.php';
 require_once '../vendor/tecnickcom/tcpdf/tcpdf.php';
 require_once '../vendor/autoload.php';
 
@@ -21,6 +22,8 @@ if ($_SERVER['REQUEST_METHOD'] !== 'GET') {
 $shop_id = $_GET['shop_id'];
 $order_id = $_GET['order_id'];
 
+generatepdf($shop_id,$order_id);
+exit;
 $shop_data = DBHelper::selectOne(
     "SELECT * FROM stores WHERE `id` = ? ",
     "s", 
