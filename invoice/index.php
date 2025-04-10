@@ -131,7 +131,7 @@ $invoices_query = DBHelper::select("SELECT * FROM `$invoice_table` ORDER BY crea
         var iframe = document.getElementById('invoiceFrame');
 
         // Load PDF via PHP file
-        iframe.src = `data:application/pdf;base64,${base64Invoice}`;
+        iframe.src = 'data:application/pdf;base64,' + invoiceId;
 
         modal.style.display = 'block';
     });
