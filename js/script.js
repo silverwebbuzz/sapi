@@ -21,7 +21,7 @@ $(document).ready(function() {
 
     // 🧾 Generate Invoice Function
     window.generateInvoice = function (shopId, orderId, invoiceStatus) {
-        fetch(`<?= BASE_URL ?>/invoice/generatepdf.php?shop_id=${shopId}&order_id=${orderId}&invoicestatus=${invoiceStatus}`)
+        fetch(`${BASE_URL}/invoice/generatepdf.php?shop_id=${shopId}&order_id=${orderId}&invoicestatus=${invoiceStatus}`)
             .then(response => response.text())
             .then(data => {
                 showMessage('Invoice processed successfully.', 'success');
@@ -34,7 +34,7 @@ $(document).ready(function() {
 
     // 📧 Send Email Function
     window.sendEmail = function (shopId, orderId, emailStatus) {
-        fetch(`<?= BASE_URL ?>/invoice/sendemail.php?shop_id=${shopId}&order_id=${orderId}&emailstatus=${emailStatus}`)
+        fetch(`${BASE_URL}/invoice/sendemail.php?shop_id=${shopId}&order_id=${orderId}&emailstatus=${emailStatus}`)
             .then(response => response.text())
             .then(data => {
                 showMessage('Email successfully sent.', 'success');
