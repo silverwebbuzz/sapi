@@ -8,10 +8,6 @@ require_once 'helper.php';
 require_once '../vendor/tecnickcom/tcpdf/tcpdf.php';
 require_once '../vendor/autoload.php';
 
-// Import PHPMailer classes
-use PHPMailer\PHPMailer\PHPMailer;
-use PHPMailer\PHPMailer\SMTP;
-use PHPMailer\PHPMailer\Exception;
 
 
 if ($_SERVER['REQUEST_METHOD'] !== 'GET') {

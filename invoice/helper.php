@@ -1,4 +1,8 @@
 <?php
+// Import PHPMailer classes
+use PHPMailer\PHPMailer\PHPMailer;
+use PHPMailer\PHPMailer\SMTP;
+use PHPMailer\PHPMailer\Exception;
 function generatepdf($shop_id,$order_id){
     $shop_data = DBHelper::selectOne(
         "SELECT * FROM stores WHERE `id` = ? ",
