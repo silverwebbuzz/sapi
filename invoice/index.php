@@ -124,12 +124,14 @@ $invoices_query = DBHelper::select("SELECT * FROM `$invoice_table` ORDER BY crea
         </table>
     </div>
 </main>
+<!-- Message Box-->
+<div id="message-box" style="display:none; position:fixed; top:20px; right:20px; padding:10px 20px; border-radius:5px; color:#fff; z-index:9999; font-weight:bold;"></div>
+
 <!-- Modal Wrapper -->
 <div id="invoiceModal" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.6); z-index:9999;">
   <div style="position:relative; width:80%; max-width:800px; margin:5% auto; background:#fff; padding:20px;">
     <span style="position:absolute; top:10px; right:20px; cursor:pointer;" onclick="closeInvoiceModal()">✖</span>
     <embed id="invoiceFrame" type="application/pdf" style="width:100%; height:600px; border:none;" />
-
   </div>
 </div>
 <?php include 'footer.php'; ?>
@@ -157,19 +159,30 @@ $invoices_query = DBHelper::select("SELECT * FROM `$invoice_table` ORDER BY crea
     fetch(`<?= BASE_URL ?>/invoice/sendemail.php?shop_id=${shopId}&order_id=${orderId}&emailstatus=${emailStatus}`)
         .then(response => response.text())
         .then(data => {
-        console.log('Email sent/resend triggered', data);
+            showMessage('Email successfully sent.', 'success');
         // You can optionally update the UI here
         })
-        .catch(error => console.error('Error:', error));
+        .catch(error => showMessage('Failed to send email.', 'error'));
     }
 
     function generateInvoice(shopId, orderId, invoiceStatus) {
     fetch(`<?= BASE_URL ?>/invoice/generatepdf.php?shop_id=${shopId}&order_id=${orderId}&invoicestatus=${invoiceStatus}`)
         .then(response => response.text())
         .then(data => {
-        console.log('Invoice generated/viewed', data);
+            showMessage('Invoice processed successfully.', 'success');
         // You can optionally update the UI here
         })
-        .catch(error => console.error('Error:', error));
+        .catch(error => showMessage('Failed to process invoice.', 'error'));
+    }
+
+    function showMessage(message, type = 'success') {
+        const box = document.getElementById('message-box');
+        box.innerText = message;
+        box.style.backgroundColor = (type === 'success') ? '#28a745' : '#dc3545'; // green or red
+        box.style.display = 'block';
+
+        setTimeout(() => {
+            box.style.display = 'none';
+        }, 5000); // hide after 5 seconds
     }
 </script>
