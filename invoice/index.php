@@ -103,9 +103,12 @@ $invoices_query = DBHelper::select("SELECT * FROM `$invoice_table` ORDER BY crea
                     <td><span class="status completed"><?= ucfirst($invoice['invoice_status']) ?></span></td>
                     <td><span class="status completed"><?= ucfirst($invoice['email_status']) ?></span></td>
                     <td>
+                        <?php if ($invoice['pdf_invoice']!=''){ ?>
                         <a href="#" class="view-invoice-btn" data-invoice-id="<?= $invoice['pdf_invoice']; ?>">View Invoice</a>
-                        <a href="<?= BASE_URL ?>/invoice/generatepdf.php?shop_id=<?= $shop_id ?>&order_id=<?= $invoice['order_id'] ?>&invoicestatus=<?= $invoice['invoice_status'] ?>" class="view-invoice"><?= ($invoice['invoice_status'] == 'pending') ? 'Generate Invoice' : 'View Invoice';?></a>
-                    <br/><a href="<?= BASE_URL ?>/invoice/sendemail.php?shop_id=<?= $shop_id ?>&order_id=<?= $invoice['order_id'] ?>&emailstatus=<?= $invoice['email_status'] ?>" class="view-invoice"><?= ($invoice['email_status'] == 'pending') ? 'Send Email' : 'Resend Email';?></a>
+                        <br/><a href="<?= BASE_URL ?>/invoice/sendemail.php?shop_id=<?= $shop_id ?>&order_id=<?= $invoice['order_id'] ?>&emailstatus=<?= $invoice['email_status'] ?>"><?= ($invoice['email_status'] == 'pending') ? 'Send Email' : 'Resend Email';?></a>
+                        <?php } else { ?>
+                            <a href="<?= BASE_URL ?>/invoice/generatepdf.php?shop_id=<?= $shop_id ?>&order_id=<?= $invoice['order_id'] ?>&invoicestatus=<?= $invoice['invoice_status'] ?>" class="view-invoice"><?= ($invoice['invoice_status'] == 'pending') ? 'Generate Invoice' : 'View Invoice';?></a>
+                        <?php } ?>
                     </td>
                 </tr>
             <?php endforeach; ?>

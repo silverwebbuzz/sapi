@@ -215,12 +215,12 @@ function sendemail($shop_id,$order_id){
                 [$shop_id]
             );
 
-            header("location:javascript://history.go(-1)");
+            return "Email Status : ". $email_status;
         } else {
-            die("No invoice found with the specified order ID.");
+            return "No invoice found with the specified order ID.";
         }
     } else {
-        die("No shop found with the specified ID.");
+        return "No shop found with the specified ID.";
     }
 }
 
