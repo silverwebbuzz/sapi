@@ -117,7 +117,7 @@ $invoices_query = DBHelper::select("SELECT * FROM `$invoice_table` ORDER BY crea
 <div id="invoiceModal" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.6); z-index:9999;">
   <div style="position:relative; width:80%; max-width:800px; margin:5% auto; background:#fff; padding:20px;">
     <span style="position:absolute; top:10px; right:20px; cursor:pointer;" onclick="closeInvoiceModal()">✖</span>
-    <embed src="data:application/pdf;base64,<?= $invoice['pdf_invoice']; ?>" type="application/pdf" width="100%" height="100%" />
+    <embed src="" type="application/pdf" width="100%" height="100%" />
   </div>
 </div>
 <?php include 'footer.php'; ?>
