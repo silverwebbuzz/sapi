@@ -153,28 +153,25 @@ function generatepdf($shop_id,$order_id){
 }
 
 function sendemail($shop_id,$order_id){
-    $conn = DB::getInstance();
-    // Fetch the correct invoice table for this shop
-    $table_query = $conn->prepare("SELECT * FROM stores WHERE id = ?");
-    $table_query->bind_param("s", $shop_id);
-    $table_query->execute();
-    $result = $table_query->get_result();
+        
+    $shop_data = DBHelper::selectOne(
+        "SELECT * FROM stores WHERE `id` = ? ",
+        "s", 
+        [$shop_id]
+    );
 
-    if ($result->num_rows > 0) {
-        $shop_data = $result->fetch_assoc();
-
+    if ($shop_data) {
         $shop_name = preg_replace('/[^a-zA-Z0-9_]/', '_', strtolower($shop_data['shop']));
         $invoice_table = "invoices_" . $shop_name;
-
         
         // Fetch invoice details
-        $stmt = $conn->prepare("SELECT * FROM `$invoice_table` WHERE order_id = ?");
-        $stmt->bind_param("s", $order_id);
-        $stmt->execute();
-        $invoice_result = $stmt->get_result();
+        $invoice = DBHelper::selectOne(
+            "SELECT * FROM `$invoice_table` WHERE order_id = ?",
+            "s", 
+            [$order_id]
+        );
 
-        if ($invoice_result->num_rows > 0) {
-            $invoice = $invoice_result->fetch_assoc();
+        if ($invoice) {
             
             $decoded_pdf = base64_decode($invoice['pdf_invoice']);
             $billing_address = json_decode($invoice['billing_address'], true);
@@ -197,13 +194,16 @@ function sendemail($shop_id,$order_id){
             $email_status = $email_sent ? 'sent' : 'failed';
 
             // Single database update for both PDF and email status
-            $update_stmt = $conn->prepare("UPDATE `$invoice_table` SET email_status = ? WHERE order_id = ? ");
-            $update_stmt->bind_param("ss", $email_status, $order_id);
-            $update_stmt->execute();
-
-            $up_sub_stmt = $conn->prepare("UPDATE `store_subscriptions` SET  email_used = email_used+1  WHERE store_id = ? ");
-            $up_sub_stmt->bind_param("s", $shop_id );
-            $up_sub_stmt->execute();
+            $affectedRows = DBHelper::execute(
+                "UPDATE `$invoice_table` SET email_status = ? WHERE order_id = ? ",
+                "ss",
+                [$email_status, $order_id]
+            );
+            $affectedRows = DBHelper::execute(
+                "UPDATE `store_subscriptions` SET  email_used = email_used+1  WHERE store_id = ? ",
+                "s",
+                [$shop_id]
+            );
 
             header("location:javascript://history.go(-1)");
         } else {
@@ -213,4 +213,54 @@ function sendemail($shop_id,$order_id){
         die("No shop found with the specified ID.");
     }
 }
+
+// Email sending function
+function sendEmailWithAttachment($to_email, $to_name, $subject, $html_body, $attachment_content, $attachment_name) {
+   
+    $mail = new PHPMailer(true);
+ 
+     try {
+         // Server settings
+         //$mail->SMTPDebug = SMTP::DEBUG_SERVER;
+         $mail->isSMTP();
+         $mail->Host       = 'mail.silverwebbuzz.com';
+         $mail->SMTPAuth   = true;
+         $mail->Username   = 'bhavik.koradiya@silverwebbuzz.com';
+         $mail->Password   = 'Bhavik@1109';
+         $mail->SMTPSecure = PHPMailer::ENCRYPTION_STARTTLS;
+         $mail->Port       = 587;
+         $mail->SMTPKeepAlive = true;
+ 
+         // Critical headers
+         $mail->setFrom('bhavik.koradiya@silverwebbuzz.com', 'Bhavik Koradiya SWB', true);
+         //$mail->addReplyTo('support@silverwebbuzz.com', 'Support Team');
+         //$mail->addAddress('vishnu@silverwebbuzz.com', 'Vishnu Prajapati');
+         $mail->addAddress($to_email, $to_name);
+ 
+         // Content
+         $mail->isHTML(true);
+         $mail->Subject = $subject;
+         $mail->Body = $html_body;
+         $mail->AltBody = strip_tags($html_body);
+         
+         // Add PDF attachment from string
+         $mail->addStringAttachment($attachment_content, $attachment_name, 'base64', 'application/pdf');
+             
+         // Delivery notifications
+         //$mail->addCustomHeader('Return-Receipt-To: bhavik.koradiya@silverwebbuzz.com');
+         //$mail->addCustomHeader('Disposition-Notification-To: bhavik.koradiya@silverwebbuzz.com');
+         
+         // Send with verification
+         if (!$mail->send()) {
+             throw new Exception('Send failed: ' . $mail->ErrorInfo);
+         }
+         return true;
+ 
+     } catch (Exception $e) {
+         echo "Error: " . $e->getMessage();
+         error_log("Mail Error: " . $e->getMessage());
+         return false;
+         
+     }
+ }
 ?>
