@@ -945,3 +945,10 @@ td {
         grid-template-columns: 1fr;
     }
 }
+#invoiceModal {
+    animation: fadeIn 0.3s ease;
+  }
+  @keyframes fadeIn {
+    from {opacity: 0;}
+    to {opacity: 1;}
+  }
