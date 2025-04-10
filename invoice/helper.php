@@ -1,4 +1,8 @@
 <?php
+// Import Dom PDF classes
+use Dompdf\Dompdf;
+use Dompdf\Options;
+
 // Import PHPMailer classes
 use PHPMailer\PHPMailer\PHPMailer;
 use PHPMailer\PHPMailer\SMTP;
@@ -113,30 +117,30 @@ function generatepdf($shop_id,$order_id){
             $html = str_replace(array_keys($replacements), array_values($replacements), $template);
     
             // Create new PDF document
-            $pdf = new TCPDF(PDF_PAGE_ORIENTATION, PDF_UNIT, PDF_PAGE_FORMAT, true, 'UTF-8', false);
-    
-            // Set document information
-            $pdf->SetCreator(PDF_CREATOR);
-            $pdf->SetAuthor($shop_data['store_name']);
-            $pdf->SetTitle('Invoice '.$invoice['order_name']);
-            $pdf->SetSubject('Invoice');
-    
-            // Remove default header/footer
-            $pdf->setPrintHeader(false);
-            $pdf->setPrintFooter(false);
-    
-            // Add a page
-            $pdf->AddPage();
-    
-            // Output HTML content
-            $pdf->writeHTML($html, true, false, true, false, '');
-    
-            // Close and output PDF document
-            $pdf_content = $pdf->Output('invoice_'.$invoice['order_name'].'.pdf', 'I');
-            $pdf_content = $pdf->Output('', 'S');
-            $encoded_pdf = base64_encode($pdf_content); // Encode PDF for storage
-    
-    
+            // Set options (optional but useful)
+            $options = new Options();
+            $options->set('isRemoteEnabled', true); // Enable external images (if needed)
+            $options->set('defaultFont', 'DejaVu Sans'); // Set default font
+
+            // Initialize DomPDF with options
+            $dompdf = new Dompdf($options);
+
+            // Load HTML content
+            $dompdf->loadHtml($html);
+
+            // (Optional) Set paper size and orientation
+            $dompdf->setPaper('A4', 'portrait'); // or 'landscape'
+
+            // Render the HTML as PDF
+            $dompdf->render();
+
+            // Output PDF to browser
+            //$dompdf->stream('invoice_'.$invoice['order_name'].'.pdf', array("Attachment" => false));
+
+            // Or to string
+            $pdf_output = $dompdf->output();
+            $encoded_pdf = base64_encode($pdf_output); // Encode for storage
+     
             // Single database update for both PDF and email status
             $affectedRows = DBHelper::execute(
                 "UPDATE `$invoice_table` SET  invoice_status = 'generated', pdf_invoice = ? WHERE order_id = ? ",
@@ -148,6 +152,7 @@ function generatepdf($shop_id,$order_id){
                 "s",
                 [$shop_id]
             );
+            return "PDF Generated Successfully.";
 
         } else {
             return "No invoice found with the specified order ID.";
