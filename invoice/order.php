@@ -41,8 +41,16 @@ $invoices_query = DBHelper::select("SELECT * FROM `$invoice_table` ORDER BY crea
                     <td><span class="status completed"><?= ucfirst($invoice['invoice_status']) ?></span></td>
                     <td><span class="status completed"><?= ucfirst($invoice['email_status']) ?></span></td>
                     <td>
-                        <a href="<?= BASE_URL ?>/invoice/generatepdf.php?shop_id=<?= $shop_id ?>&order_id=<?= $invoice['order_id'] ?>&invoicestatus=<?= $invoice['invoice_status'] ?>" class="view-invoice"><?= ($invoice['invoice_status'] == 'pending') ? 'Generate Invoice' : 'View Invoice';?></a>
-                    <br/><a href="<?= BASE_URL ?>/invoice/sendemail.php?shop_id=<?= $shop_id ?>&order_id=<?= $invoice['order_id'] ?>&emailstatus=<?= $invoice['email_status'] ?>" class="view-invoice"><?= ($invoice['email_status'] == 'pending') ? 'Send Email' : 'Resend Email';?></a>
+                    <?php if ($invoice['pdf_invoice']!=''){ ?>
+                            <a href="#" class="view-invoice-btn" data-invoice-id="<?= $invoice['pdf_invoice']; ?>">View Invoice</a>
+                            <a href="#" onclick="sendEmail(<?= $shop_id ?>, <?= $invoice['order_id'] ?>, '<?= $invoice['email_status'] ?>'); return false;">
+                            <?= ($invoice['email_status'] == 'pending') ? 'Send Email' : 'Resend Email'; ?>
+                            </a>
+                        <?php } else { ?>
+                            <a href="#" onclick="generateInvoice(<?= $shop_id ?>, <?= $invoice['order_id'] ?>, '<?= $invoice['invoice_status'] ?>'); return false;" class="view-invoice">
+                            <?= ($invoice['invoice_status'] == 'pending') ? 'Generate Invoice' : 'View Invoice'; ?>
+                            </a>
+                        <?php } ?>
                     </td>
                 </tr>
             <?php endforeach; ?>
@@ -52,5 +60,15 @@ $invoices_query = DBHelper::select("SELECT * FROM `$invoice_table` ORDER BY crea
         </table>
     </div>
 </main>
+<!-- Message Box-->
+<div id="message-box" style="display:none; position:fixed; top:20px; right:20px; padding:10px 20px; border-radius:5px; color:#fff; z-index:9999; font-weight:bold;"></div>
+
+<!-- Modal Wrapper -->
+<div id="invoiceModal" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.6); z-index:9999;">
+  <div style="position:relative; width:80%; max-width:800px; margin:5% auto; background:#fff; padding:20px;">
+    <span style="position:absolute; top:10px; right:20px; cursor:pointer;" onclick="closeInvoiceModal()">✖</span>
+    <embed id="invoiceFrame" type="application/pdf" style="width:100%; height:600px; border:none;" />
+  </div>
+</div>
 
 <?php include 'footer.php'; ?>
