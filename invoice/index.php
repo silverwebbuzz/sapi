@@ -105,9 +105,17 @@ $invoices_query = DBHelper::select("SELECT * FROM `$invoice_table` ORDER BY crea
                     <td>
                         <?php if ($invoice['pdf_invoice']!=''){ ?>
                         <a href="#" class="view-invoice-btn" data-invoice-id="<?= $invoice['pdf_invoice']; ?>">View Invoice</a>
+                        <a href="#" onclick="sendEmail(<?= $shop_id ?>, <?= $invoice['order_id'] ?>, '<?= $invoice['email_status'] ?>'); return false;">
+                        <?= ($invoice['email_status'] == 'pending') ? 'Send Email' : 'Resend Email'; ?>
+                        </a>
+
+                        
                         <br/><a href="<?= BASE_URL ?>/invoice/sendemail.php?shop_id=<?= $shop_id ?>&order_id=<?= $invoice['order_id'] ?>&emailstatus=<?= $invoice['email_status'] ?>"><?= ($invoice['email_status'] == 'pending') ? 'Send Email' : 'Resend Email';?></a>
                         <?php } else { ?>
                             <a href="<?= BASE_URL ?>/invoice/generatepdf.php?shop_id=<?= $shop_id ?>&order_id=<?= $invoice['order_id'] ?>&invoicestatus=<?= $invoice['invoice_status'] ?>" class="view-invoice"><?= ($invoice['invoice_status'] == 'pending') ? 'Generate Invoice' : 'View Invoice';?></a>
+                            <a href="#" onclick="generateInvoice(<?= $shop_id ?>, <?= $invoice['order_id'] ?>, '<?= $invoice['invoice_status'] ?>'); return false;" class="view-invoice">
+                            <?= ($invoice['invoice_status'] == 'pending') ? 'Generate Invoice' : 'View Invoice'; ?>
+                            </a>
                         <?php } ?>
                     </td>
                 </tr>
@@ -143,5 +151,25 @@ $invoices_query = DBHelper::select("SELECT * FROM `$invoice_table` ORDER BY crea
     function closeInvoiceModal() {
     document.getElementById('invoiceModal').style.display = 'none';
     document.getElementById('invoiceFrame').src = '';
+    }
+
+    function sendEmail(shopId, orderId, emailStatus) {
+    fetch(`<?= BASE_URL ?>/invoice/sendemail.php?shop_id=${shopId}&order_id=${orderId}&emailstatus=${emailStatus}`)
+        .then(response => response.text())
+        .then(data => {
+        console.log('Email sent/resend triggered', data);
+        // You can optionally update the UI here
+        })
+        .catch(error => console.error('Error:', error));
+    }
+
+    function generateInvoice(shopId, orderId, invoiceStatus) {
+    fetch(`<?= BASE_URL ?>/invoice/generatepdf.php?shop_id=${shopId}&order_id=${orderId}&invoicestatus=${invoiceStatus}`)
+        .then(response => response.text())
+        .then(data => {
+        console.log('Invoice generated/viewed', data);
+        // You can optionally update the UI here
+        })
+        .catch(error => console.error('Error:', error));
     }
 </script>
