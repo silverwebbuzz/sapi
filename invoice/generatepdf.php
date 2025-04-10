@@ -5,13 +5,10 @@ ini_set('display_startup_errors', 1);
 require_once '../config/config.php';
 require_once '../config/db.php';
 require_once 'helper.php';
-require_once '../vendor/tecnickcom/tcpdf/tcpdf.php';
 require_once '../vendor/autoload.php';
 
-// Import PHPMailer classes
-use PHPMailer\PHPMailer\PHPMailer;
-use PHPMailer\PHPMailer\SMTP;
-use PHPMailer\PHPMailer\Exception;
+use Dompdf\Dompdf;
+use Dompdf\Options;
 
 
 if ($_SERVER['REQUEST_METHOD'] !== 'GET') {
@@ -22,8 +19,8 @@ if ($_SERVER['REQUEST_METHOD'] !== 'GET') {
 $shop_id = $_GET['shop_id'];
 $order_id = $_GET['order_id'];
 
-generatepdf($shop_id,$order_id);
-exit;
+//generatepdf($shop_id,$order_id);
+//exit;
 //below code is in helper
 $shop_data = DBHelper::selectOne(
     "SELECT * FROM stores WHERE `id` = ? ",
@@ -132,30 +129,30 @@ if ($shop_data) {
         $template = file_get_contents('invoice_templates/html/'.$template_html['template_file']);
         $html = str_replace(array_keys($replacements), array_values($replacements), $template);
 
-        // Create new PDF document
-        $pdf = new TCPDF(PDF_PAGE_ORIENTATION, PDF_UNIT, PDF_PAGE_FORMAT, true, 'UTF-8', false);
 
-        // Set document information
-        $pdf->SetCreator(PDF_CREATOR);
-        $pdf->SetAuthor($shop_data['store_name']);
-        $pdf->SetTitle('Invoice '.$invoice['order_name']);
-        $pdf->SetSubject('Invoice');
+        // Set options (optional but useful)
+        $options = new Options();
+        $options->set('isRemoteEnabled', true); // Enable external images (if needed)
+        $options->set('defaultFont', 'DejaVu Sans'); // Set default font
 
-        // Remove default header/footer
-        $pdf->setPrintHeader(false);
-        $pdf->setPrintFooter(false);
+        // Initialize DomPDF with options
+        $dompdf = new Dompdf($options);
 
-        // Add a page
-        $pdf->AddPage();
+        // Load HTML content
+        $dompdf->loadHtml($html);
 
-        // Output HTML content
-        $pdf->writeHTML($html, true, false, true, false, '');
+        // (Optional) Set paper size and orientation
+        $dompdf->setPaper('A4', 'portrait'); // or 'landscape'
 
-        // Close and output PDF document
-        $pdf_content = $pdf->Output('invoice_'.$invoice['order_name'].'.pdf', 'I');
-        $pdf_content = $pdf->Output('', 'S');
-        $encoded_pdf = base64_encode($pdf_content); // Encode PDF for storage
+        // Render the HTML as PDF
+        $dompdf->render();
 
+        // Output PDF to browser
+        //$dompdf->stream('invoice_'.$invoice['order_name'].'.pdf', array("Attachment" => false));
+
+        // Or to string
+        $pdf_output = $dompdf->output();
+        $encoded_pdf = base64_encode($pdf_output); // Encode for storage
 
         // Single database update for both PDF and email status
         $affectedRows = DBHelper::execute(
