@@ -117,7 +117,8 @@ $invoices_query = DBHelper::select("SELECT * FROM `$invoice_table` ORDER BY crea
 <div id="invoiceModal" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.6); z-index:9999;">
   <div style="position:relative; width:80%; max-width:800px; margin:5% auto; background:#fff; padding:20px;">
     <span style="position:absolute; top:10px; right:20px; cursor:pointer;" onclick="closeInvoiceModal()">✖</span>
-    <embed id="invoiceFrame" src="" type="application/pdf" style="width:100%; height:600px; border:none;" />
+    <embed id="invoiceFrame" type="application/pdf" style="width:100%; height:600px; border:none;" />
+
   </div>
 </div>
 <?php include 'footer.php'; ?>
@@ -130,7 +131,7 @@ $invoices_query = DBHelper::select("SELECT * FROM `$invoice_table` ORDER BY crea
         var iframe = document.getElementById('invoiceFrame');
 
         // Load PDF via PHP file
-        iframe.src = 'data:application/pdf;base64' + invoiceId;
+        iframe.src = `data:application/pdf;base64,${base64Invoice}`;
 
         modal.style.display = 'block';
     });
