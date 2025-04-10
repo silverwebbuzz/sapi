@@ -67,7 +67,7 @@ if ($shop_data) {
                 $tax_amount = $item['tax_lines'][0]['price'];
             }
             
-            $items_html .= '<tr style="font-size: 10px; border-bottom: 1px solid #ddd">';
+            $items_html .= '<tr style="font-size: 10px; border-bottom: 1px solid #ccc">';
             $items_html .= '<td style="text-align: left">'.$item['name'].'</td>';
             $items_html .= '<td style="text-align: left">'.$item['variant_title'].'</td>';
             $items_html .= '<td style="text-align: left">'.$invoice['currency'].' '.number_format($item['price'], 2).'</td>';
