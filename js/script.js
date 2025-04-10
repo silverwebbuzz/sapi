@@ -19,7 +19,7 @@ $(document).ready(function() {
         "responsive": true
     });
 
-    // 🧾 Generate Invoice Function
+    //Generate Invoice Function
     window.generateInvoice = function (shopId, orderId, invoiceStatus) {
         fetch(`${BASE_URL}/invoice/generatepdf.php?shop_id=${shopId}&order_id=${orderId}&invoicestatus=${invoiceStatus}`)
             .then(response => response.text())
@@ -32,7 +32,7 @@ $(document).ready(function() {
             });
     };
 
-    // 📧 Send Email Function
+    // Send Email Function
     window.sendEmail = function (shopId, orderId, emailStatus) {
         fetch(`${BASE_URL}/invoice/sendemail.php?shop_id=${shopId}&order_id=${orderId}&emailstatus=${emailStatus}`)
             .then(response => response.text())
@@ -45,7 +45,7 @@ $(document).ready(function() {
             });
     };
 
-    // ✅ Show Message (success or error)
+    //Show Message (success or error)
     window.showMessage = function (message, type = 'success') {
         var $box = $('#message-box');
         $box.text(message)
@@ -58,7 +58,7 @@ $(document).ready(function() {
     };
 
 
-    // 📄 View Invoice Button -- Display Invoice in modal
+    //View Invoice Button -- Display Invoice in modal
     $('.view-invoice-btn').on('click', function (e) {
         e.preventDefault();
 
@@ -71,7 +71,7 @@ $(document).ready(function() {
         $modal.show();
     });
 
-    // ❌ Close Modal Function
+    // Close Modal Function
     window.closeInvoiceModal = function () {
         $('#invoiceModal').hide();
         $('#invoiceFrame').attr('src', '');
