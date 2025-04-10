@@ -2,8 +2,9 @@
 ini_set('display_errors', 1);
 ini_set('display_startup_errors', 1);
 
-require_once '../config.php';
-require_once '../db.php';
+require_once '../config/config.php';
+require_once '../config/db.php';
+require_once 'helper.php';
 require_once '../vendor/tecnickcom/tcpdf/tcpdf.php';
 require_once '../vendor/autoload.php';
 
@@ -21,29 +22,24 @@ if ($_SERVER['REQUEST_METHOD'] !== 'GET') {
 $shop_id = $_GET['shop_id'];
 $order_id = $_GET['order_id'];
 
-$conn = DB::getInstance();
+$shop_data = DBHelper::selectOne(
+    "SELECT * FROM stores WHERE `id` = ? ",
+    "s", 
+    [$shop_id]
+);
 
-// Fetch the correct invoice table for this shop
-$table_query = $conn->prepare("SELECT * FROM stores WHERE id = ?");
-$table_query->bind_param("s", $shop_id);
-$table_query->execute();
-$result = $table_query->get_result();
-
-if ($result->num_rows > 0) {
-    $shop_data = $result->fetch_assoc();
-
+if ($shop_data) {
     $shop_name = preg_replace('/[^a-zA-Z0-9_]/', '_', strtolower($shop_data['shop']));
     $invoice_table = "invoices_" . $shop_name;
-
     
     // Fetch invoice details
-    $stmt = $conn->prepare("SELECT * FROM `$invoice_table` WHERE order_id = ?");
-    $stmt->bind_param("s", $order_id);
-    $stmt->execute();
-    $invoice_result = $stmt->get_result();
+    $invoice = DBHelper::selectOne(
+        "SELECT * FROM `$invoice_table` WHERE order_id = ?",
+        "s", 
+        [$order_id]
+    );
 
-    if ($invoice_result->num_rows > 0) {
-        $invoice = $invoice_result->fetch_assoc();
+    if ($invoice) {
         
         $decoded_pdf = base64_decode($invoice['pdf_invoice']);
         $billing_address = json_decode($invoice['billing_address'], true);
@@ -66,13 +62,16 @@ if ($result->num_rows > 0) {
         $email_status = $email_sent ? 'sent' : 'failed';
 
         // Single database update for both PDF and email status
-        $update_stmt = $conn->prepare("UPDATE `$invoice_table` SET email_status = ? WHERE order_id = ? ");
-        $update_stmt->bind_param("ss", $email_status, $order_id);
-        $update_stmt->execute();
-
-        $up_sub_stmt = $conn->prepare("UPDATE `store_subscriptions` SET  email_used = email_used+1  WHERE store_id = ? ");
-        $up_sub_stmt->bind_param("s", $shop_id );
-        $up_sub_stmt->execute();
+        $affectedRows = DBHelper::execute(
+            "UPDATE `$invoice_table` SET email_status = ? WHERE order_id = ? ",
+            "ss",
+            [$email_status, $order_id]
+        );
+        $affectedRows = DBHelper::execute(
+            "UPDATE `store_subscriptions` SET  email_used = email_used+1  WHERE store_id = ? ",
+            "s",
+            [$shop_id]
+        );
 
         header("location:javascript://history.go(-1)");
     } else {

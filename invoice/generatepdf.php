@@ -24,6 +24,7 @@ $order_id = $_GET['order_id'];
 
 generatepdf($shop_id,$order_id);
 exit;
+//below code is in helper
 $shop_data = DBHelper::selectOne(
     "SELECT * FROM stores WHERE `id` = ? ",
     "s", 
