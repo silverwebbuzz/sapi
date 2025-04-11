@@ -15,7 +15,7 @@ if (!hash_equals($hmac, $calculated_hmac)) {
 }
 
 // Decode webhook data
-$order = json_decode($data, true);
+$webhook = $order = json_decode($data, true);
 $shop = $_SERVER['HTTP_X_SHOPIFY_SHOP_DOMAIN'];
 $topic = $_SERVER['HTTP_X_SHOPIFY_TOPIC']; // Get webhook topic
 $cdate = date("Y-m-d H:i:s");
@@ -104,7 +104,15 @@ if ($topic === 'app/uninstalled') {
     
     $generatepdf  = generatepdf($shop_id,$order_id);
     $sendemail  = sendemail($shop_id,$order_id);
-    
+
+} elseif ($topic === 'app_subscription/activated') {
+
+    handleSubscriptionActivated($webhook);
+
+} elseif ($topic === 'app_subscription/cancelled') {  
+
+    handleSubscriptionCancelled($webhook);
+
 } else {
     error_log("Unhandled webhook topic: {$topic}");
 }

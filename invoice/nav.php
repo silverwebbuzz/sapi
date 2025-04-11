@@ -20,13 +20,7 @@
     </ul>
 </nav>
 
-<?php 
-$smtp_settings_data = DBHelper::selectOne(
-    "SELECT smtp_settings FROM stores WHERE `id` = ? ",
-    "s", 
-    [$shop_id]
-);
-if (!$smtp_settings_data['smtp_settings']): // You can set this based on your SMTP check logic ?>
+<?php if($currentPlan['price']>'0'): // You can set this based on your SMTP check logic ?>
 <div id="smtp-warning" class="warning-box">
     <span style="font-size:18px">⚠</span> Please upgrade you plan and set your SMTP settings to receive invoice emails from your defined Email Address.
 </div>

@@ -231,12 +231,115 @@ function getShopLogo($shop, $access_token) {
     return $assets;
 }
 
+function createRecurringCharge($shop,$access_token, $charge_data){
+    $Url = "https://{$shop}/admin/api/" . SHOPIFY_API_VERSION . "/recurring_application_charges.json";
+
+    $ch = curl_init($Url);
+    curl_setopt_array($ch, [
+        CURLOPT_RETURNTRANSFER => true,
+        CURLOPT_POST => true,
+        CURLOPT_HTTPHEADER => [
+            "X-Shopify-Access-Token: {$access_token}",
+            "Content-Type: application/json"
+        ],
+        CURLOPT_POSTFIELDS => json_encode($charge_data)
+    ]);
+
+    $response = curl_exec($ch);
+    $http_code = curl_getinfo($ch, CURLINFO_HTTP_CODE);
+    curl_close($ch);
+    
+    if ($http_code !== 201) {
+        error_log("Failed to create charge: " . $response);
+        return false;
+    }
+    
+    $response_data = json_decode($response, true);
+    return $response_data['recurring_application_charge'];
+}
+
+function activateRecurringCharge($shop, $access_token, $charge_id) {
+    $url = "https://{$shop}/admin/api/" . SHOPIFY_API_VERSION . "/recurring_application_charges/{$charge_id}/activate.json";
+    
+    $ch = curl_init($url);
+    curl_setopt_array($ch, [
+        CURLOPT_RETURNTRANSFER => true,
+        CURLOPT_POST => true,
+        CURLOPT_HTTPHEADER => [
+            "X-Shopify-Access-Token: {$access_token}",
+            "Content-Type: application/json"
+        ]
+    ]);
+    
+    $response = curl_exec($ch);
+    $http_code = curl_getinfo($ch, CURLINFO_HTTP_CODE);
+    curl_close($ch);
+    
+    if ($http_code !== 200) {
+        error_log("Failed to activate charge: " . $response);
+        return false;
+    }
+    
+    $response_data = json_decode($response, true);
+    return $response_data['recurring_application_charge'];
+}
+
+function getChargeDetails($shop, $access_token, $charge_id) {
+    $url = "https://{$shop}/admin/api/" . SHOPIFY_API_VERSION . "/recurring_application_charges/{$charge_id}.json";
+    
+    $ch = curl_init($url);
+    curl_setopt_array($ch, [
+        CURLOPT_RETURNTRANSFER => true,
+        CURLOPT_HTTPHEADER => [
+            "X-Shopify-Access-Token: {$access_token}"
+        ]
+    ]);
+    
+    $response = curl_exec($ch);
+    $http_code = curl_getinfo($ch, CURLINFO_HTTP_CODE);
+    curl_close($ch);
+    
+    if ($http_code !== 200) {
+        error_log("Failed to get charge details: " . $response);
+        return false;
+    }
+    
+    $response_data = json_decode($response, true);
+    return $response_data['recurring_application_charge'];
+}
+
+function cancelRecurringCharge($shop, $access_token, $charge_id) {
+    $url = "https://{$shop}/admin/api/" . SHOPIFY_API_VERSION . "/recurring_application_charges/{$charge_id}.json";
+    
+    $ch = curl_init($url);
+    curl_setopt_array($ch, [
+        CURLOPT_RETURNTRANSFER => true,
+        CURLOPT_CUSTOMREQUEST => "DELETE",
+        CURLOPT_HTTPHEADER => [
+            "X-Shopify-Access-Token: {$access_token}"
+        ]
+    ]);
+    
+    $response = curl_exec($ch);
+    $http_code = curl_getinfo($ch, CURLINFO_HTTP_CODE);
+    curl_close($ch);
+    
+    if ($http_code !== 200) {
+        error_log("Failed to cancel charge: " . $response);
+        return false;
+    }
+    
+    return true;
+}
+
 function registerShopifyWebhooks($shop, $access_token) {
     $webhook_url = BASE_SHOPIFY_AF_URL . 'webhook'; 
     $topics = [
         'orders/create',
         'orders/paid',
-        'app/uninstalled'
+        'app/uninstalled',
+        'app_subscription/activated',
+        'app_subscription/cancelled'
     ];
 
     foreach ($topics as $topic) {

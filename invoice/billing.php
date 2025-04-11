@@ -28,7 +28,6 @@ $plans = DBHelper::select("SELECT * FROM `plans` where price != '0.00'  ORDER BY
                 </ul>
                 <div class="plan-footer">
                     <div class="renewal-date">Renews on: <strong><?= htmlspecialchars($currentPlan['cancelled_on'])?></strong></div>
-                    <button class="btn-cancel">Cancel Subscription</button>
                 </div>
             </div>
         </div>
@@ -58,7 +57,7 @@ $plans = DBHelper::select("SELECT * FROM `plans` where price != '0.00'  ORDER BY
                     </ul>
                     <input type="hidden" name="shop_id" value="<?= $shop_id ?>">
                     <input type="hidden" name="plan_id" value="<?= $plan['id'] ?>">
-                    <button class="btn-upgrade <?php if($plan['id']=='2') echo 'current';?>">Upgrade</button>
+                    <a class="btn-upgrade <?php if($plan['id']=='2') echo 'current';?>" href="create-charge.php?shop_id=<?= urlencode($shop_id) ?>&plan_id=<?= $plan['id'] ?>">Upgrade</a>
                 </div>
             <?php endforeach; ?>
             </div>
