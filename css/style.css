@@ -376,7 +376,7 @@ td {
 label {
     font-size: 12px;
  }
-a.view-invoice-btn , .email-btn , .gen-invoice-btn .upgrade-btn{
+a.view-invoice-btn , .email-btn , .gen-invoice-btn , .upgrade-btn{
     background-color: #303030;
     color: #fff;
     text-decoration: none;
