@@ -42,10 +42,9 @@ $plans = DBHelper::select("SELECT * FROM `plans` where price != '0.00'  ORDER BY
                 </div>
                 <ul class="plan-features">
                     <li>Invoices : <?= htmlspecialchars($currentPlan['plan_order_limit'])?>/month</li>
-                    <li><?= htmlspecialchars($currentPlan['email_limit'])?>/month Emails Notifications With Attached Invoice </li>
+                    <li>Emails Notifications with Invoice : <?= htmlspecialchars($currentPlan['email_limit'])?>/month </li>
                     <li>Auto Create and Send Invoices</li>
                     <li>Personalized Setup</li>
-                    <li>Credit Notes</li>
                     <li>Invoice Templates Selection</li>
                     <li>Email Template Change</li>
                     <li>Email Support</li>
@@ -61,20 +60,28 @@ $plans = DBHelper::select("SELECT * FROM `plans` where price != '0.00'  ORDER BY
         <div class="available-plans">
             <h3>Available Plans</h3>
             <div class="plans-grid">
+
+            <?php foreach ($plans as $plan) : ?>
                 <div class="plan-card">
                     <div class="plan-header">
-                        <h4>Basic</h4>
-                        <div class="plan-price">$9.99<span>/month</span></div>
+                        <h4><?= htmlspecialchars($plan['name']) ?></h4>
+                        <div class="plan-price">$<?= number_format($plan['price'], 2) ?><span>/month</span></div>
                     </div>
                     <ul class="plan-features">
-                        <li>100 Invoices/month</li>
-                        <li>100 Email Notifications</li>
-                        <li>Basic Analytics</li>
+                        <li><?= $plan['order_limit'] ?> Invoices/month</li>
+                        <li><?= $plan['email_limit'] ?> Email Notifications</li>
+                        <li>Auto Create and Send Invoices</li>
+                        <li>Personalized Setup</li>
+                        <li>Invoice Templates Selection</li>
+                        <li>Email Template Change</li>
                         <li>Email Support</li>
                     </ul>
+                    <input type="hidden" name="shop_id" value="<?= $shop_id ?>">
+                    <input type="hidden" name="plan_id" value="<?= $plan['id'] ?>">
                     <button class="btn-upgrade">Upgrade</button>
                 </div>
-                
+            <?php endforeach; ?>
+
                 <div class="plan-card recommended">
                     <div class="recommended-badge">Recommended</div>
                     <div class="plan-header">
