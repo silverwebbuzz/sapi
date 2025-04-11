@@ -966,7 +966,7 @@ a.view-invoice-btn , .email-btn , .gen-invoice-btn , .upgrade-btn{
     to {opacity: 1;}
   }
   .warning-box {
-    background-color: #ffc107;
+    background-color: #ffc107c7;
     color: #212529;
     padding: 10px;
     margin: 0;
