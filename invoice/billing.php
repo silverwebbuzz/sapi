@@ -39,7 +39,8 @@ $plans = DBHelper::select("SELECT * FROM `plans` where price != '0.00'  ORDER BY
             <div class="plans-grid">
 
             <?php foreach ($plans as $plan) : ?>
-                <div class="plan-card">
+                <div class="plan-card <?php if($plan['id']=='2') echo 'recommended'; ?>">
+                <?php if($plan['id']=='2') echo '<div class="recommended-badge">Recommended</div>'; ?>
                     <div class="plan-header">
                         <h4><?= htmlspecialchars($plan['name']) ?></h4>
                         <div class="plan-price">$<?= number_format($plan['price'], 2) ?><span>/month</span></div>
