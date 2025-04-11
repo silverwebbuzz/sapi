@@ -7,7 +7,7 @@ $plans = DBHelper::select("SELECT * FROM `plans` where price != '0.00'  ORDER BY
 
 <main class="main-content">
     <div class="billing-container">
-        <h2>Billing & Subscription</h2>
+        <h2>Subscription Plans</h2>
         <!-- Current Plan -->
         <div class="current-plan">
             <h3>Your Current Plan</h3>
