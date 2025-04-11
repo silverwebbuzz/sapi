@@ -36,17 +36,22 @@ $plans = DBHelper::select("SELECT * FROM `plans` where price != '0.00'  ORDER BY
             <h3>Your Current Plan</h3>
             <div class="plan-card active">
                 <div class="plan-header">
-                    <h4>Professional</h4>
-                    <div class="plan-price">$29.99<span>/month</span></div>
+                    <h4><?= htmlspecialchars($currentPlan['plan_name'])?></h4>
+                    <div class="plan-price">$<?= htmlspecialchars($currentPlan['price'])?><span>/month</span></div>
+                    <div><?= htmlspecialchars($currentPlan['description']); ?></div>
                 </div>
                 <ul class="plan-features">
-                    <li>Unlimited Invoices</li>
-                    <li>500 Email Notifications</li>
-                    <li>Advanced Analytics</li>
-                    <li>Priority Support</li>
+                    <li>Invoices : <?= htmlspecialchars($currentPlan['plan_order_limit'])?>/month</li>
+                    <li><?= htmlspecialchars($currentPlan['email_limit'])?>/month Emails Notifications With Attached Invoice </li>
+                    <li>Auto Create and Send Invoices</li>
+                    <li>Personalized Setup</li>
+                    <li>Credit Notes</li>
+                    <li>Invoice Templates Selection</li>
+                    <li>Email Template Change</li>
+                    <li>Email Support</li>
                 </ul>
                 <div class="plan-footer">
-                    <div class="renewal-date">Renews on: <strong>April 28, 2025</strong></div>
+                    <div class="renewal-date">Renews on: <strong><?= htmlspecialchars($currentPlan['cancelled_on'])?></strong></div>
                     <button class="btn-cancel">Cancel Subscription</button>
                 </div>
             </div>
