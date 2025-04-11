@@ -69,8 +69,7 @@ $invoices_query = DBHelper::select("SELECT * FROM `$invoice_table` ORDER BY crea
                 </div>
             </div>
             <div class="package-stats">
-                <button class="btn-upgrade">Upgrade Plan</button>
-                <button class="btn-cancel">Cancel Plan</button>
+                <button class="btn-upgrade"><a href="billing.php">Upgrade Plan</a></button>
             </div>
         </div>
     </div>
