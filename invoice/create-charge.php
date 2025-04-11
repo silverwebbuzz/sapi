@@ -44,6 +44,7 @@ DBHelper::insert($pending_charge_sql,"ssssss",
 $plan_id,
 $charge['id'],
 $charge_data['recurring_application_charge']['price'],
+$current_sub['plan_id'],
 $charge['confirmation_url']]
 );
 
