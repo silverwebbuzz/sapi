@@ -968,11 +968,10 @@ a.view-invoice-btn , .email-btn , .gen-invoice-btn , .upgrade-btn{
   .warning-box {
     background-color: #ffc107;
     color: #212529;
-    padding: 15px 20px;
+    padding: 10px;
     margin: 0;
     text-align: center;
-    font-weight: bold;
     position: relative;
     z-index: 999;
-    border-bottom: 2px solid #d39e00;
+    font-size: 14px;
 }
