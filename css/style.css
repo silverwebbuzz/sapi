@@ -373,7 +373,10 @@ td {
     border-bottom: 1px solid var(--border);
     font-size: 12px;
 }
-a.view-invoice-btn , .email-btn , .gen-invoice-btn {
+label {
+    font-size: 12px;
+ }
+a.view-invoice-btn , .email-btn , .gen-invoice-btn .upgrade-btn{
     background-color: #303030;
     color: #fff;
     text-decoration: none;
