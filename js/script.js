@@ -1,7 +1,8 @@
 $(document).ready(function() {
     // Initialize DataTables
     $('#ordersTable, .billing-table').DataTable({
-        "pageLength": 10,
+        "order": [[1, 'desc']],
+        "pageLength": 25,
         "lengthMenu": [10, 25, 50, 100],
         "language": {
             "search": "Search:",
