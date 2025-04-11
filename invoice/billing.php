@@ -44,6 +44,7 @@ $plans = DBHelper::select("SELECT * FROM `plans` where price != '0.00'  ORDER BY
                     <div class="plan-header">
                         <h4><?= htmlspecialchars($plan['name']) ?></h4>
                         <div class="plan-price">$<?= number_format($plan['price'], 2) ?><span>/month</span></div>
+                        <div><?= htmlspecialchars($plan['description']); ?></div>
                     </div>
                     
                     <ul class="plan-features">
