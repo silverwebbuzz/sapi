@@ -952,3 +952,14 @@ td {
     from {opacity: 0;}
     to {opacity: 1;}
   }
+  .warning-box {
+    background-color: #ffc107;
+    color: #212529;
+    padding: 15px 20px;
+    margin: 0;
+    text-align: center;
+    font-weight: bold;
+    position: relative;
+    z-index: 999;
+    border-bottom: 2px solid #d39e00;
+}
