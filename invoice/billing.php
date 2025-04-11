@@ -44,7 +44,9 @@ $plans = DBHelper::select("SELECT * FROM `plans` where price != '0.00'  ORDER BY
                         <h4><?= htmlspecialchars($plan['name']) ?></h4>
                         <div class="plan-price">$<?= number_format($plan['price'], 2) ?><span>/month</span></div>
                     </div>
-                    <ul class="plan-features">
+                    
+                    <ul class="plan-features <?php if($plan['id']=='2') echo 'recommended'; ?>">
+                    <?php if($plan['id']=='2') echo '<div class="recommended-badge">Recommended</div>'; ?>
                         <li><?= $plan['order_limit'] ?> Invoices/month</li>
                         <li><?= $plan['email_limit'] ?> Email Notifications</li>
                         <li>Auto Create and Send Invoices</li>
