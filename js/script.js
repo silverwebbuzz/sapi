@@ -26,7 +26,7 @@ $(document).ready(function() {
             .then(response => response.text())
             .then(data => {
                 showMessage('Invoice processed successfully.', 'success');
-                $('#ordersTable').DataTable().ajax.reload(null, false);
+                setTimeout(() => location.reload(), 6000);
             })
             .catch(error => {
                 showMessage('Failed to process invoice.', 'error');
@@ -39,7 +39,7 @@ $(document).ready(function() {
             .then(response => response.text())
             .then(data => {
                 showMessage('Email successfully sent.', 'success');
-                $('#ordersTable').DataTable().ajax.reload(null, false);
+                setTimeout(() => location.reload(), 6000);
             })
             .catch(error => {
                 showMessage('Failed to send email.', 'error');

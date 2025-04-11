@@ -1,9 +1,8 @@
 <?php include 'header.php';
 include 'nav.php'; 
-$shop_id = 1;
-$store['shop'] = 'silverwebbuzzapp.myshopify.com';
+
 //fetch invoices
-$invoice_table = "invoices_" . preg_replace('/[^a-zA-Z0-9_]/', '_', strtolower($store['shop']));
+$invoice_table = "invoices_" . preg_replace('/[^a-zA-Z0-9_]/', '_', strtolower($shop));
 $invoices_query = DBHelper::select("SELECT * FROM `$invoice_table` ORDER BY created_at DESC","",[]);
 ?>
 
