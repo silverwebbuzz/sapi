@@ -1,5 +1,9 @@
-<?php include 'header.php'; ?>
-<?php include 'nav.php'; ?>
+<?php include 'header.php';
+include 'nav.php'; 
+
+//Fetch Plans
+$plans_query = DBHelper::select("SELECT * FROM `plans` where price != '0.00'  ORDER BY id","",[]);
+?>
 
 <main class="main-content">
     <div class="billing-container">
