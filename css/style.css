@@ -362,7 +362,7 @@ th {
     text-align: left;
     padding: 12px 15px;
     background-color: var(--bg-light);
-    font-size: 13px;
+    font-size: 12px;
     color: var(--text-light);
     font-weight: 600;
     text-transform: uppercase;
@@ -371,7 +371,14 @@ th {
 td {
     padding: 12px 15px;
     border-bottom: 1px solid var(--border);
-    font-size: 14px;
+    font-size: 12px;
+}
+a.view-invoice-btn , .email-btn , .gen-invoice-btn {
+    background-color: #303030;
+    color: #fff;
+    text-decoration: none;
+    padding: 5px 8px;
+    border-radius: 5px;
 }
 
 .status {
