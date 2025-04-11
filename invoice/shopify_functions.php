@@ -232,7 +232,7 @@ function getShopLogo($shop, $access_token) {
 }
 
 function registerShopifyWebhooks($shop, $access_token) {
-    $webhook_url = SHOPIFY_APP_URL . '/shopify/webhook'; 
+    $webhook_url = BASE_SHOPIFY_AF_URL . 'webhook'; 
     $topics = [
         'orders/create',
         'orders/paid',
