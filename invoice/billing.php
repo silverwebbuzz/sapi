@@ -57,67 +57,12 @@ $plans = DBHelper::select("SELECT * FROM `plans` where price != '0.00'  ORDER BY
                     </ul>
                     <input type="hidden" name="shop_id" value="<?= $shop_id ?>">
                     <input type="hidden" name="plan_id" value="<?= $plan['id'] ?>">
-                    <button class="btn-upgrade">Upgrade</button>
+                    <button class="btn-upgrade <?php if($plan['id']=='2') echo 'current';?>">Upgrade</button>
                 </div>
             <?php endforeach; ?>
-
-                <div class="plan-card recommended">
-                    <div class="recommended-badge">Recommended</div>
-                    <div class="plan-header">
-                        <h4>Professional</h4>
-                        <div class="plan-price">$29.99<span>/month</span></div>
-                    </div>
-                    <ul class="plan-features">
-                        <li>Unlimited Invoices</li>
-                        <li>500 Email Notifications</li>
-                        <li>Advanced Analytics</li>
-                        <li>Priority Support</li>
-                    </ul>
-                    <button class="btn-upgrade current">Current Plan</button>
-                </div>
-                
-                <div class="plan-card">
-                    <div class="plan-header">
-                        <h4>Enterprise</h4>
-                        <div class="plan-price">$99.99<span>/month</span></div>
-                    </div>
-                    <ul class="plan-features">
-                        <li>Unlimited Invoices</li>
-                        <li>Unlimited Notifications</li>
-                        <li>Advanced Analytics</li>
-                        <li>24/7 Support</li>
-                        <li>API Access</li>
-                    </ul>
-                    <button class="btn-upgrade">Upgrade</button>
-                </div>
             </div>
         </div>
         
-        <!-- Billing History -->
-        <div class="billing-history">
-            <h3>Billing History</h3>
-            <table class="billing-table">
-                <thead>
-                    <tr>
-                        <th>Date</th>
-                        <th>Description</th>
-                        <th>Amount</th>
-                        <th>Status</th>
-                        <th>Invoice</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <tr>
-                        <td>Mar 28, 2025</td>
-                        <td>Professional Plan Subscription</td>
-                        <td>$29.99</td>
-                        <td><span class="status paid">Paid</span></td>
-                        <td><a href="#" class="view-invoice">Download</a></td>
-                    </tr>
-                    <!-- More rows would be loaded from database -->
-                </tbody>
-            </table>
-        </div>
     </div>
 </main>
 
