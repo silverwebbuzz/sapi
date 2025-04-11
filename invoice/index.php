@@ -19,7 +19,12 @@ $invoices_query = DBHelper::select("SELECT * FROM `$invoice_table` ORDER BY crea
             <div class="package-info">
                 <div class="package-name"><?= htmlspecialchars($currentPlan['plan_name'])?></div>
                 <div class="package-price">$<?= htmlspecialchars($currentPlan['price'])?>/month</div>
-                <div class="package-stat"><span><?= htmlspecialchars($currentPlan['description']); ?></span></div>
+                <div class="package-stat">
+                    <span><?= htmlspecialchars($currentPlan['description']); ?></span>
+                    <div class="package-stats">
+                        <a href="billing.php" class="upgrade-btn">Upgrade Plan</a>
+                    </div>
+                </div>
             </div>
             <div class="package-stats">
                 <div class="package-stat">
@@ -67,9 +72,6 @@ $invoices_query = DBHelper::select("SELECT * FROM `$invoice_table` ORDER BY crea
                     ?>
                     <div class="usage-progress" style="width: <?= $percentageUsedemail;?>%"></div>
                 </div>
-            </div>
-            <div class="package-stats">
-                <a href="billing.php" class="upgrade-btn">Upgrade Plan</a>
             </div>
         </div>
     </div>
