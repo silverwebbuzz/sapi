@@ -2,7 +2,7 @@
 include 'nav.php'; 
 
 //Fetch Plans
-$plan = DBHelper::select("SELECT * FROM `plans` where price != '0.00'  ORDER BY id","",[]);
+$plans = DBHelper::select("SELECT * FROM `plans` where price != '0.00'  ORDER BY id","",[]);
 ?>
 
 <main class="main-content">
