@@ -50,4 +50,31 @@ $charge['confirmation_url']]
 
 // Redirect to Shopify approval screen
 header("Location: " . $charge['confirmation_url']);
-exit;
+?>
+<!DOCTYPE html>
+<html>
+<head>
+    <script type="text/javascript">
+        // Break out of iframe and redirect parent window
+        if (window.self !== window.top) {
+            window.top.location.href = "<?= htmlspecialchars($charge['confirmation_url'], ENT_QUOTES) ?>";
+        } else {
+            window.location.href = "<?= htmlspecialchars($charge['confirmation_url'], ENT_QUOTES) ?>";
+        }
+    </script>
+    <noscript>
+        <!-- Fallback for browsers without JavaScript -->
+        <meta http-equiv="refresh" content="0; url=<?= htmlspecialchars($charge['confirmation_url'], ENT_QUOTES) ?>">
+    </noscript>
+</head>
+<body>
+    <!-- Fallback content -->
+    <p>Redirecting to Shopify... 
+        <a href="<?= htmlspecialchars($charge['confirmation_url'], ENT_QUOTES) ?>">
+            Click here if not redirected
+        </a>
+    </p>
+</body>
+</html>
+<?php
+exit();

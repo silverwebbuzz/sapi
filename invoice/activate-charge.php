@@ -50,5 +50,27 @@ $activated_charge['billing_on'],
 $end_date]
 );
 
-header("Location: /billing?subscription=success");
-exit;
+// After handling the charge activation
+$redirect_url = SHOPIFY_APP_URL . "?shop=" . urlencode($shop);
+?>
+<!DOCTYPE html>
+<html>
+<head>
+    <script type="text/javascript">
+        // Return to app interface in parent window
+        if (window.self !== window.top) {
+            window.top.location.href = "<?= $redirect_url ?>";
+        } else {
+            window.location.href = "<?= $redirect_url ?>";
+        }
+    </script>
+</head>
+<body>
+    <!-- Loading spinner or message -->
+    <div class="loading">Completing setup...</div>
+</body>
+</html>
+<?php
+exit();
+//header("Location: /billing?subscription=success");
+//exit;
