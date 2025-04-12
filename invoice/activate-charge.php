@@ -54,6 +54,6 @@ $end_date]
 $store_name = explode('.', $shop)[0];
 
 // Redirect to Shopify admin
-$admin_url = "https://admin.shopify.com/store/" . $store_name;
+$admin_url = "https://admin.shopify.com/store/".$store_name."/apps/".SHOPIFY_APP_HANDLE;
 header("Location: $admin_url");
 exit;
