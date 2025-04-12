@@ -69,7 +69,7 @@ $charge['confirmation_url']]
 </head>
 <body>
     <!-- Fallback content -->
-    <p>Redirecting to Shopify... 
+    <p>Redirecting to Shopify Billing... 
         <a href="<?= htmlspecialchars($charge['confirmation_url'], ENT_QUOTES) ?>">
             Click here if not redirected
         </a>

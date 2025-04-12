@@ -284,6 +284,43 @@ function activateRecurringCharge($shop, $access_token, $charge_id) {
     return $response_data['recurring_application_charge'];
 }
 
+function cancelOldSubscription($shop, $access_token,$charge_id) {
+    
+    $api_url = "https://$shop/admin/api/2024-01/recurring_application_charges/$charge_id.json";
+
+    //Initialize cURL request
+    $ch = curl_init();
+    curl_setopt_array($ch, [
+        CURLOPT_URL => $api_url,
+        CURLOPT_RETURNTRANSFER => true,
+        CURLOPT_CUSTOMREQUEST => 'DELETE',
+        CURLOPT_HTTPHEADER => [
+            "X-Shopify-Access-Token: $access_token",
+            "Content-Type: application/json"
+        ]
+    ]);
+
+    // Execute the API call
+    $response = curl_exec($ch);
+    $http_code = curl_getinfo($ch, CURLINFO_HTTP_CODE);
+    curl_close($ch);
+
+    //Verify cancellation
+    if ($http_code === 200) {
+        // Update database
+        $affectedRows = DBHelper::execute(
+            "UPDATE `store_subscriptions` SET  status = 'cancelled', cancelled_on = NOW()  WHERE charge_id = ? ",
+            "s",
+            [$charge_id]
+        );
+        error_log("Successfully cancelled charge $charge_id for $shop");
+        return true;
+    } else {
+        error_log("Failed to cancel charge $charge_id. HTTP $http_code: $response");
+        return false;
+    }
+}
+
 function getChargeDetails($shop, $access_token, $charge_id) {
     $url = "https://{$shop}/admin/api/" . SHOPIFY_API_VERSION . "/recurring_application_charges/{$charge_id}.json";
     
@@ -308,29 +345,6 @@ function getChargeDetails($shop, $access_token, $charge_id) {
     return $response_data['recurring_application_charge'];
 }
 
-function cancelRecurringCharge($shop, $access_token, $charge_id) {
-    $url = "https://{$shop}/admin/api/" . SHOPIFY_API_VERSION . "/recurring_application_charges/{$charge_id}.json";
-    
-    $ch = curl_init($url);
-    curl_setopt_array($ch, [
-        CURLOPT_RETURNTRANSFER => true,
-        CURLOPT_CUSTOMREQUEST => "DELETE",
-        CURLOPT_HTTPHEADER => [
-            "X-Shopify-Access-Token: {$access_token}"
-        ]
-    ]);
-    
-    $response = curl_exec($ch);
-    $http_code = curl_getinfo($ch, CURLINFO_HTTP_CODE);
-    curl_close($ch);
-    
-    if ($http_code !== 200) {
-        error_log("Failed to cancel charge: " . $response);
-        return false;
-    }
-    
-    return true;
-}
 
 function registerShopifyWebhooks($shop, $access_token) {
     $webhook_url = BASE_SHOPIFY_AF_URL . 'webhook'; 

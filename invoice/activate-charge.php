@@ -23,9 +23,13 @@ if (!$activated_charge) {
 }
 
 $pending_charge = DBHelper::selectOne("SELECT * FROM pending_charges WHERE charge_id = ?","i",[$charge_id]);
-/*if ($pending_charge['previous_plan_id'] && $pending_charge['previous_plan_id'] != 5) {
-    cancelOldSubscription($shop, $access_token);
-}*/
+if ($pending_charge['previous_plan_id'] && $pending_charge['previous_plan_id'] != 5) {
+
+    $current_charge_id = DBHelper::selectOne("SELECT charge_id FROM store_subscriptions WHERE `store_id` = ? ","s", [$shop_id]);
+    $charge_id = $current_charge_id['charge_id'];
+
+    cancelOldSubscription($shop, $access_token, $charge_id);
+}
 
 $Plan = DBHelper::selectOne("SELECT * FROM `plans` where id = ?","i",[$pending_charge['plan_id']]);
 
