@@ -309,7 +309,7 @@ function cancelOldSubscription($shop, $access_token,$charge_id) {
     if ($http_code === 200) {
         // Update database
         $affectedRows = DBHelper::execute(
-            "UPDATE `store_subscriptions` SET  status = 'cancelled', cancelled_on = NOW()  WHERE charge_id = ? ",
+            "UPDATE `store_subscriptions` SET  `status` = 'cancelled', `cancelled_on` = NOW()  WHERE charge_id = ? ",
             "s",
             [$charge_id]
         );
