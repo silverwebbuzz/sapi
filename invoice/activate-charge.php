@@ -41,7 +41,7 @@ $insertSql = "INSERT INTO store_subscriptions
 (store_id, plan_id, charge_id, order_limit, email_limit, order_used, email_used, features, activated_on, billing_on)
 VALUES (?, ?, ?, ?, ?, 0, 0, ?, ?, ?)";
 
-$subscription_id = DBHelper::insert($insertSql,"iiiiissss",
+$subscription_id = DBHelper::insert($insertSql,"iiiiisss",
 [$shop_id,
 $pending_charge['plan_id'],
 $charge_id,
