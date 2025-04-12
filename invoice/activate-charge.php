@@ -50,29 +50,10 @@ $activated_charge['billing_on'],
 $end_date]
 );
 
-echo "<pre>";
-print_r($activated_charge); exit;
-// After handling the charge activation
-$redirect_url = SHOPIFY_APP_URL . "?shop=" . urlencode($shop);
-?>
-<!DOCTYPE html>
-<html>
-<head>
-    <script type="text/javascript">
-        // Return to app interface in parent window
-        if (window.self !== window.top) {
-            window.top.location.href = "<?= $redirect_url ?>";
-        } else {
-            window.location.href = "<?= $redirect_url ?>";
-        }
-    </script>
-</head>
-<body>
-    <!-- Loading spinner or message -->
-    <div class="loading">Completing setup...</div>
-</body>
-</html>
-<?php
-exit();
-//header("Location: /billing?subscription=success");
-//exit;
+// Extract store name from domain
+$store_name = explode('.', $shop)[0];
+
+// Redirect to Shopify admin
+$admin_url = "https://admin.shopify.com/store/" . $store_name;
+header("Location: $admin_url");
+exit;
