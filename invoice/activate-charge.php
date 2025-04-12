@@ -50,6 +50,8 @@ $activated_charge['billing_on'],
 $end_date]
 );
 
+echo "<pre>";
+print_r($activated_charge); exit;
 // After handling the charge activation
 $redirect_url = SHOPIFY_APP_URL . "?shop=" . urlencode($shop);
 ?>
