@@ -33,9 +33,9 @@ if ($pending_charge['previous_plan_id'] && $pending_charge['previous_plan_id'] !
     if ($http_code === 200) {
         // Update database
         $affectedRows = DBHelper::execute(
-            "UPDATE `store_subscriptions` SET  `status` = 'cancelled', `cancelled_on` = NOW()  WHERE id = ? ",
-            "s",
-            [$pending_charge['plan_id']]
+            "UPDATE `store_subscriptions` SET  `status` = 'cancelled', `cancelled_on` = NOW()  WHERE plan_id = ? and store_id = ? ",
+            "ss",
+            [$pending_charge['plan_id'],$shop_id]
         );
         error_log("Successfully cancelled charge $charge_id for $shop");
         return true;
