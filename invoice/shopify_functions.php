@@ -304,21 +304,7 @@ function cancelOldSubscription($shop, $access_token,$charge_id) {
     $response = curl_exec($ch);
     $http_code = curl_getinfo($ch, CURLINFO_HTTP_CODE);
     curl_close($ch);
-
-    //Verify cancellation
-    if ($http_code === 200) {
-        // Update database
-        $affectedRows = DBHelper::execute(
-            "UPDATE `store_subscriptions` SET  `status` = 'cancelled', `cancelled_on` = NOW()  WHERE charge_id = ? ",
-            "s",
-            [$charge_id]
-        );
-        error_log("Successfully cancelled charge $charge_id for $shop");
-        return true;
-    } else {
-        error_log("Failed to cancel charge $charge_id. HTTP $http_code: $response");
-        return false;
-    }
+    return $http_code;
 }
 
 function getChargeDetails($shop, $access_token, $charge_id) {

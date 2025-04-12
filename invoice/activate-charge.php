@@ -28,7 +28,21 @@ if ($pending_charge['previous_plan_id'] && $pending_charge['previous_plan_id'] !
     $current_charge_id = DBHelper::selectOne("SELECT charge_id FROM store_subscriptions WHERE `store_id` = ? ","s", [$shop_id]);
     $charge_id = $current_charge_id['charge_id'];
 
-    cancelOldSubscription($shop, $access_token, $charge_id);
+    $http_code = cancelOldSubscription($shop, $access_token, $charge_id);
+    //Verify cancellation
+    if ($http_code === 200) {
+        // Update database
+        $affectedRows = DBHelper::execute(
+            "UPDATE `store_subscriptions` SET  `status` = 'cancelled', `cancelled_on` = NOW()  WHERE id = ? ",
+            "s",
+            [$pending_charge['plan_id']]
+        );
+        error_log("Successfully cancelled charge $charge_id for $shop");
+        return true;
+    } else {
+        error_log("Failed to cancel charge $charge_id. HTTP $http_code: $response");
+        return false;
+    }
 }
 
 $Plan = DBHelper::selectOne("SELECT * FROM `plans` where id = ?","i",[$pending_charge['plan_id']]);
@@ -53,11 +67,11 @@ $activated_charge['billing_on']]
 );
 
  // Clear pending charge table.
- /*$affectedRows = DBHelper::execute(
+ $affectedRows = DBHelper::execute(
     "DELETE FROM pending_charges WHERE charge_id = ?",
     "i",
     [$charge_id]
-);*/
+);
 
 // Extract store name from domain
 $store_name = explode('.', $shop)[0];
