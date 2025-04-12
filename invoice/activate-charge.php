@@ -28,7 +28,7 @@ if ($pending_charge['previous_plan_id'] && $pending_charge['previous_plan_id'] !
     $current_charge_id = DBHelper::selectOne("SELECT charge_id FROM store_subscriptions WHERE `store_id` = ? ORDER BY activated_on DESC ","s", [$shop_id]);
     $charge_id = $current_charge_id['charge_id'];
 
-    $http_code = cancelOldSubscription($shop, $access_token, $charge_id);
+    echo $http_code = cancelOldSubscription($shop, $access_token, $charge_id);
     //Verify cancellation
     if ($http_code === 200) {
         // Update database
