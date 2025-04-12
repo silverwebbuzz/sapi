@@ -33,7 +33,6 @@ if ($pending_charge['previous_plan_id'] && $pending_charge['previous_plan_id'] !
 
 $Plan = DBHelper::selectOne("SELECT * FROM `plans` where id = ?","i",[$pending_charge['plan_id']]);
 
-
 $start_date = date("Y-m-d H:i:s");
 // For demonstration, we set the end_date to one year from now.
 $end_date = date("Y-m-d H:i:s", strtotime("+1 month"));
@@ -52,6 +51,13 @@ $Plan['features'],
 $start_date,
 $activated_charge['billing_on'],
 $end_date]
+);
+
+ // Clear pending charge table.
+ $affectedRows = DBHelper::execute(
+    "DELETE FROM pending_charges WHERE charge_id = ?",
+    "i",
+    [$charge_id]
 );
 
 // Extract store name from domain
