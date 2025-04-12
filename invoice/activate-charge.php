@@ -54,11 +54,11 @@ $end_date]
 );
 
  // Clear pending charge table.
- $affectedRows = DBHelper::execute(
+ /*$affectedRows = DBHelper::execute(
     "DELETE FROM pending_charges WHERE charge_id = ?",
     "i",
     [$charge_id]
-);
+);*/
 
 // Extract store name from domain
 $store_name = explode('.', $shop)[0];
