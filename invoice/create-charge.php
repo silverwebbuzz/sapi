@@ -49,7 +49,7 @@ $charge['confirmation_url']]
 );
 
 // Redirect to Shopify approval screen
-header("Location: " . $charge['confirmation_url']);
+//header("Location: " . $charge['confirmation_url']);
 ?>
 <!DOCTYPE html>
 <html>
