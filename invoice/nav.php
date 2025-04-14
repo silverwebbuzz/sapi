@@ -22,6 +22,6 @@
 
 <?php if($currentPlan['price']>'0'): // You can set this based on your SMTP check logic ?>
 <div id="smtp-warning" class="warning-box">
-    <span style="font-size:18px">⚠</span> Please upgrade you plan and set your SMTP settings to receive invoice emails from your defined Email Address.
+    <span style="font-size:18px">⚠</span> Please <a href="billing">upgrade</a> you plan and set your <a href="settings.php#email">SMTP settings</a> to receive invoice emails from your defined Email Address.
 </div>
 <?php endif; ?>
