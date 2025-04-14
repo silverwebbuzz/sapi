@@ -14,7 +14,7 @@ $shop_owner = $cookieData['shop_owner'];
 $shop_data = DBHelper::selectOne("SELECT * FROM stores WHERE `id` = ? ","s", [$shop_id]);
 $access_token = $shop_data['access_token'];
 
-$current_sub = DBHelper::selectOne("SELECT plan_id FROM store_subscriptions WHERE `store_id` = ? ORDER BY activated_on DESC ","s", [$shop_id]);
+$current_sub = DBHelper::selectOne("SELECT plan_id FROM store_subscriptions WHERE `store_id` = ? and `status` = 'active' ORDER BY activated_on DESC ","s", [$shop_id]);
 
 $plan_id = (int)$_GET['plan_id'];
 $plan = DBHelper::selectOne("SELECT * FROM `plans` where id = ?","i",[$plan_id]);

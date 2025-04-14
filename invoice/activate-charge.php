@@ -24,7 +24,7 @@ if (!$activated_charge) {
 $pending_charge = DBHelper::selectOne("SELECT * FROM pending_charges WHERE charge_id = ?","i",[$charge_id]);
 if ($pending_charge['previous_plan_id']) {
 
-    $current_charge_id = DBHelper::selectOne("SELECT charge_id FROM store_subscriptions WHERE `store_id` = ? ORDER BY activated_on DESC ","s", [$shop_id]);
+    $current_charge_id = DBHelper::selectOne("SELECT charge_id FROM store_subscriptions WHERE `store_id` = ? and `status` = 'active' ORDER BY activated_on DESC ","s", [$shop_id]);
     $old_charge_id = $current_charge_id['charge_id'];
 
     if($curr_charge_id!='')
