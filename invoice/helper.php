@@ -201,7 +201,7 @@ function sendemail($shop_id,$order_id){
                     'body' => $default_body
                 ];
             }
-
+            echo "<pre>"; print_r($smtp_settings); exit;
             $to_email = $invoice['customer_email'];
             $to_name = $invoice['customer_name'];
             $subject = str_replace(['{invoice_number}','{shop_name}'],[$invoice['order_name'],$shop_data['store_name']],$smtp_settings['subject']);
