@@ -12,7 +12,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['save_email_settings']
     $smtp_settings = [
         'host' => $_POST['smtp_host'],
         'port' => $_POST['smtp_port'],
-        'displayname' => $shop_data['smtp_displayname'],
+        'displayname' => $_POST['smtp_displayname'],
         'username' => $_POST['smtp_user'],
         'password' => $_POST['smtp_pass'],
         'subject' => $_POST['email_subject'],

@@ -195,7 +195,7 @@ function sendemail($shop_id,$order_id){
                 $smtp_settings = [
                     'host' => 'mail.silverwebbuzz.com',
                     'port' => '587',
-                    'displayname' => $shop_data['store_name'].' Sapi',
+                    'displayname' => $shop_data['store_name'].' - Sapi',
                     'username' => 'support.sapi@silverwebbuzz.com',
                     'password' => 'Bhavik@1109',
                     'subject' => $default_subject,
