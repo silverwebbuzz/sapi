@@ -45,10 +45,10 @@ $start_date = date("Y-m-d H:i:s");
 $end_date = date("Y-m-d H:i:s", strtotime("+1 month"));
 
 $insertSql = "INSERT INTO store_subscriptions 
-(store_id, plan_id, charge_id, order_limit, email_limit, order_used, email_used, features, activated_on, billing_on)
+(store_id, plan_id, charge_id, order_limit, email_limit, order_used, email_used, features, activated_on, billing_on, next_charge_date)
 VALUES (?, ?, ?, ?, ?, 0, 0, ?, ?, ?)";
 
-$subscription_id = DBHelper::insert($insertSql,"iiiiisss",
+$subscription_id = DBHelper::insert($insertSql,"iiiiissss",
 [$shop_id,
 $pending_charge['plan_id'],
 $charge_id,
@@ -56,7 +56,8 @@ $Plan['order_limit'],
 $Plan['email_limit'],
 $Plan['features'],
 $start_date,
-$activated_charge['billing_on']]
+$activated_charge['billing_on'],
+$end_date]
 );
 
  // Clear pending charge table.
