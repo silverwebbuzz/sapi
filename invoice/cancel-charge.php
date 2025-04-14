@@ -29,8 +29,8 @@ if($charge_id!='') {
 
     $affectedRows = DBHelper::execute(
         "UPDATE `store_subscriptions` SET  `status` = 'active'  WHERE plan_id = 5 and store_id = ? ",
-        "ss",
-        [$_GET['plan_id'],$shop_id]
+        "s",
+        [$shop_id]
     );
 }
 // Redirect to Shopify admin
