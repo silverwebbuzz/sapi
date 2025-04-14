@@ -117,7 +117,7 @@ $(document).ready(function() {
             const planName = $(this).closest('.plan-card').find('h4').text();
             if (confirm(`Are you sure you want to upgrade to ${planName} plan?`)) {
                 // Here you would typically redirect to payment page or make an AJAX call
-                alert(`Upgraded to ${planName} plan!`);
+                //alert(`Upgraded to ${planName} plan!`);
             }
         }
     });
@@ -126,7 +126,7 @@ $(document).ready(function() {
     $('.btn-cancel').on('click', function() {
         if (confirm('Are you sure you want to cancel your subscription?')) {
             // Here you would typically make an AJAX call to cancel subscription
-            alert('Subscription cancelled!');
+           // alert('Subscription cancelled!');
         }
     });
 
