@@ -77,7 +77,7 @@ $default_body = DEFAULT_EMAIL_BODY;
 
 // Fetch existing settings
 
-$sql_settings = "SELECT smtp_settings,auto_invoice_customer, auto_invoice_personal, email_invoice, email, invoice_templates_id FROM stores WHERE id = ?";
+$sql_settings = "SELECT store_name,smtp_settings,auto_invoice_customer, auto_invoice_personal, email_invoice, email, invoice_templates_id FROM stores WHERE id = ?";
 $row = DBHelper::selectOne($sql_settings,"s", [$shop_id]);
 
 $settings = [
@@ -88,7 +88,7 @@ $settings = [
 $smtp_settings = [
     'host' => '',
     'port' => '587',
-    'displayname' => $shop_data['store_name'].' Sapi',
+    'displayname' => $row['store_name'].' Sapi',
     'username' => '',
     'password' => '',
     'subject' => $default_subject,
