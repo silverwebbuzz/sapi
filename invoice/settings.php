@@ -12,6 +12,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['save_email_settings']
     $smtp_settings = [
         'host' => $_POST['smtp_host'],
         'port' => $_POST['smtp_port'],
+        'displayname' => $shop_data['smtp_displayname'],
         'username' => $_POST['smtp_user'],
         'password' => $_POST['smtp_pass'],
         'subject' => $_POST['email_subject'],
@@ -87,6 +88,7 @@ $settings = [
 $smtp_settings = [
     'host' => '',
     'port' => '587',
+    'displayname' => $shop_data['store_name'].' Sapi',
     'username' => '',
     'password' => '',
     'subject' => $default_subject,
@@ -162,6 +164,10 @@ if ($row) {
                 <h3>Email Settings</h3>
                 <form method="POST" class="settings-form">
                     <input type="hidden" name="save_email_settings" value="1">
+                    <div class="form-group">
+                        <label>Email Display Name</label>
+                        <input type="text" name="smtp_displayname" class="form-input"  value="<?= htmlspecialchars($smtp_settings['displayname']) ?>"  placeholder="Sapi Support" required>
+                    </div>
                     <div class="form-group">
                         <label>SMTP Host</label>
                         <input type="text" name="smtp_host" class="form-input"  value="<?= htmlspecialchars($smtp_settings['host']) ?>"  placeholder="smtp.example.com" required>

@@ -195,6 +195,7 @@ function sendemail($shop_id,$order_id){
                 $smtp_settings = [
                     'host' => 'mail.silverwebbuzz.com',
                     'port' => '587',
+                    'displayname' => $shop_data['store_name'].' Sapi',
                     'username' => 'support.sapi@silverwebbuzz.com',
                     'password' => 'Bhavik@1109',
                     'subject' => $default_subject,
@@ -256,7 +257,7 @@ function sendEmailWithAttachment($smtp_settings, $to_email, $to_name, $subject, 
          $mail->SMTPKeepAlive = true;
  
          // Critical headers
-         $mail->setFrom('bhavik.koradiya@silverwebbuzz.com', 'Bhavik Koradiya SWB', true);
+         $mail->setFrom($smtp_settings['username'], $smtp_settings['displayname'], true);
          //$mail->addReplyTo('support@silverwebbuzz.com', 'Support Team');
          //$mail->addAddress('vishnu@silverwebbuzz.com', 'Vishnu Prajapati');
          $mail->addAddress($to_email, $to_name);
