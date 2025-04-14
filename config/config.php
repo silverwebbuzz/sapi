@@ -26,5 +26,28 @@ define('ADMIN_URL_FORMAT', 'https://admin.shopify.com/store/%s/apps/%s');
 
 define('COOKIE_KEY', 'abcdefghijklmnopqrstuvwxyz123456'); // 32-character random key
 
+define('DEFAULT_EMAIL_SUBJECT', "Invoice #{invoice_number} from {shop_name})");
+$default_body = '
+<html>
+<head>
+    <style>
+        body { font-family: Arial, sans-serif; line-height: 1.6; }
+        .header { color: #333366; }
+        .footer { margin-top: 20px; font-size: 12px; color: #666; }
+    </style>
+</head>
+<body>
+    <h2 class="header">Dear {customer_name},</h2>
+    <p>Thank you for your order! Please find your invoice #{invoice_number} attached.</p>
+    <p><strong>Order Total:</strong> {currency} {total_price}</p>
+    <p><strong>Date:</strong> {created_at}</p>
+    <div class="footer">
+        <p>If you have any questions, please contact our support team.</p>
+        <p>Thank you for your business!</p>
+    </div>
+</body>
+</html>
+';
+define('DEFAULT_EMAIL_BODY', $default_body);
 
 session_start();

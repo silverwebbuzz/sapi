@@ -70,28 +70,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['save_invoice_settings
 }
 
 // Default email template
-$default_subject = "Invoice #{invoice_number} from Your Store";
-$default_body = '
-<html>
-<head>
-    <style>
-        body { font-family: Arial, sans-serif; line-height: 1.6; }
-        .header { color: #333366; }
-        .footer { margin-top: 20px; font-size: 12px; color: #666; }
-    </style>
-</head>
-<body>
-    <h2 class="header">Dear {customer_name},</h2>
-    <p>Thank you for your order! Please find your invoice #{invoice_number} attached.</p>
-    <p><strong>Order Total:</strong> {currency} {total_price}</p>
-    <p><strong>Date:</strong> {created_at}</p>
-    <div class="footer">
-        <p>If you have any questions, please contact our support team.</p>
-        <p>Thank you for your business!</p>
-    </div>
-</body>
-</html>
-';
+
+$default_subject = DEFAULT_EMAIL_SUBJECT;
+$default_body = DEFAULT_EMAIL_BODY;
 
 // Fetch existing settings
 

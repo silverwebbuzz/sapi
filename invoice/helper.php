@@ -186,11 +186,25 @@ function sendemail($shop_id,$order_id){
             $decoded_pdf = base64_decode($invoice['pdf_invoice']);
             $billing_address = json_decode($invoice['billing_address'], true);
 
+            // SMTP settings 
             $smtp_settings = json_decode($shop_data['smtp_settings'], true);
+            if($smtp_settings=="")
+            {
+                $default_subject = DEFAULT_EMAIL_SUBJECT;
+                $default_body = DEFAULT_EMAIL_BODY;
+                $smtp_settings = [
+                    'host' => 'mail.silverwebbuzz.com',
+                    'port' => '587',
+                    'username' => 'support@silverwebbuzz.com',
+                    'password' => 'Bhavik@1109',
+                    'subject' => $default_subject,
+                    'body' => $default_body
+                ];
+            }
 
             $to_email = $invoice['customer_email'];
             $to_name = $invoice['customer_name'];
-            $subject = str_replace('{invoice_number}',$invoice['order_name'],$smtp_settings['subject']);
+            $subject = str_replace(['{invoice_number}','{shop_name}'],[$invoice['order_name'],$shop_data['store_name']],$smtp_settings['subject']);
             $body = $smtp_settings['body'];
             //When sending an email, you would replace the variables like this:
             $email_body = str_replace(
@@ -200,7 +214,7 @@ function sendemail($shop_id,$order_id){
             );
 
             // Send email with attachment
-            $email_sent = sendEmailWithAttachment( $to_email,$to_name, $subject, $email_body, $decoded_pdf, "invoice_{$invoice['order_name']}.pdf");
+            $email_sent = sendEmailWithAttachment($smtp_settings, $to_email,$to_name, $subject, $email_body, $decoded_pdf, "invoice_{$invoice['order_name']}.pdf");
             $email_status = $email_sent ? 'sent' : 'failed';
 
             // Single database update for both PDF and email status
@@ -225,7 +239,7 @@ function sendemail($shop_id,$order_id){
 }
 
 // Email sending function
-function sendEmailWithAttachment($to_email, $to_name, $subject, $html_body, $attachment_content, $attachment_name) {
+function sendEmailWithAttachment($smtp_settings, $to_email, $to_name, $subject, $html_body, $attachment_content, $attachment_name) {
    
     $mail = new PHPMailer(true);
  
@@ -233,12 +247,12 @@ function sendEmailWithAttachment($to_email, $to_name, $subject, $html_body, $att
          // Server settings
          //$mail->SMTPDebug = SMTP::DEBUG_SERVER;
          $mail->isSMTP();
-         $mail->Host       = 'mail.silverwebbuzz.com';
+         $mail->Host       = $smtp_settings['host'];
          $mail->SMTPAuth   = true;
-         $mail->Username   = 'bhavik.koradiya@silverwebbuzz.com';
-         $mail->Password   = 'Bhavik@1109';
+         $mail->Username   = $smtp_settings['username'];
+         $mail->Password   = $smtp_settings['password'];
          $mail->SMTPSecure = PHPMailer::ENCRYPTION_STARTTLS;
-         $mail->Port       = 587;
+         $mail->Port       = $smtp_settings['port'];
          $mail->SMTPKeepAlive = true;
  
          // Critical headers
