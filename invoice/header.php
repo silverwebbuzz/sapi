@@ -67,7 +67,7 @@ $currentPlan = DBHelper::selectOne($sql_currentPlan,"s", [$shop_id]);
         const actions = AppBridge.actions;
 
         const app = createApp({
-            apiKey: 'YOUR_SHOPIFY_API_KEY',
+            apiKey: '<?=SHOPIFY_API_KEY?>',
             shopOrigin: '<?php echo $shop; ?>',
             forceRedirect: true,
         });
