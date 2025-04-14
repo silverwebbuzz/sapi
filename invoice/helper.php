@@ -195,7 +195,7 @@ function sendemail($shop_id,$order_id){
                 $smtp_settings = [
                     'host' => 'mail.silverwebbuzz.com',
                     'port' => '587',
-                    'username' => 'support@silverwebbuzz.com',
+                    'username' => 'support.sapi@silverwebbuzz.com',
                     'password' => 'Bhavik@1109',
                     'subject' => $default_subject,
                     'body' => $default_body
@@ -240,7 +240,7 @@ function sendemail($shop_id,$order_id){
 
 // Email sending function
 function sendEmailWithAttachment($smtp_settings, $to_email, $to_name, $subject, $html_body, $attachment_content, $attachment_name) {
-    echo "<pre>"; print_r($smtp_settings); exit;
+    
     $mail = new PHPMailer(true);
  
      try {
