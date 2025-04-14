@@ -27,14 +27,14 @@ if ($pending_charge['previous_plan_id']) {
 
     $current_charge_id = DBHelper::selectOne("SELECT charge_id FROM store_subscriptions WHERE `store_id` = ? ORDER BY activated_on DESC ","s", [$shop_id]);
     $charge_id = $current_charge_id['charge_id'];
-    
+
     if($charge_id!='')
     cancelOldSubscription($shop, $access_token, $charge_id);
     //Verify cancellation
     $affectedRows = DBHelper::execute(
         "UPDATE `store_subscriptions` SET  `status` = 'cancelled', `cancelled_on` = NOW()  WHERE plan_id = ? and store_id = ? ",
         "ss",
-        [$pending_charge['plan_id'],$shop_id]
+        [$pending_charge['previous_plan_id'],$shop_id]
     );
     
 }
