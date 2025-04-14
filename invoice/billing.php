@@ -38,6 +38,7 @@ $plans = DBHelper::select("SELECT * FROM `plans` where price != '0.00'  ORDER BY
             <div class="plans-grid">
 
             <?php foreach ($plans as $plan) : ?>
+                <?php if ($plan['id'] != $currentPlan['plan_id']) ?>
                 <div class="plan-card <?php if($plan['id']=='2') echo 'recommended'; ?>">
                 <?php if($plan['id']=='2') echo '<div class="recommended-badge">Recommended</div>'; ?>
                     <div class="plan-header">
