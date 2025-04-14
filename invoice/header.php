@@ -14,7 +14,7 @@ $allowed_origins = [
     'https://*.shopify.com'
 ];
 print_r($_SERVER);
-if (!in_array($_SERVER['HTTP_ORIGIN'], $allowed_origins)) {
+if (!in_array($_SERVER['HTTP_REFERER'], $allowed_origins)) {
     http_response_code(403);
     die(json_encode(['error' => 'Invalid origin']));
 }
