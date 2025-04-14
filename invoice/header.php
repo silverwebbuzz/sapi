@@ -8,20 +8,10 @@ require_once '../config/db.php';
 require_once 'shopify_functions.php';
 require_once 'helper.php';
 
-// Validate request origin
-$allowed_origins = [
-    'https://admin.shopify.com',
-    'https://*.shopify.com'
-];
-print_r($_GET);
-if (!in_array($_SERVER['HTTP_REFERER'], $allowed_origins)) {
-    //ttp_response_code(403);
-    //die(json_encode(['error' => 'Invalid origin']));
-}
-
 $cookieData = decryptCookie($_COOKIE['swb_auth']);
 $shop_id = $cookieData['shop_id'];
 $shop = $cookieData['shop'];
+$host = $cookieData['host'];
 $shop_owner = $cookieData['shop_owner'];
 
 //Fetch store plan.
@@ -60,38 +50,37 @@ $currentPlan = DBHelper::selectOne($sql_currentPlan,"s", [$shop_id]);
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>SWB Auto PDF Invoices</title>
 <!-- Load App Bridge -->
-    <script src="https://unpkg.com/@shopify/app-bridge@3.x"></script>
+    <script src="https://unpkg.com/@shopify/app-bridge@3"></script>
     <script>
         const AppBridge = window['app-bridge'];
         const createApp = AppBridge.default;
         const actions = AppBridge.actions;
 
         const app = createApp({
-            apiKey: '<?=SHOPIFY_API_KEY?>',
-            shopOrigin: '<?php echo $shop; ?>',
-            forceRedirect: true,
+        apiKey: '<?=SHOPIFY_API_KEY?>', // Replace with your real public API key
+        host: '<?php echo $host; ?>',
+        forceRedirect: true,
         });
-        </script>
-        <script>
-            const NavigationMenu = actions.NavigationMenu;
 
-            const navigationMenu = NavigationMenu.create(app, {
-                items: [
-                {
-                    label: 'Dashboard',
-                    destination: '/dashboard',
-                },
-                {
-                    label: 'Invoices',
-                    destination: '/invoices',
-                },
-                {
-                    label: 'Settings',
-                    destination: '/settings',
-                },
-                ],
-            });
-            </script>
+        const NavigationMenu = actions.NavigationMenu;
+
+        const navigationMenu = NavigationMenu.create(app, {
+            items: [
+            {
+                label: 'Dashboard',
+                destination: '/dashboard',
+            },
+            {
+                label: 'Invoices',
+                destination: '/invoices',
+            },
+            {
+                label: 'Settings',
+                destination: '/settings',
+            },
+            ],
+        });
+    </script>
 
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/1.11.5/css/jquery.dataTables.css">

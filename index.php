@@ -35,6 +35,7 @@ if (isset($_GET['hmac']) && isset($_GET['shop']) && isset($_GET['timestamp'])) {
             'shop_id' => $store['id'],
             'shop' =>  $shop,
             'shop_owner' => $store['shop_owner'],
+            'host' => $_GET['host'],
             'expires' => time() + (86400 * 30) // 30 days
         ];
         $encryptedCookie =  setEncryptCookie($cookieData);
