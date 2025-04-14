@@ -13,7 +13,7 @@ $allowed_origins = [
     'https://admin.shopify.com',
     'https://*.shopify.com'
 ];
-print_r($_SERVER['HTTP_ORIGIN']);
+print_r($_SERVER);
 if (!in_array($_SERVER['HTTP_ORIGIN'], $allowed_origins)) {
     http_response_code(403);
     die(json_encode(['error' => 'Invalid origin']));
