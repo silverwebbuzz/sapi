@@ -13,7 +13,7 @@ $allowed_origins = [
     'https://admin.shopify.com',
     'https://*.shopify.com'
 ];
-print_r($_SERVER);
+print_r($_GET);
 if (!in_array($_SERVER['HTTP_REFERER'], $allowed_origins)) {
     //ttp_response_code(403);
     //die(json_encode(['error' => 'Invalid origin']));
