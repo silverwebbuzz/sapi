@@ -75,10 +75,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['save_invoice_settings
 $default_subject = DEFAULT_EMAIL_SUBJECT;
 $default_body = DEFAULT_EMAIL_BODY;
 
-// Fetch existing settings
-
-$sql_settings = "SELECT store_name,smtp_settings,auto_invoice_customer, auto_invoice_personal, email_invoice, email, invoice_templates_id FROM stores WHERE id = ?";
-$row = DBHelper::selectOne($sql_settings,"s", [$shop_id]);
+// Fetch existing settings -- already write same code in naviga
+//$sql_settings = "SELECT store_name,smtp_settings,auto_invoice_customer, auto_invoice_personal, email_invoice, email, invoice_templates_id FROM stores WHERE id = ?";
+//$row = DBHelper::selectOne($sql_settings,"s", [$shop_id]);
 
 $settings = [
     'auto_invoice_customer' => 'No',
