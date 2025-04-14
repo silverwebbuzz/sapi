@@ -27,7 +27,7 @@ $plans = DBHelper::select("SELECT * FROM `plans` where price != '0.00'  ORDER BY
                     <li>Email Support</li>
                 </ul>
                 <div class="plan-footer">
-                    <div class="renewal-date">Renews on: <strong><?= htmlspecialchars($currentPlan['cancelled_on'])?></strong></div>
+                    <div class="renewal-date">Renews on: <strong><?= $currentPlan['next_charge_date']?></strong></div>
                 </div>
             </div>
         </div>

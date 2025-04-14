@@ -33,7 +33,7 @@ $invoices_query = DBHelper::select("SELECT * FROM `$invoice_table` ORDER BY crea
                 </div>
                 <div class="package-stat">
                     <span>Next Billing Date</span>
-                    <strong><?= htmlspecialchars($currentPlan['cancelled_on'])?></strong>
+                    <strong><?= $currentPlan['next_charge_date']?></strong>
                 </div>
                 <div class="package-stat">
                     <span>PDF Invoice Limit</span>

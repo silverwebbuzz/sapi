@@ -23,6 +23,7 @@ SELECT
     ss.features AS subscription_features,
     ss.activated_on,
     ss.cancelled_on,
+    ss.next_charge_date,
     ss.status,
     ss.order_used,
     ss.email_used,

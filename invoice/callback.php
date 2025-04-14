@@ -134,7 +134,7 @@ if (isset($access_token)) {
         
 
         $insertSql = "INSERT INTO store_subscriptions 
-    (store_id, plan_id, order_limit, email_limit, order_used, email_used, features, activated_on, cancelled_on, status)
+    (store_id, plan_id, order_limit, email_limit, order_used, email_used, features, activated_on, next_charge_date, status)
     VALUES (?, ?, ?, ?, 0, 0, ?, ?, ?, 'active')";
 
         $subscription_id = DBHelper::insert($insertSql,"iiiisss",
