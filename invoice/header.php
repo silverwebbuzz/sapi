@@ -59,6 +59,40 @@ $currentPlan = DBHelper::selectOne($sql_currentPlan,"s", [$shop_id]);
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>SWB Auto PDF Invoices</title>
+<!-- Load App Bridge -->
+    <script src="https://unpkg.com/@shopify/app-bridge@3.x"></script>
+    <script>
+        const AppBridge = window['app-bridge'];
+        const createApp = AppBridge.default;
+        const actions = AppBridge.actions;
+
+        const app = createApp({
+            apiKey: 'YOUR_SHOPIFY_API_KEY',
+            shopOrigin: '<?php echo $shop; ?>',
+            forceRedirect: true,
+        });
+        </script>
+        <script>
+            const NavigationMenu = actions.NavigationMenu;
+
+            const navigationMenu = NavigationMenu.create(app, {
+                items: [
+                {
+                    label: 'Dashboard',
+                    destination: '/dashboard',
+                },
+                {
+                    label: 'Invoices',
+                    destination: '/invoices',
+                },
+                {
+                    label: 'Settings',
+                    destination: '/settings',
+                },
+                ],
+            });
+            </script>
+
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/1.11.5/css/jquery.dataTables.css">
     <link rel="stylesheet" href="../css/style.css">
