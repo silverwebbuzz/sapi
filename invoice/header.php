@@ -8,6 +8,9 @@ require_once '../config/db.php';
 require_once 'shopify_functions.php';
 require_once 'helper.php';
 
+echo "<pre>";
+print_r($_GET); 
+
 $cookieData = decryptCookie($_COOKIE['swb_auth']);
 $shop_id = $cookieData['shop_id'];
 $shop = $cookieData['shop'];
