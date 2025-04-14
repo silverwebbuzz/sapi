@@ -26,7 +26,7 @@ define('ADMIN_URL_FORMAT', 'https://admin.shopify.com/store/%s/apps/%s');
 
 define('COOKIE_KEY', 'abcdefghijklmnopqrstuvwxyz123456'); // 32-character random key
 
-define('DEFAULT_EMAIL_SUBJECT', "Invoice #{invoice_number} from {shop_name})");
+define('DEFAULT_EMAIL_SUBJECT', "Invoice #{invoice_number} from {shop_name}");
 $default_body = '
 <html>
 <head>
