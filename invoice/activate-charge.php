@@ -46,7 +46,7 @@ $end_date = date("Y-m-d H:i:s", strtotime("+1 month"));
 
 $insertSql = "INSERT INTO store_subscriptions 
 (store_id, plan_id, charge_id, order_limit, email_limit, order_used, email_used, features, activated_on, billing_on, next_charge_date)
-VALUES (?, ?, ?, ?, ?, 0, 0, ?, ?, ?)";
+VALUES (?, ?, ?, ?, ?, 0, 0, ?, ?, ?, ?)";
 
 $subscription_id = DBHelper::insert($insertSql,"iiiiissss",
 [$shop_id,
