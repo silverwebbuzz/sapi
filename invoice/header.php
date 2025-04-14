@@ -15,8 +15,8 @@ $allowed_origins = [
 ];
 print_r($_SERVER);
 if (!in_array($_SERVER['HTTP_REFERER'], $allowed_origins)) {
-    http_response_code(403);
-    die(json_encode(['error' => 'Invalid origin']));
+    //ttp_response_code(403);
+    //die(json_encode(['error' => 'Invalid origin']));
 }
 
 $cookieData = decryptCookie($_COOKIE['swb_auth']);
