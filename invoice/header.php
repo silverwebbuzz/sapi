@@ -8,8 +8,16 @@ require_once '../config/db.php';
 require_once 'shopify_functions.php';
 require_once 'helper.php';
 
-echo "<pre>";
-print_r($_GET); 
+// Validate request origin
+$allowed_origins = [
+    'https://admin.shopify.com',
+    'https://*.shopify.com'
+];
+print_r($_SERVER['HTTP_ORIGIN']);
+if (!in_array($_SERVER['HTTP_ORIGIN'], $allowed_origins)) {
+    http_response_code(403);
+    die(json_encode(['error' => 'Invalid origin']));
+}
 
 $cookieData = decryptCookie($_COOKIE['swb_auth']);
 $shop_id = $cookieData['shop_id'];
