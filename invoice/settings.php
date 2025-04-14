@@ -212,7 +212,13 @@ if ($row) {
                         <textarea name="email_body" class="form-input" rows="12" required><?= htmlspecialchars($smtp_settings['body']) ?></textarea>
                         <p class="description">Available variables: {invoice_number}, {customer_name}, {total_price}, {currency}, {created_at}</p>
                     </div>
+                    <?php 
+                    if($currentPlan['price']>'0'){ ?>
                     <button type="submit" class="btn-save">Save Email Settings</button>
+                    <?php  }else {?>
+                    <p>Please activate any paid plan to get using this services.</p>
+                    <?php   } ?>
+                    
                 </form>
             </section>
             
