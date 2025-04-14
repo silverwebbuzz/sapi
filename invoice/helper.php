@@ -191,7 +191,7 @@ function sendemail($shop_id,$order_id){
             if($smtp_settings=="")
             {
                 $default_subject = DEFAULT_EMAIL_SUBJECT;
-                echo $default_body = DEFAULT_EMAIL_BODY; exit;
+                $default_body = DEFAULT_EMAIL_BODY;
                 $smtp_settings = [
                     'host' => 'mail.silverwebbuzz.com',
                     'port' => '587',
