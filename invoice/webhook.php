@@ -2,6 +2,7 @@
 require_once '../config/config.php';
 require_once '../config/db.php';
 require_once 'helper.php';
+require_once 'shopify_functions.php';
 require_once '../vendor/autoload.php';
  
 // Verify webhook HMAC
@@ -107,11 +108,11 @@ if ($topic === 'app/uninstalled') {
 
 } elseif ($topic === 'app_subscription/activated') {
 
-    handleSubscriptionActivated($webhook);
+    //handleSubscriptionActivated($webhook);
 
 } elseif ($topic === 'app_subscription/cancelled') {  
 
-    handleSubscriptionCancelled($webhook);
+    //handleSubscriptionCancelled($webhook);
 
 } else {
     error_log("Unhandled webhook topic: {$topic}");
