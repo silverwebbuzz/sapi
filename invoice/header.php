@@ -18,6 +18,7 @@ $sql_currentPlan = "
 SELECT 
     ss.store_id,
     ss.plan_id,
+    ss.charge_id,
     ss.order_limit AS subscription_order_limit,
     ss.features AS subscription_features,
     ss.activated_on,
