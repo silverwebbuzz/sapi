@@ -38,7 +38,7 @@ $plans = DBHelper::select("SELECT * FROM `plans` where price != '0.00'  ORDER BY
             <div class="plans-grid">
 
             <?php foreach ($plans as $plan) : ?>
-                <?php if ($plan['id'] != $currentPlan['plan_id']) ?>
+                <?php if ($plan['id'] != $currentPlan['plan_id']) { ?>
                 <div class="plan-card <?php if($plan['id']=='2') echo 'recommended'; ?>">
                 <?php if($plan['id']=='2') echo '<div class="recommended-badge">Recommended</div>'; ?>
                     <div class="plan-header">
@@ -60,6 +60,7 @@ $plans = DBHelper::select("SELECT * FROM `plans` where price != '0.00'  ORDER BY
                     <input type="hidden" name="plan_id" value="<?= $plan['id'] ?>">
                     <a class="btn-upgrade <?php if($plan['id']=='2') echo 'current';?>" href="create-charge.php?shop_id=<?= urlencode($shop_id) ?>&plan_id=<?= $plan['id'] ?>">Upgrade</a>
                 </div>
+                <?php } ?>
             <?php endforeach; ?>
             </div>
         </div>
