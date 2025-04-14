@@ -28,7 +28,7 @@ $plans = DBHelper::select("SELECT * FROM `plans` where price != '0.00'  ORDER BY
                 </ul>
                 <div class="plan-footer">
                     <div class="renewal-date">Renews on: <strong><?= $currentPlan['next_charge_date']?></strong></div>
-                    <a class="btn-cancel" href="cancel-charge.php?shop_id=<?= urlencode($shop_id) ?>&plan_id=<?= $currentPlan['id'] ?>">Cancel Plan</a>
+                    <a class="btn-cancel" href="cancel-charge.php?shop_id=<?= urlencode($shop_id) ?>&plan_id=<?= $currentPlan['plan_id'] ?>">Cancel Plan</a>
                 </div>
             </div>
         </div>
