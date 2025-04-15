@@ -1,8 +1,8 @@
 <?php ini_set('display_errors', 0);
 error_reporting(0);
 header('Content-Type: application/json');
-require_once '../config/config.php';
-require_once '../vendor/autoload.php';
+require_once 'config/config.php';
+require_once 'vendor/autoload.php';
 use Firebase\JWT\JWT;
 use Firebase\JWT\Key;
 
