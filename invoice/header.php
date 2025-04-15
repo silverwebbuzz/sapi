@@ -88,10 +88,10 @@ $currentPlan = DBHelper::selectOne($sql_currentPlan,"s", [$shop_id]);
       })
       .then(res => res.json())
       .then(data => {
-        alert(data.message || 'Verified!');
+        consol.log(data.message || 'Verified!');
       })
       .catch(err => {
-        alert('Auth failed: ' + err.message);
+        consol.log('Auth failed: ' + err.message);
       });
     });
   </script>
