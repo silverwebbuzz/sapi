@@ -88,10 +88,10 @@ $currentPlan = DBHelper::selectOne($sql_currentPlan,"s", [$shop_id]);
       })
       .then(res => res.json())
       .then(data => {
-        document.getElementById('result').innerText = data.message || 'Verified!';
+        alert(data.message || 'Verified!');
       })
       .catch(err => {
-        document.getElementById('result').innerText = 'Auth failed: ' + err.message;
+        alert('Auth failed: ' + err.message);
       });
     });
   </script>
@@ -103,7 +103,6 @@ $currentPlan = DBHelper::selectOne($sql_currentPlan,"s", [$shop_id]);
     <div class="dashboard-container">
         <header class="main-header">
             <h1>SWB Auto PDF Invoices</h1>
-            <div id="result">Authenticating...</div>
             <div class="user-profile">
                 <span><?= $shop_owner?></span>
                 <div class="avatar"><?= ucfirst(substr($shop_owner,0,1))?></div>
