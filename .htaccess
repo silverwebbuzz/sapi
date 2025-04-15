@@ -7,6 +7,12 @@
     # Allow access to static files (CSS, JS, images, fonts)
     RewriteCond %{REQUEST_URI} !\.(css|js|png|jpg|jpeg|gif|ico|svg|woff|woff2|ttf|eot|otf)$ [NC]
 
+
+    # Allow direct access to verify_token.php
+RewriteCond %{REQUEST_URI} ^/verify_token\.php$
+RewriteRule ^ - [L]
+
+
 # Remove trailing slashes (except for directories)
 RewriteCond %{REQUEST_FILENAME} !-d
 RewriteRule ^(.*)/$ /$1 [L,R=301]
