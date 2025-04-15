@@ -49,6 +49,52 @@ $currentPlan = DBHelper::selectOne($sql_currentPlan,"s", [$shop_id]);
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>SWB Auto PDF Invoices</title>
+    <script src="https://unpkg.com/@shopify/app-bridge@3"></script>
+    <script src="https://unpkg.com/@shopify/app-bridge-utils@3"></script>
+    <script>
+    const AppBridge = window['app-bridge'];
+    const createApp = AppBridge.default;
+    const actions = AppBridge.actions;
+    const utils = window['app-bridge-utils'];
+
+    const app = createApp({
+      apiKey: '<?= SHOPIFY_API_KEY?>',
+      host: '<?php echo $host; ?>',
+      forceRedirect: true,
+    });
+
+    const NavigationMenu = actions.NavigationMenu;
+
+    NavigationMenu.create(app, {
+      items: [
+        {
+          label: 'Dashboard',
+          destination: '<?= BASE_SHOPIFY_AF_URL;?>index.php?shop=<?php echo $shop; ?>&host=<?php echo $host; ?>',
+        },
+        {
+          label: 'Settings',
+          destination: '<?= BASE_SHOPIFY_AF_URL;?>/settings.php?shop=<?php echo $shop; ?>&host=<?php echo $host; ?>',
+        },
+      ],
+    });
+
+    // Get and send session token
+    utils.getSessionToken(app).then((token) => {
+      fetch('verify_token.php', {
+        method: 'POST',
+        headers: {
+          'Authorization': 'Bearer ' + token
+        }
+      })
+      .then(res => res.json())
+      .then(data => {
+        document.getElementById('result').innerText = data.message || 'Verified!';
+      })
+      .catch(err => {
+        document.getElementById('result').innerText = 'Auth failed: ' + err.message;
+      });
+    });
+  </script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/1.11.5/css/jquery.dataTables.css">
     <link rel="stylesheet" href="../css/style.css">
