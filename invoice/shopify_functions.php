@@ -361,45 +361,37 @@ function extractIdFromGql($gqlId) {
 
 function fetchSubscriptionWithGraphQL($shop, $accessToken, $chargeId) {
     $graphqlEndpoint = "https://{$shop}/admin/api/" . SHOPIFY_API_VERSION . "/graphql.json";
-    $query = '
-    query ($id: ID!) {
-        appSubscription(id: $id) {
+    $query = '{
+        appInstallation {
+          activeSubscriptions {
             id
             name
             status
             createdAt
-            updatedAt
             currentPeriodEnd
-            trialEndsOn
-            activatedOn
-            cancelledOn
-            billingInterval
-            billingPolicy {
-                interval
-                intervalCount
-            }
             test
             lineItems {
-                id
-                plan {
-                    pricingDetails {
-                        ... on AppRecurringPricing {
-                            interval
-                            price {
-                                amount
-                                currencyCode
-                            }
-                        }
-                        ... on AppUsagePricing {
-                            terms
-                            cappedAmount {
-                                amount
-                                currencyCode
-                            }
-                        }
+              id
+              plan {
+                pricingDetails {
+                  ... on AppRecurringPricing {
+                    interval
+                    price {
+                      amount
+                      currencyCode
                     }
+                  }
+                  ... on AppUsagePricing {
+                    terms
+                    cappedAmount {
+                      amount
+                      currencyCode
+                    }
+                  }
                 }
+              }
             }
+          }
         }
     }';
     
@@ -446,31 +438,37 @@ function fetchSubscriptionWithGraphQL($shop, $accessToken, $chargeId) {
         return null;
     }
     
-    return normalizeGraphQLData($data['data']['appSubscription']);
+    return normalizeGraphQLData($data['data']['appInstallation']);
 }
 
 function normalizeGraphQLData($subscription) {
-    $lineItem = $subscription['lineItems'][0] ?? [];
+    // Handle both direct subscription data and appInstallation->activeSubscriptions array
+    $subscriptionData = $subscription;
+    if (isset($subscription['activeSubscriptions'][0])) {
+        $subscriptionData = $subscription['activeSubscriptions'][0];
+    }
+    
+    $lineItem = $subscriptionData['lineItems'][0] ?? [];
     $pricingDetails = $lineItem['plan']['pricingDetails'] ?? [];
     
     return [
-        'id' => extractIdFromGql($subscription['id']),
-        'name' => $subscription['name'],
-        'status' => strtolower($subscription['status']),
-        'created_at' => $subscription['createdAt'],
-        'updated_at' => $subscription['updatedAt'],
-        'activated_on' => $subscription['activatedOn'],
-        'cancelled_on' => $subscription['cancelledOn'],
-        'trial_ends_on' => $subscription['trialEndsOn'],
-        'current_period_end' => $subscription['currentPeriodEnd'],
-        'billing_interval' => $pricingDetails['interval'] ?? $subscription['billingInterval'],
-        'interval_count' => $subscription['billingPolicy']['intervalCount'] ?? 1,
+        'id' => extractIdFromGql($subscriptionData['id']),
+        'name' => $subscriptionData['name'],
+        'status' => strtolower($subscriptionData['status']),
+        'created_at' => $subscriptionData['createdAt'],
+        'updated_at' => $subscriptionData['createdAt'], // Using createdAt since updatedAt doesn't exist
+        'activated_on' => $subscriptionData['createdAt'], // Using createdAt as activation date
+        'cancelled_on' => null, // Not available in response
+        'trial_ends_on' => null, // Not available in response
+        'current_period_end' => $subscriptionData['currentPeriodEnd'],
+        'billing_interval' => strtolower($pricingDetails['interval'] ?? 'month'), // Convert ANNUAL to annual
+        'interval_count' => 1, // Default to 1 since not available in response
         'price' => $pricingDetails['price']['amount'] ?? null,
         'currency' => $pricingDetails['price']['currencyCode'] ?? 'USD',
-        'capped_amount' => $pricingDetails['cappedAmount']['amount'] ?? null,
-        'terms' => $pricingDetails['terms'] ?? null,
-        'is_test' => $subscription['test'],
-        'next_billing_date' => $subscription['currentPeriodEnd']
+        'capped_amount' => null, // Not available in this response
+        'terms' => null, // Not available in this response
+        'is_test' => $subscriptionData['test'] ?? false,
+        'next_billing_date' => $subscriptionData['currentPeriodEnd']
     ];
 }
 
