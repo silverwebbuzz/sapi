@@ -264,8 +264,8 @@ if (isset($access_token)) {
 
     // Create webhook
     $shopify_webhook = registerShopifyWebhooks($shop, $access_token);
-    echo "<pre>"; print_r($shopify_webhook); exit;
-    if (registerShopifyWebhooks($shop, $access_token)) {
+    
+    if ($shopify_webhook==1) {
         $redirect_url = "https://{$shop}/admin/apps/" . SHOPIFY_API_KEY;
         header("Location: " . $redirect_url);
         exit;
