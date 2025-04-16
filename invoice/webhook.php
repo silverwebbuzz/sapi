@@ -189,7 +189,7 @@ if ($topic === 'app/uninstalled') {
         
     } catch (Exception $e) {
         DBHelper::rollback();
-        http_response_code(500);
+        http_response_code(200);
         error_log("Subscription processing failed: " . $e->getMessage());
         echo json_encode([
             'success' => false,
