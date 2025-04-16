@@ -137,17 +137,16 @@ if ($topic === 'app/uninstalled') {
         // Insert new subscription
         $newId = DBHelper::insert("
             INSERT INTO store_subscriptions (
-                store_id, shopify_id, shop_domain, charge_id, initial_charge_id,
+                store_id, shopify_id,  charge_id, initial_charge_id,
                 plan_name, status, price, currency, billing_interval,
                 interval_count, capped_amount, terms,
                 activated_on, current_period_end, trial_ends_on, billing_on,
                 order_limit, email_limit, order_used, email_used,
                 is_test
-            ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
-        ", "iissssssdssisssssiiii", [
+            ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+        ", "iisssssdssisssssiiii", [
             $store['id'],                             // store_id
             $shopId,                                  // shop_id
-            $store['myshopify_domain'],               // shop_domain
             $subscriptionData['id'],                  // charge_id
             $subscriptionData['id'],                  // initial_charge_id (same for new subs)
             $subscriptionData['name'],                // plan_name
