@@ -58,7 +58,7 @@ $invoices_query = DBHelper::select("SELECT * FROM `$invoice_table` ORDER BY crea
         <div class="package-usage">
             <div class="usage-info">
                 <span>Invoice Used: <?= htmlspecialchars($currentPlan['order_used'] ?? '0') ?></span>
-                <span>Invoice Remaining: <?= (htmlspecialchars($currentPlan['order_limit'] ?? '0') - htmlspecialchars($currentPlan['order_used'] ?? '0') ?></span>
+                <span>Invoice Remaining: <?= (htmlspecialchars($currentPlan['order_limit'] ?? '0') - htmlspecialchars($currentPlan['order_used'] ?? '0')) ?></span>
             </div>
             <div class="usage-bar">
                 <?php 
@@ -75,7 +75,7 @@ $invoices_query = DBHelper::select("SELECT * FROM `$invoice_table` ORDER BY crea
             
             <div class="usage-info">
                 <span>Email Used: <?= htmlspecialchars($currentPlan['email_used'] ?? '0') ?></span>
-                <span>Email Remaining: <?= (htmlspecialchars($currentPlan['email_limit'] ?? '0') - htmlspecialchars($currentPlan['email_used'] ?? '0') ?></span>
+                <span>Email Remaining: <?= (htmlspecialchars($currentPlan['email_limit'] ?? '0') - htmlspecialchars($currentPlan['email_used'] ?? '0')) ?></span>
             </div>
             <div class="usage-bar">
                 <?php 
