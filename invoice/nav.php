@@ -29,6 +29,10 @@ $row = DBHelper::selectOne($sql_settings,"s", [$shop_id]);
 foreach ($webhooks as $hook) {
     echo "Topic: {$hook['topic']}, URL: {$hook['address']}<br>";
 }*/
+$charge_id='34950971692';
+$chargedetails = getChargeDetails($shop, $row['access_token'], $charge_id);
+print_r($chargedetails);
+
 
 if($currentPlan['price']>0 && $row['smtp_settings']==''): // You can set this based on your SMTP check logic ?>
 <div id="smtp-warning" class="warning-box">

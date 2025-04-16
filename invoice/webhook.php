@@ -106,7 +106,8 @@ if ($topic === 'app/uninstalled') {
     $sendemail  = sendemail($shop_id,$order_id);
 
 } elseif ($topic === 'app_subscription/activated') {
-
+    //app_subscription['admin_graphql_api_id'];
+   // 34950971692
     //handleSubscriptionActivated($webhook);
 
 } elseif ($topic === 'app_subscriptions/update') {  

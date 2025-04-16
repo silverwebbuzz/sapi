@@ -286,8 +286,8 @@ function getChargeDetails($shop, $access_token, $charge_id) {
         return false;
     }
     
-    $response_data = json_decode($response, true);
-    return $response_data['recurring_application_charge'];
+    return $response_data = json_decode($response, true);
+    //return $response_data['recurring_application_charge'];
 }
 
 
@@ -351,4 +351,10 @@ function listWebhooks($shop, $accessToken) {
 
     $data = json_decode($response, true);
     return $data['webhooks'] ?? [];
+}
+
+// Helper function to extract ID from GraphQL ID string
+function extractIdFromGql($gqlId) {
+    $parts = explode('/', $gqlId);
+    return end($parts);
 }
