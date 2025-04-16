@@ -433,7 +433,7 @@ function fetchSubscriptionWithGraphQL($shop, $accessToken, $chargeId) {
         return null;
     }
     
-    if (!isset($data['data']['appSubscription'])) {
+    if (!isset($data['data']['appInstallation'])) {
         error_log("Invalid GraphQL response structure");
         return null;
     }
