@@ -297,8 +297,6 @@ function registerShopifyWebhooks($shop, $access_token) {
         'orders/create',
         'orders/paid',
         'app/uninstalled',
-        'app_subscription/activated',
-        'app_subscription/cancelled',
         'app_subscriptions/update'
     ];
 
