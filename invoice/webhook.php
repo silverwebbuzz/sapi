@@ -21,7 +21,6 @@ $shop = $_SERVER['HTTP_X_SHOPIFY_SHOP_DOMAIN'];
 $topic = $_SERVER['HTTP_X_SHOPIFY_TOPIC']; // Get webhook topic
 $cdate = date("Y-m-d H:i:s");
 
-$conn = DB::getInstance();
 
 // webhook logs.
 $insertSql = "INSERT INTO webhook (shop, topic, orders, cdate) VALUES (?, ?, ?, ?)";
