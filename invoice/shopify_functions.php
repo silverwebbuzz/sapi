@@ -298,7 +298,8 @@ function registerShopifyWebhooks($shop, $access_token) {
         'orders/paid',
         'app/uninstalled',
         'app_subscription/activated',
-        'app_subscription/cancelled'
+        'app_subscription/cancelled',
+        'app_subscriptions/update'
     ];
 
     foreach ($topics as $topic) {
