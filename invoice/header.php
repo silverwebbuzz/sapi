@@ -16,25 +16,7 @@ $shop_owner = $cookieData['shop_owner'];
 
 //Fetch store plan.
 $sql_currentPlan = "
-SELECT 
-    ss.store_id,
-    ss.plan_name,
-    ss.charge_id,
-    ss.price,
-    ss.order_limit AS subscription_order_limit,
-    ss.email_limit AS subscription_email_limit,
-    ss.activated_on,
-    ss.cancelled_on,
-    ss.current_period_end AS next_charge_date,
-    ss.status,
-    ss.order_used,
-    ss.email_used,
-    ss.currency,
-    ss.billing_interval,
-    ss.interval_count,
-    ss.capped_amount,
-    ss.terms,
-    ss.is_test
+SELECT *
 FROM store_subscriptions ss
 WHERE ss.store_id = ? AND ss.status = 'active'
 ORDER BY ss.activated_on DESC
