@@ -22,8 +22,14 @@
 
 <?php 
 // Fetch existing settings
-$sql_settings = "SELECT store_name,smtp_settings,auto_invoice_customer, auto_invoice_personal, email_invoice, email, invoice_templates_id FROM stores WHERE id = ?";
+$sql_settings = "SELECT access_token, store_name,smtp_settings,auto_invoice_customer, auto_invoice_personal, email_invoice, email, invoice_templates_id FROM stores WHERE id = ?";
 $row = DBHelper::selectOne($sql_settings,"s", [$shop_id]);
+
+$webhooks = listWebhooks($shop, $accessToken);
+foreach ($webhooks as $hook) {
+    echo "Topic: {$hook['topic']}, URL: {$hook['address']}<br>";
+}
+
 
 if($currentPlan['price']>0 && $row['smtp_settings']==''): // You can set this based on your SMTP check logic ?>
 <div id="smtp-warning" class="warning-box">

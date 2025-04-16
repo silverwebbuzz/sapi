@@ -245,7 +245,7 @@ function activateRecurringCharge($shop, $access_token, $charge_id) {
 
 function cancelOldSubscription($shop, $access_token,$charge_id) {
     
-    $api_url = "https://$shop/admin/api/2024-01/recurring_application_charges/$charge_id.json";
+    $api_url = "https://{$shop}/admin/api/2024-01/recurring_application_charges/$charge_id.json";
 
     //Initialize cURL request
     $ch = curl_init();
@@ -334,4 +334,23 @@ function registerShopifyWebhooks($shop, $access_token) {
     }
 
     return true;
+}
+
+function listWebhooks($shop, $accessToken) {
+    $url = "https://{$shop}/admin/api/" . SHOPIFY_API_VERSION . "/webhooks.json";
+    
+    $headers = [
+        "Content-Type: application/json",
+        "X-Shopify-Access-Token: $accessToken"
+    ];
+
+    $ch = curl_init($url);
+    curl_setopt($ch, CURLOPT_HTTPHEADER, $headers);
+    curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+
+    $response = curl_exec($ch);
+    curl_close($ch);
+
+    $data = json_decode($response, true);
+    return $data['webhooks'] ?? [];
 }
