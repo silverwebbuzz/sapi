@@ -135,31 +135,32 @@ if ($topic === 'app/uninstalled') {
         $terms = !empty($subscriptionData['terms']) ? $subscriptionData['terms'] : null;
 
         // Insert new subscription
+        // Insert new subscription
         $newId = DBHelper::insert("
             INSERT INTO store_subscriptions (
-                store_id, shopify_id,  charge_id,
+                store_id, shopify_id, charge_id,
                 plan_name, status, price, currency, billing_interval,
                 interval_count, capped_amount, terms,
                 activated_on, current_period_end, trial_ends_on, billing_on,
                 order_limit, email_limit, order_used, email_used,
                 is_test
             ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
-        ", "iissssdssisssssiiii", [
+        ", "iisssssssssssssiiiii", [
             $store['id'],                             // store_id
-            $shopId,                                  // shop_id
+            $shopId,                                  // shopify_id
             $subscriptionData['id'],                  // charge_id
             $subscriptionData['name'],                // plan_name
-            strtolower($subscriptionData['status']),  // status (ensure lowercase)
+            strtolower($subscriptionData['status']),  // status
             $subscriptionData['price'],               // price
             $subscriptionData['currency'],            // currency
             $subscriptionData['billing_interval'],    // billing_interval
             $subscriptionData['interval_count'],      // interval_count
-            $cappedAmount,                            // capped_amount (can be null)
-            $terms,                                   // terms (can be null)
+            $cappedAmount,                            // capped_amount
+            $terms,                                   // terms
             $subscriptionData['activated_on'],        // activated_on
             $subscriptionData['current_period_end'],  // current_period_end
-            $trialEndsOn,                             // trial_ends_on (null if missing)
-            null,                                     // billing_on (to update after first billing cycle)
+            $trialEndsOn,                             // trial_ends_on
+            null,                                     // billing_on
             $limits['order_limit'],                   // order_limit
             $limits['email_limit'],                   // email_limit
             0,                                        // order_used
