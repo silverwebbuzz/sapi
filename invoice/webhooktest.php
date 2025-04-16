@@ -1,94 +1,98 @@
 <?php
-require_once '../config.php';
-require_once '../db.php';
-$conn = DB::getInstance();
-
-require_once '../vendor/tecnickcom/tcpdf/tcpdf.php';
+require_once '../config/config.php';
+require_once '../config/db.php';
+require_once 'helper.php';
+require_once 'shopify_functions.php';
 require_once '../vendor/autoload.php';
-
- // Import PHPMailer classes
- use PHPMailer\PHPMailer\PHPMailer;
- use PHPMailer\PHPMailer\SMTP;
- use PHPMailer\PHPMailer\Exception;
-
-require_once '../invoice/helper.php';
  
-$shop = 'silverwebbuzzapp.myshopify.com';
-$order_id = '6303427920172';
+$data = '{"app_subscription":{"admin_graphql_api_id":"gid:\/\/shopify\/AppSubscription\/34950971692","name":"Premium","status":"CANCELLED","admin_graphql_api_shop_id":"gid:\/\/shopify\/Shop\/92496724268","created_at":"2025-04-16T02:07:00-07:00","updated_at":"2025-04-16T06:47:25-07:00","currency":"USD","capped_amount":null}}';
+$webhook = json_decode($data, true);
+try {
+        $subscription = $webhook['app_subscription'];
+        $chargeId = extractIdFromGql($subscription['admin_graphql_api_id']);  // Returns 34950971692
+        $shopId = extractIdFromGql($subscription['admin_graphql_api_shop_id']);  // Returns 92496724
+        
+        // Get store data in shopify table its save as 	shopify_id
+        $store = DBHelper::fetch("SELECT id, shop, access_token FROM stores WHERE shopify_id = ?  LIMIT 1", "i", [$shopId]);
+        
+        if (!$store) {
+            throw new Exception("Store not found");
+        }
+        
+        // Get FULL subscription details via GraphQL
+        $subscriptionData = ShopifyHelper::fetchSubscriptionWithGraphQL($store['shop'],$store['access_token'],$chargeId);
+        
+        if (!$subscriptionData) {
+            throw new Exception("Failed to fetch subscription details");
+        }
 
-    $table_query = $conn->prepare("SELECT * FROM stores WHERE shop = ?");
-    $table_query->bind_param("s", $shop);
-    $table_query->execute();
-    $result = $table_query->get_result();
-    $shop_data = $result->fetch_assoc();
-    $shop_id = $shop_data['id'];
+        // Determine plan limits based on your requirements
+        $limits = calculatePlanLimits($subscriptionData['name'], $subscriptionData['price'], $subscriptionData['billing_interval']);
 
-    $generatepdf  = generatepdf($shop_id,$order_id);
-    $sendemail  = sendemail($shop_id,$order_id);
-    
-    $results_pdf_email =$generatepdf.$sendemail;
-    // webhook logs.
-    $insertSql = "INSERT INTO webhook (shop, topic, orders, cdate) VALUES (?, ?, ?, ?)";
-    $stmt = $conn->prepare($insertSql);
-    // Bind parameters: 'shop' and 'topic' are strings, 'orders' is a string, and 'cdate' is a string representation of datetime.
-    $stmt->bind_param("ssss", $shop, $topic, $results_pdf_email , $cdate);
-
-// Email sending function
-function sendEmailWithAttachment($to_email, $to_name, $subject, $html_body, $attachment_content, $attachment_name) {
-   
-    $mail = new PHPMailer(true);
- 
-     try {
-         // Server settings
-         //$mail->SMTPDebug = SMTP::DEBUG_SERVER;
-         $mail->isSMTP();
-         $mail->Host       = 'mail.silverwebbuzz.com';
-         $mail->SMTPAuth   = true;
-         $mail->Username   = 'bhavik.koradiya@silverwebbuzz.com';
-         $mail->Password   = 'Bhavik@1109';
-         $mail->SMTPSecure = PHPMailer::ENCRYPTION_STARTTLS;
-         $mail->Port       = 587;
-         $mail->SMTPKeepAlive = true;
- 
-         // Critical headers
-         $mail->setFrom('bhavik.koradiya@silverwebbuzz.com', 'Bhavik Koradiya SWB', true);
-         //$mail->addReplyTo('support@silverwebbuzz.com', 'Support Team');
-         //$mail->addAddress('vishnu@silverwebbuzz.com', 'Vishnu Prajapati');
-         $mail->addAddress($to_email, $to_name);
- 
-         // Content
-         $mail->isHTML(true);
-         $mail->Subject = $subject;
-         $mail->Body = $html_body;
-         $mail->AltBody = strip_tags($html_body);
-         
-         // Add PDF attachment from string
-         $mail->addStringAttachment($attachment_content, $attachment_name, 'base64', 'application/pdf');
-             
-         // Delivery notifications
-         //$mail->addCustomHeader('Return-Receipt-To: bhavik.koradiya@silverwebbuzz.com');
-         //$mail->addCustomHeader('Disposition-Notification-To: bhavik.koradiya@silverwebbuzz.com');
-         
-         // Send with verification
-         if (!$mail->send()) {
-             throw new Exception('Send failed: ' . $mail->ErrorInfo);
-         }
-         return true;
-         // Verify in mail logs
-         echo "Message sent! Check:<br>";
-         echo "1. Server mail logs<br>";
-         echo "2. Spam folder<br>";
-         echo "3. <a href='https://www.mail-tester.com' target='_blank'>Mail-Tester.com</a>";
- 
-     } catch (Exception $e) {
-         echo "Error: " . $e->getMessage();
-         error_log("Mail Error: " . $e->getMessage());
-         return false;
-         // Try fallback method
-         //$headers = "From: noreply@silverwebbuzz.com\r\n";
-         //$headers .= "Content-Type: text/html; charset=UTF-8\r\n";
-         //mail('recipient@example.com', 'Fallback Test', 'Test content', $headers);
-         //echo "<br>Fallback method attempted";
-         
-     }
- }
+        // Start transaction
+        DBHelper::beginTransaction();
+        
+        // Insert new subscription
+        $newId = DBHelper::insert("
+            INSERT INTO store_subscriptions (
+                store_id, shop_id, shop_domain, charge_id, initial_charge_id,
+                plan_name, status, price, currency, billing_interval,
+                interval_count, capped_amount, terms,
+                activated_on, current_period_end, trial_ends_on, billing_on,
+                order_limit, email_limit, order_used, email_used,
+                is_test
+            ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+        ", "iissssssdssisssssiiii", [
+            $store['id'],
+            $shopId,
+            $store['myshopify_domain'],
+            $chargeId,
+            $chargeId, // Initial charge same as current for new subscriptions
+            $subscriptionData['name'],
+            $subscriptionData['status'],
+            $subscriptionData['price'],
+            $subscriptionData['currency'],
+            $subscriptionData['billing_interval'],
+            $subscriptionData['interval_count'],
+            $subscriptionData['capped_amount'],
+            $subscriptionData['terms'],
+            $subscriptionData['activated_on'],
+            $subscriptionData['current_period_end'],
+            $subscriptionData['trial_ends_on'],
+            null, // billing_on will be set after first charge
+            $limits['order_limit'],
+            $limits['email_limit'],
+            0, // order_used
+            0, // email_used
+            $subscriptionData['is_test']
+        ]);
+        
+        // 8. Cancel old subscriptions (except the one we just created)
+        DBHelper::execute("
+            UPDATE store_subscriptions 
+            SET status = 'cancelled',
+                cancelled_on = NOW(),
+                updated_at = NOW()
+            WHERE store_id = ? 
+              AND id != ?
+              AND status = 'active'
+        ", "ii", [$store['id'], $newId]);
+        
+        DBHelper::commit();
+        
+        http_response_code(200);
+        echo json_encode([
+            'success' => true,
+            'subscription_id' => $newId,
+            'limits' => $limits
+        ]);
+        
+    } catch (Exception $e) {
+        DBHelper::rollback();
+        http_response_code(200);
+        error_log("Subscription processing failed: " . $e->getMessage());
+        echo json_encode([
+            'success' => false,
+            'error' => $e->getMessage()
+        ]);
+    }
