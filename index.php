@@ -5,7 +5,20 @@ require_once 'invoice/shopify_functions.php';
 
 // Handle direct access to the root URL
 if ($_SERVER['REQUEST_METHOD'] === 'GET' && empty($_GET)) {
-    handleDirectAccess();
+    ?>
+    <!DOCTYPE html>
+    <html>
+    <head>
+        <title>Install App</title>
+    </head>
+    <body>
+        <h1>Please install this app via Shopify Admin</h1>
+        <p>If you're a store owner, please <a href="https://www.shopify.com/login" target="_blank">login to Shopify</a> 
+        and install this app from your admin dashboard.</p>
+        <p>If you're being redirected from Shopify Admin, <a href="<?= LIVE_SHOPIFY_APP_URL?>">click here</a> to continue installation.</p>
+    </body>
+    </html>
+    <?php 
 }
 
 // Handle OAuth flow
@@ -44,21 +57,5 @@ if (isset($_GET['hmac']) && isset($_GET['shop']) && isset($_GET['timestamp'])) {
         header("Location: $dashboard_redirect ");
     }
 
-} else {
-$shopifyLoginUrl = 'https://www.shopify.com/login';
-$shopParam = isset($_GET['shop']) ? htmlspecialchars($_GET['shop'], ENT_QUOTES, 'UTF-8') : SHOPIFY_APP_HANDLE;
-$installUrl = LIVE_SHOPIFY_APP_URL . '?shop=' . urlencode($shopParam);
-?>
-<!DOCTYPE html>
-<html>
-<head>
-    <title>Install App</title>
-</head>
-<body>
-    <h1>Please install this app via Shopify Admin</h1>
-    <p>If you're a store owner, please <a href="<?=$shopifyLoginUrl?>" target="_blank">login to Shopify</a> 
-    and install this app from your admin dashboard.</p>
-    <p>If you're being redirected from Shopify Admin, <a href="<?=$installUrl?>">click here</a> to continue installation.</p>
-</body>
-</html>
-<?php } ?>
+}
+exit();
