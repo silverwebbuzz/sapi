@@ -42,7 +42,7 @@ ORDER BY ss.activated_on DESC
 LIMIT 1
 ";
 
-$currentPlan = DBHelper::selectOne($sql_currentPlan, "i", [$store_id]);
+$currentPlan = DBHelper::selectOne($sql_currentPlan, "i", [$shop_id]);
 if (!isset($currentPlan) || empty($currentPlan)) {
   header("Location: change-plan.php");
   exit();
