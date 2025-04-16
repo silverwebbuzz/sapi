@@ -5,6 +5,7 @@
  
  require_once '../config/config.php';
  require_once '../config/db.php';
+ require_once 'shopify_functions.php';
 
 $cookieData = decryptCookie($_COOKIE['swb_auth']);
 $shop_id = $cookieData['shop_id'];
