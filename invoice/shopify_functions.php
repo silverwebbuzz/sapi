@@ -474,7 +474,7 @@ function normalizeGraphQLData($subscription) {
 
 function calculatePlanLimits($planName, $price, $billingInterval) {
     $planName = strtolower($planName);
-    $isAnnual = strtolower($billingInterval) === 'year';
+    $isAnnual = strtolower($billingInterval) === 'annual';
     $unlimited = PHP_INT_MAX;
     
     switch ($planName) {
