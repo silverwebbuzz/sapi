@@ -14,92 +14,16 @@ $invoices_query = DBHelper::select("SELECT * FROM `$invoice_table` ORDER BY crea
     <!-- Subscription Package -->
     
     <div class="package-card">
-    <h3>Current Subscription Package</h3>
-    <div class="package-details">
-        <div class="package-info">
-            <div class="package-name"><?= htmlspecialchars($currentPlan['plan_name'] ?? 'No active plan') ?></div>
-            <div class="package-price">
-                $<?= htmlspecialchars($currentPlan['price'] ?? '0.00') ?>
-                /<?= ($currentPlan['billing_interval'] === 'annual') ? 'year' : 'month' ?>
-            </div>
-            <div class="package-stat">
-                <span><?= htmlspecialchars($currentPlan['terms'] ?? 'Automated PDF invoices'); ?></span>
-                <div class="package-stats">
-                    <a href="change-plan" class="upgrade-btn">Upgrade Plan</a>
-                </div>
-            </div>
-        </div>
-        <div class="package-stats">
-            <div class="package-stat">
-                <span>Billing Cycle</span>
-                <strong>
-                    <?= ucfirst($currentPlan['billing_interval'] ?? 'month') ?>ly
-                </strong>
-            </div>
-            <div class="package-stat">
-                <span>Next Billing Date</span>
-                <strong><?= date('M d, Y', strtotime($currentPlan['current_period_end'] ?? '')) ?></strong>
-            </div>
-            <div class="package-stat">
-                <span>PDF Invoice Limit</span>
-                <strong>
-                    <?= htmlspecialchars($currentPlan['order_limit'] ?? '0') ?>
-                    /<?= ($currentPlan['billing_interval'] === 'annual') ? 'year' : 'month' ?>
-                </strong>
-            </div>
-            <div class="package-stat">
-                <span>Email Sent Limit</span>
-                <strong>
-                    <?= htmlspecialchars($currentPlan['email_limit'] ?? '0') ?>
-                    /<?= ($currentPlan['billing_interval'] === 'annual') ? 'year' : 'month' ?>
-                </strong>
-            </div>
-        </div>
-        <div class="package-usage">
-            <div class="usage-info">
-                <span>Invoice Used: <?= htmlspecialchars($currentPlan['order_used'] ?? '0') ?></span>
-                <span>Invoice Remaining: <?= (htmlspecialchars($currentPlan['order_limit'] ?? '0') - htmlspecialchars($currentPlan['order_used'] ?? '0')) ?></span>
-            </div>
-            <div class="usage-bar">
-                <?php 
-                $percentageUsed = 0;
-                if ($currentPlan['order_limit'] > 0) {
-                    $percentageUsed = ($currentPlan['order_used'] / $currentPlan['order_limit']) * 100;
-                    $percentageUsed = min(100, round($percentageUsed, 2));
-                }
-                ?>
-                <div class="usage-progress" style="width: <?= $percentageUsed ?>%"></div>
-            </div>
-            
-            <br/>
-            
-            <div class="usage-info">
-                <span>Email Used: <?= htmlspecialchars($currentPlan['email_used'] ?? '0') ?></span>
-                <span>Email Remaining: <?= (htmlspecialchars($currentPlan['email_limit'] ?? '0') - htmlspecialchars($currentPlan['email_used'] ?? '0')) ?></span>
-            </div>
-            <div class="usage-bar">
-                <?php 
-                $percentageUsedemail = 0;
-                if ($currentPlan['email_limit'] > 0) {
-                    $percentageUsedemail = ($currentPlan['email_used'] / $currentPlan['email_limit']) * 100;
-                    $percentageUsedemail = min(100, round($percentageUsedemail, 2));
-                }
-                ?>
-                <div class="usage-progress" style="width: <?= $percentageUsedemail ?>%"></div>
-            </div>
-        </div>
-    </div>
-</div>
-
-    
-    <div class="package-card">
         <h3>Current Subscription Package</h3>
         <div class="package-details">
             <div class="package-info">
-                <div class="package-name"><?= htmlspecialchars($currentPlan['plan_name'])?></div>
-                <div class="package-price">$<?= htmlspecialchars($currentPlan['price'])?>/month</div>
+                <div class="package-name"><?= htmlspecialchars($currentPlan['plan_name'] ?? 'No active plan') ?></div>
+                <div class="package-price">
+                    $<?= htmlspecialchars($currentPlan['price'] ?? '0.00') ?>
+                    /<?= ($currentPlan['billing_interval'] === 'annual') ? 'year' : 'month' ?>
+                </div>
                 <div class="package-stat">
-                    <span><?= htmlspecialchars($currentPlan['description']); ?></span>
+                    <span><?= htmlspecialchars($currentPlan['terms'] ?? 'Automated PDF invoices'); ?></span>
                     <div class="package-stats">
                         <a href="change-plan" class="upgrade-btn">Upgrade Plan</a>
                     </div>
@@ -108,52 +32,65 @@ $invoices_query = DBHelper::select("SELECT * FROM `$invoice_table` ORDER BY crea
             <div class="package-stats">
                 <div class="package-stat">
                     <span>Billing Cycle</span>
-                    <strong>1 Month</strong>
+                    <strong>
+                        <?= ucfirst($currentPlan['billing_interval'] ?? 'month') ?>ly
+                    </strong>
                 </div>
                 <div class="package-stat">
                     <span>Next Billing Date</span>
-                    <strong><?= $currentPlan['next_charge_date']?></strong>
+                    <strong><?= date('M d, Y', strtotime($currentPlan['current_period_end'] ?? '')) ?></strong>
                 </div>
                 <div class="package-stat">
                     <span>PDF Invoice Limit</span>
-                    <strong><?= htmlspecialchars($currentPlan['plan_order_limit'])?>/month</strong>
+                    <strong>
+                        <?= htmlspecialchars($currentPlan['order_limit'] ?? '0') ?>
+                        /<?= ($currentPlan['billing_interval'] === 'annual') ? 'year' : 'month' ?>
+                    </strong>
                 </div>
                 <div class="package-stat">
                     <span>Email Sent Limit</span>
-                    <strong><?= htmlspecialchars($currentPlan['email_limit'])?>/month</strong>
+                    <strong>
+                        <?= htmlspecialchars($currentPlan['email_limit'] ?? '0') ?>
+                        /<?= ($currentPlan['billing_interval'] === 'annual') ? 'year' : 'month' ?>
+                    </strong>
                 </div>
             </div>
             <div class="package-usage">
                 <div class="usage-info">
-                    <span>Invoice Used: <?= htmlspecialchars($currentPlan['order_used'])?></span>
-                    <span>Invoice Remaining: <?= (htmlspecialchars($currentPlan['plan_order_limit']) - htmlspecialchars($currentPlan['order_used']))?></span>
+                    <span>Invoice Used: <?= htmlspecialchars($currentPlan['order_used'] ?? '0') ?></span>
+                    <span>Invoice Remaining: <?= (htmlspecialchars($currentPlan['order_limit'] ?? '0') - htmlspecialchars($currentPlan['order_used'] ?? '0')) ?></span>
                 </div>
                 <div class="usage-bar">
                     <?php 
-                    // Calculate percentage
-                        $percentageUsed = ($currentPlan['order_used'] / $currentPlan['plan_order_limit']) * 100;
-                        // Optionally round the value
-                        $percentageUsed = round($percentageUsed, 2); 
+                    $percentageUsed = 0;
+                    if ($currentPlan['order_limit'] > 0) {
+                        $percentageUsed = ($currentPlan['order_used'] / $currentPlan['order_limit']) * 100;
+                        $percentageUsed = min(100, round($percentageUsed, 2));
+                    }
                     ?>
-                    <div class="usage-progress" style="width: <?= $percentageUsed;?>%"></div>
+                    <div class="usage-progress" style="width: <?= $percentageUsed ?>%"></div>
                 </div>
+                
                 <br/>
+                
                 <div class="usage-info">
-                    <span>Email Used: <?= htmlspecialchars($currentPlan['email_used'])?></span>
-                    <span>Email Remaining: <?= (htmlspecialchars($currentPlan['email_limit']) - htmlspecialchars($currentPlan['email_used']))?></span>
+                    <span>Email Used: <?= htmlspecialchars($currentPlan['email_used'] ?? '0') ?></span>
+                    <span>Email Remaining: <?= (htmlspecialchars($currentPlan['email_limit'] ?? '0') - htmlspecialchars($currentPlan['email_used'] ?? '0')) ?></span>
                 </div>
                 <div class="usage-bar">
-                <?php 
-                    // Calculate percentage
+                    <?php 
+                    $percentageUsedemail = 0;
+                    if ($currentPlan['email_limit'] > 0) {
                         $percentageUsedemail = ($currentPlan['email_used'] / $currentPlan['email_limit']) * 100;
-                        // Optionally round the value
-                        $percentageUsedemail = round($percentageUsedemail, 2); 
+                        $percentageUsedemail = min(100, round($percentageUsedemail, 2));
+                    }
                     ?>
-                    <div class="usage-progress" style="width: <?= $percentageUsedemail;?>%"></div>
+                    <div class="usage-progress" style="width: <?= $percentageUsedemail ?>%"></div>
                 </div>
             </div>
         </div>
     </div>
+
 
     <!-- Orders Table -->
     <div class="orders-card">
