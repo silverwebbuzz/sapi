@@ -22,7 +22,7 @@ $invoices_query = DBHelper::select("SELECT * FROM `$invoice_table` ORDER BY crea
                 <div class="package-stat">
                     <span><?= htmlspecialchars($currentPlan['description']); ?></span>
                     <div class="package-stats">
-                        <a href="billing.php" class="upgrade-btn">Upgrade Plan</a>
+                        <a href="https://admin.shopify.com/store/<?=$shop?>/charges/<?=SHOPIFY_APP_HANDLE?>pricing_plans" class="upgrade-btn">Upgrade Plan</a>
                     </div>
                 </div>
             </div>

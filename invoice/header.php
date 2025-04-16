@@ -56,12 +56,23 @@ $currentPlan = DBHelper::selectOne($sql_currentPlan,"s", [$shop_id]);
     const createApp = AppBridge.default;
     const actions = AppBridge.actions;
     const utils = window['app-bridge-utils'];
+    const Redirect = actions.Redirect;
 
     const app = createApp({
       apiKey: '<?= SHOPIFY_API_KEY?>',
       host: '<?php echo $host; ?>',
       forceRedirect: true,
     });
+
+    const redirect = Redirect.create(app);
+
+    // Replace with your real store/app handles
+    const storeHandle = '<?= $shop ?>';
+    const appHandle = '<?= SHOPIFY_APP_HANDLE ?>';
+    const pricingUrl = `https://admin.shopify.com/store/${storeHandle}/charges/${appHandle}/pricing_plans`;
+
+    // Now redirect outside the iframe
+    redirect.dispatch(Redirect.Action.REMOTE, pricingUrl);
 
     const NavigationMenu = actions.NavigationMenu;
 
