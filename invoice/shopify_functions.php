@@ -365,10 +365,9 @@ function registerShopifyWebhooks($shop, $access_token) {
         curl_close($ch);
 
         if ($status == 201) {
-            error_log("Webhook for {$topic} registered successfully!");
+            return "Webhook for {$topic} registered successfully!";
         } else {
-            error_log("Failed to register webhook for {$topic}. Response: " . $result);
-            return false;
+            return "Failed to register webhook for {$topic}. Response: " . $result;
         }
     }
 
