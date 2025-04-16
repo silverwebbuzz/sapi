@@ -1,16 +1,16 @@
 <nav class="horizontal-menu">
     <ul>
         <li class="<?= basename($_SERVER['PHP_SELF']) == 'index.php' ? 'active' : '' ?>">
-            <a href="index"><i class="icon-dashboard"></i> Dashboard</a>
+            <a href="index">Dashboard</a>
         </li>
         <li class="<?= basename($_SERVER['PHP_SELF']) == 'order.php' ? 'active' : '' ?>">
-            <a href="order"><i class="icon-orders"></i>Shopify Orders</a>
+            <a href="order">Shopify Orders</a>
         </li>
         <li class="<?= basename($_SERVER['PHP_SELF']) == 'billing.php' ? 'active' : '' ?>">
-            <a href="billing"><i class="icon-billing"></i> Subscription Plans</a>
+            <a href="change-plan"><i class="icon-billing"></i>Change Plans</a>
         </li>
         <li class="menu-dropdown <?= in_array(basename($_SERVER['PHP_SELF']), ['settings.php']) ? 'active' : '' ?>">
-            <a href="settings.php"><i class="icon-settings"></i> Settings <i class="icon-chevron"></i></a>
+            <a href="settings">Settings</a>
             <ul class="dropdown-menu">
                 <li><a href="settings.php#general">General Settings</a></li>
                 <li><a href="settings.php#email">Email Settings</a></li>

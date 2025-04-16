@@ -10,7 +10,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'GET' && empty($_GET)) {
 
 // Handle OAuth flow
 if (isset($_GET['hmac']) && isset($_GET['shop']) && isset($_GET['timestamp'])) {
-    //handleOAuthRequest();
     $installparams = $params = $_GET;
 
     if (!verifyHmac($params, SHOPIFY_API_SECRET)) die('Invalid HMAC');
@@ -45,6 +44,21 @@ if (isset($_GET['hmac']) && isset($_GET['shop']) && isset($_GET['timestamp'])) {
         header("Location: $dashboard_redirect ");
     }
 
-}
-handleDirectAccess();
-exit();
+} else {
+$shopifyLoginUrl = 'https://www.shopify.com/login';
+$shopParam = isset($_GET['shop']) ? htmlspecialchars($_GET['shop'], ENT_QUOTES, 'UTF-8') : SHOPIFY_APP_HANDLE;
+$installUrl = LIVE_SHOPIFY_APP_URL . '?shop=' . urlencode($shopParam);
+?>
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Install App</title>
+</head>
+<body>
+    <h1>Please install this app via Shopify Admin</h1>
+    <p>If you're a store owner, please <a href="<?=$shopifyLoginUrl?>" target="_blank">login to Shopify</a> 
+    and install this app from your admin dashboard.</p>
+    <p>If you're being redirected from Shopify Admin, <a href="<?=$installUrl?>">click here</a> to continue installation.</p>
+</body>
+</html>
+<?php } ?>

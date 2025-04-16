@@ -59,7 +59,7 @@ $currentPlan = DBHelper::selectOne($sql_currentPlan,"s", [$shop_id]);
 
     const app = createApp({
       apiKey: '<?= SHOPIFY_API_KEY?>',
-      host: '<?php echo $host; ?>',
+      host: '<?= $host?>',
       forceRedirect: true,
     });
 
