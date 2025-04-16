@@ -326,10 +326,10 @@ function registerShopifyWebhooks($shop, $access_token) {
 
         if ($status == 201) {
             //return "Webhook for {$topic} registered successfully!";
-            return true;
+            //return true;
         } else {
             //return "Failed to register webhook for {$topic}. Response: " . $result;
-            return false;
+            //return false;
         }
     }
 
