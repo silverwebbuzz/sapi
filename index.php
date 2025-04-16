@@ -24,7 +24,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'GET' && empty($_GET)) {
 if(isset($_GET['charge_id'])){
     $shop_data = DBHelper::selectOne("SELECT * FROM stores WHERE `id` = ? ","s", [$shop_id]);
     $access_token = $shop_data['access_token'];
-    getChargeDetails($shop, $access_token, $_GET['charge_id'])
+    getChargeDetails($shop, $access_token, $_GET['charge_id']);
 }
 
 // Handle OAuth flow
