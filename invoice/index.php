@@ -91,6 +91,7 @@ $invoices_query = DBHelper::select("SELECT * FROM `$invoice_table` ORDER BY crea
     </div>
 </div>
 
+    
     <div class="package-card">
         <h3>Current Subscription Package</h3>
         <div class="package-details">
