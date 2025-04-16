@@ -37,7 +37,7 @@ try {
         // Insert new subscription
         $newId = DBHelper::insert("
             INSERT INTO store_subscriptions (
-                store_id, shop_id, shop_domain, charge_id, initial_charge_id,
+                store_id, shopify_id, shop_domain, charge_id, initial_charge_id,
                 plan_name, status, price, currency, billing_interval,
                 interval_count, capped_amount, terms,
                 activated_on, current_period_end, trial_ends_on, billing_on,
@@ -75,10 +75,10 @@ try {
             SET status = 'cancelled',
                 cancelled_on = NOW(),
                 updated_at = NOW()
-            WHERE store_id = ? 
+            WHERE shopify_id = ? 
               AND id != ?
               AND status = 'active'
-        ", "ii", [$store['id'], $newId]);
+        ", "ii", [$shopId, $newId]);
 
         http_response_code(200);
         echo json_encode([
