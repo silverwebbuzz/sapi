@@ -7,7 +7,7 @@
             <a href="order.php"><i class="icon-orders"></i>Shopify Orders</a>
         </li>
         <li class="<?= basename($_SERVER['PHP_SELF']) == 'billing.php' ? 'active' : '' ?>">
-            <a href="billing.php"><i class="icon-billing"></i> Subscription Plans</a>
+            <a href="https://admin.shopify.com/store/{$shop}/charges/{SHOPIFY_APP_HANDLE}/pricing_plans"><i class="icon-billing"></i> Subscription Plans</a>
         </li>
         <li class="menu-dropdown <?= in_array(basename($_SERVER['PHP_SELF']), ['settings.php']) ? 'active' : '' ?>">
             <a href="settings.php"><i class="icon-settings"></i> Settings <i class="icon-chevron"></i></a>
