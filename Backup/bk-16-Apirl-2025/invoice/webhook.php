@@ -78,7 +78,7 @@ if ($topic === 'app/uninstalled') {
     $order_status = $order['financial_status'] ?? 'pending';
     $products = json_encode($order['line_items'], JSON_UNESCAPED_UNICODE);
 
-    $webhook_invoice_id = DBHelper::insert($invoice_insert_query,"ssssssssdddddsss",[$order_id,
+    $webhook_id = DBHelper::insert($invoice_insert_query,"ssssssssdddddsss",[$order_id,
     $order_number,
     $order_name,
     $customer_name, 
@@ -105,97 +105,14 @@ if ($topic === 'app/uninstalled') {
     $generatepdf  = generatepdf($shop_id,$order_id);
     $sendemail  = sendemail($shop_id,$order_id);
 
+} elseif ($topic === 'app_subscription/activated') {
+    //app_subscription['admin_graphql_api_id'];
+   // 34950971692
+    //handleSubscriptionActivated($webhook);
+
 } elseif ($topic === 'app_subscriptions/update') {  
 
-    try {
-        $subscription = $webhook['app_subscription'];
-        $chargeId = extractIdFromGql($subscription['admin_graphql_api_id']);  // Returns 34950971692
-        $shopId = extractIdFromGql($subscription['admin_graphql_api_shop_id']);  // Returns 92496724
-        
-        // Get store data in shopify table its save as 	shopify_id
-        $store = DBHelper::fetch("SELECT id, shop, access_token FROM stores WHERE shopify_id = ?  LIMIT 1", "i", [$shopId]);
-        
-        if (!$store) {
-            throw new Exception("Store not found");
-        }
-        
-        // Get FULL subscription details via GraphQL
-        $subscriptionData = ShopifyHelper::fetchSubscriptionWithGraphQL($store['shop'],$store['access_token'],$chargeId);
-        
-        if (!$subscriptionData) {
-            throw new Exception("Failed to fetch subscription details");
-        }
-
-        // Determine plan limits based on your requirements
-        $limits = calculatePlanLimits($subscriptionData['name'], $subscriptionData['price'], $subscriptionData['billing_interval']);
-
-        // Start transaction
-        DBHelper::beginTransaction();
-        
-        // Insert new subscription
-        $newId = DBHelper::insert("
-            INSERT INTO store_subscriptions (
-                store_id, shop_id, shop_domain, charge_id, initial_charge_id,
-                plan_name, status, price, currency, billing_interval,
-                interval_count, capped_amount, terms,
-                activated_on, current_period_end, trial_ends_on, billing_on,
-                order_limit, email_limit, order_used, email_used,
-                is_test
-            ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
-        ", "iissssssdssisssssiiii", [
-            $store['id'],
-            $shopId,
-            $store['myshopify_domain'],
-            $chargeId,
-            $chargeId, // Initial charge same as current for new subscriptions
-            $subscriptionData['name'],
-            $subscriptionData['status'],
-            $subscriptionData['price'],
-            $subscriptionData['currency'],
-            $subscriptionData['billing_interval'],
-            $subscriptionData['interval_count'],
-            $subscriptionData['capped_amount'],
-            $subscriptionData['terms'],
-            $subscriptionData['activated_on'],
-            $subscriptionData['current_period_end'],
-            $subscriptionData['trial_ends_on'],
-            null, // billing_on will be set after first charge
-            $limits['order_limit'],
-            $limits['email_limit'],
-            0, // order_used
-            0, // email_used
-            $subscriptionData['is_test']
-        ]);
-        
-        // 8. Cancel old subscriptions (except the one we just created)
-        DBHelper::execute("
-            UPDATE store_subscriptions 
-            SET status = 'cancelled',
-                cancelled_on = NOW(),
-                updated_at = NOW()
-            WHERE store_id = ? 
-              AND id != ?
-              AND status = 'active'
-        ", "ii", [$store['id'], $newId]);
-        
-        DBHelper::commit();
-        
-        http_response_code(200);
-        echo json_encode([
-            'success' => true,
-            'subscription_id' => $newId,
-            'limits' => $limits
-        ]);
-        
-    } catch (Exception $e) {
-        DBHelper::rollback();
-        http_response_code(500);
-        error_log("Subscription processing failed: " . $e->getMessage());
-        echo json_encode([
-            'success' => false,
-            'error' => $e->getMessage()
-        ]);
-    }
+    //handleSubscriptionUpdate($webhook);
 }
 
 // Respond to Shopify

@@ -18,31 +18,29 @@ $shop_owner = $cookieData['shop_owner'];
 $sql_currentPlan = "
 SELECT 
     ss.store_id,
-    ss.plan_name,
+    ss.plan_id,
     ss.charge_id,
-    ss.price,
     ss.order_limit AS subscription_order_limit,
-    ss.email_limit AS subscription_email_limit,
     ss.features AS subscription_features,
     ss.activated_on,
     ss.cancelled_on,
-    ss.current_period_end AS next_charge_date,
+    ss.next_charge_date,
     ss.status,
     ss.order_used,
     ss.email_used,
-    ss.currency,
-    ss.billing_interval,
-    ss.interval_count,
-    ss.capped_amount,
-    ss.terms,
-    ss.is_test
+    p.name AS plan_name,
+    p.price,
+    p.order_limit AS plan_order_limit,
+    p.email_limit,
+    p.features AS plan_features,
+    p.description
 FROM store_subscriptions ss
+JOIN plans p ON ss.plan_id = p.id
 WHERE ss.store_id = ? AND ss.status = 'active'
 ORDER BY ss.activated_on DESC
 LIMIT 1
 ";
-
-$currentPlan = DBHelper::selectOne($sql_currentPlan, "i", [$store_id]);
+$currentPlan = DBHelper::selectOne($sql_currentPlan,"s", [$shop_id]);
 
 ?>
 <!DOCTYPE html>

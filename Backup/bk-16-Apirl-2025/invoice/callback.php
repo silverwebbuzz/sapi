@@ -116,6 +116,38 @@ if (isset($access_token)) {
         $money_in_emails_format, $money_with_currency_in_emails_format, 
         $restapi_json, $created_at, $updated_at]
     );
+    
+    //create free subscription. 
+    $sql_subscription = "SELECT id FROM store_subscriptions WHERE store_id = ? AND status = 'active'";
+    $subscription_result = DBHelper::selectOne($sql_subscription,"s", [$shop_id]);
+    
+
+    if (!$subscription_result) {
+         // Assuming the free plan is identified by the name 'Free'
+        $plans_query = "SELECT * FROM `plans` where price = '0.00'  ORDER BY id";
+        $freePlan = DBHelper::selectOne($plans_query);
+       
+        // You might set start_date to the current datetime and end_date as needed (e.g., one year later).
+        $start_date = date("Y-m-d H:i:s");
+        // For demonstration, we set the end_date to one year from now.
+        $end_date = date("Y-m-d H:i:s", strtotime("+1 year"));
+        
+
+        $insertSql = "INSERT INTO store_subscriptions 
+    (store_id, plan_id, order_limit, email_limit, order_used, email_used, features, activated_on, next_charge_date, status)
+    VALUES (?, ?, ?, ?, 0, 0, ?, ?, ?, 'active')";
+
+        $subscription_id = DBHelper::insert($insertSql,"iiiisss",
+        [$shop_id,
+        $freePlan['id'],
+        $freePlan['order_limit'],
+        $freePlan['email_limit'],
+        $freePlan['features'],
+        $start_date,
+        $end_date]
+        );
+
+    }
 
     //Create Invoice Table.
     $shop_table_name = preg_replace('/[^a-zA-Z0-9_]/', '_', strtolower($shop)); // Sanitize table name
