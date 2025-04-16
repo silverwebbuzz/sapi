@@ -113,14 +113,14 @@ if ($topic === 'app/uninstalled') {
         $shopId = extractIdFromGql($subscription['admin_graphql_api_shop_id']);  // Returns 92496724
         
         // Get store data in shopify table its save as 	shopify_id
-        $store = DBHelper::fetch("SELECT id, shop, access_token FROM stores WHERE shopify_id = ?  LIMIT 1", "i", [$shopId]);
+        $store = DBHelper::selectOne("SELECT id, shop, access_token FROM stores WHERE shopify_id = ?  LIMIT 1", "i", [$shopId]);
         
         if (!$store) {
             throw new Exception("Store not found");
         }
         
         // Get FULL subscription details via GraphQL
-        $subscriptionData = ShopifyHelper::fetchSubscriptionWithGraphQL($store['shop'],$store['access_token'],$chargeId);
+        $subscriptionData = fetchSubscriptionWithGraphQL($store['shop'],$store['access_token'],$chargeId);
         
         if (!$subscriptionData) {
             throw new Exception("Failed to fetch subscription details");
