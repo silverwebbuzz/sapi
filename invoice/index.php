@@ -12,6 +12,7 @@ $invoices_query = DBHelper::select("SELECT * FROM `$invoice_table` ORDER BY crea
 <main class="main-content">
 
     <!-- Subscription Package -->
+    
     <div class="package-card">
     <h3>Current Subscription Package</h3>
     <div class="package-details">
@@ -19,7 +20,7 @@ $invoices_query = DBHelper::select("SELECT * FROM `$invoice_table` ORDER BY crea
             <div class="package-name"><?= htmlspecialchars($currentPlan['plan_name'] ?? 'No active plan') ?></div>
             <div class="package-price">
                 $<?= htmlspecialchars($currentPlan['price'] ?? '0.00') ?>
-                /<?= strtolower($currentPlan['billing_interval'] === 'YEAR' ? 'year' : 'month') ?>
+                /<?= ($currentPlan['billing_interval'] === 'annual') ? 'year' : 'month' ?>
             </div>
             <div class="package-stat">
                 <span><?= htmlspecialchars($currentPlan['terms'] ?? 'Automated PDF invoices'); ?></span>
@@ -32,7 +33,7 @@ $invoices_query = DBHelper::select("SELECT * FROM `$invoice_table` ORDER BY crea
             <div class="package-stat">
                 <span>Billing Cycle</span>
                 <strong>
-                    <?= ($currentPlan['billing_interval'] === 'YEAR' ? 'Annual' : 'Monthly') ?>
+                    <?= ucfirst($currentPlan['billing_interval'] ?? 'month') ?>ly
                 </strong>
             </div>
             <div class="package-stat">
@@ -42,28 +43,28 @@ $invoices_query = DBHelper::select("SELECT * FROM `$invoice_table` ORDER BY crea
             <div class="package-stat">
                 <span>PDF Invoice Limit</span>
                 <strong>
-                    <?= htmlspecialchars($currentPlan['subscription_order_limit'] ?? '0') ?>
-                    /<?= ($currentPlan['billing_interval'] === 'YEAR' ? 'year' : 'month') ?>
+                    <?= htmlspecialchars($currentPlan['order_limit'] ?? '0') ?>
+                    /<?= ($currentPlan['billing_interval'] === 'annual') ? 'year' : 'month' ?>
                 </strong>
             </div>
             <div class="package-stat">
                 <span>Email Sent Limit</span>
                 <strong>
-                    <?= htmlspecialchars($currentPlan['subscription_email_limit'] ?? '0') ?>
-                    /<?= ($currentPlan['billing_interval'] === 'YEAR' ? 'year' : 'month') ?>
+                    <?= htmlspecialchars($currentPlan['email_limit'] ?? '0') ?>
+                    /<?= ($currentPlan['billing_interval'] === 'annual') ? 'year' : 'month' ?>
                 </strong>
             </div>
         </div>
         <div class="package-usage">
             <div class="usage-info">
                 <span>Invoice Used: <?= htmlspecialchars($currentPlan['order_used'] ?? '0') ?></span>
-                <span>Invoice Remaining: <?= (htmlspecialchars($currentPlan['subscription_order_limit'] ?? '0') - htmlspecialchars($currentPlan['order_used'] ?? '0')) ?></span>
+                <span>Invoice Remaining: <?= (htmlspecialchars($currentPlan['order_limit'] ?? '0') - htmlspecialchars($currentPlan['order_used'] ?? '0') ?></span>
             </div>
             <div class="usage-bar">
                 <?php 
                 $percentageUsed = 0;
-                if ($currentPlan['subscription_order_limit'] > 0) {
-                    $percentageUsed = ($currentPlan['order_used'] / $currentPlan['subscription_order_limit']) * 100;
+                if ($currentPlan['order_limit'] > 0) {
+                    $percentageUsed = ($currentPlan['order_used'] / $currentPlan['order_limit']) * 100;
                     $percentageUsed = min(100, round($percentageUsed, 2));
                 }
                 ?>
@@ -74,13 +75,13 @@ $invoices_query = DBHelper::select("SELECT * FROM `$invoice_table` ORDER BY crea
             
             <div class="usage-info">
                 <span>Email Used: <?= htmlspecialchars($currentPlan['email_used'] ?? '0') ?></span>
-                <span>Email Remaining: <?= (htmlspecialchars($currentPlan['subscription_email_limit'] ?? '0') - htmlspecialchars($currentPlan['email_used'] ?? '0')) ?></span>
+                <span>Email Remaining: <?= (htmlspecialchars($currentPlan['email_limit'] ?? '0') - htmlspecialchars($currentPlan['email_used'] ?? '0') ?></span>
             </div>
             <div class="usage-bar">
                 <?php 
                 $percentageUsedemail = 0;
-                if ($currentPlan['subscription_email_limit'] > 0) {
-                    $percentageUsedemail = ($currentPlan['email_used'] / $currentPlan['subscription_email_limit']) * 100;
+                if ($currentPlan['email_limit'] > 0) {
+                    $percentageUsedemail = ($currentPlan['email_used'] / $currentPlan['email_limit']) * 100;
                     $percentageUsedemail = min(100, round($percentageUsedemail, 2));
                 }
                 ?>
@@ -89,6 +90,7 @@ $invoices_query = DBHelper::select("SELECT * FROM `$invoice_table` ORDER BY crea
         </div>
     </div>
 </div>
+
     <div class="package-card">
         <h3>Current Subscription Package</h3>
         <div class="package-details">
