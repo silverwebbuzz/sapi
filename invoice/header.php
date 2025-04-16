@@ -23,7 +23,6 @@ SELECT
     ss.price,
     ss.order_limit AS subscription_order_limit,
     ss.email_limit AS subscription_email_limit,
-    ss.features AS subscription_features,
     ss.activated_on,
     ss.cancelled_on,
     ss.current_period_end AS next_charge_date,
