@@ -5,7 +5,7 @@ require_once 'helper.php';
 require_once 'shopify_functions.php';
 require_once '../vendor/autoload.php';
  
-$data = '{"app_subscription":{"admin_graphql_api_id":"gid:\/\/shopify\/AppSubscription\/34952020268","name":"Lifetime Free","status":"CANCELLED","admin_graphql_api_shop_id":"gid:\/\/shopify\/Shop\/92496724268","created_at":"2025-04-16T06:47:22-07:00","updated_at":"2025-04-16T07:20:14-07:00","currency":"USD","capped_amount":null}}';
+$data = '{"app_subscription":{"admin_graphql_api_id":"gid:\/\/shopify\/AppSubscription\/34989998380","name":"Starter","status":"ACTIVE","admin_graphql_api_shop_id":"gid:\/\/shopify\/Shop\/92496724268","created_at":"2025-04-16T07:20:12-07:00","updated_at":"2025-04-16T07:20:14-07:00","currency":"USD","capped_amount":null}}';
 $webhook = json_decode($data, true);
 try {
         $subscription = $webhook['app_subscription'];
