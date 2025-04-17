@@ -123,6 +123,13 @@ if ($row) {
 <main class="main-content">
     <div class="settings-container">
         <h2>Settings</h2>
+        
+        <!-- Tab Navigation -->
+        <div class="settings-tabs">
+            <a href="#general" class="settings-tab active"><i class="icon-gear"></i> General</a>
+            <a href="#email" class="settings-tab"><i class="icon-email"></i> Email</a>
+            <a href="#invoice" class="settings-tab"><i class="icon-invoice"></i> Invoice</a>
+        </div>
 
         <!-- Display messages -->
         <?php if (isset($success_message)): ?>
@@ -131,13 +138,6 @@ if ($row) {
         <?php if (isset($error_message)): ?>
             <div class="alert alert-error"><?= htmlspecialchars($error_message) ?></div>
         <?php endif; ?>
-
-        <!-- Tab Navigation -->
-        <div class="settings-tabs">
-            <a href="#general" class="settings-tab active"><i class="icon-gear"></i> General</a>
-            <a href="#email" class="settings-tab"><i class="icon-email"></i> Email</a>
-            <a href="#invoice" class="settings-tab"><i class="icon-invoice"></i> Invoice</a>
-        </div>
         
         <!-- Tab Content -->
         <div class="tab-content">
