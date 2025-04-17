@@ -14,13 +14,13 @@ $shop_data = DBHelper::selectOne(
     "ss", 
     [$shop, "installed"]
 );
-$shop_id = $shop_data['id'];
+echo $shop_id = $shop_data['id'];
 
 $sql_currentPlan = "SELECT * FROM store_subscriptions ss WHERE ss.store_id = ? AND ss.status = 'active'  ORDER BY ss.activated_on DESC LIMIT 1 ";
 $currentPlan = DBHelper::selectOne($sql_currentPlan, "i", [$shop_id]);
-
+print_r($currentPlan['price']);
 if ($currentPlan['price']!='0.00') {
-
+    echo $order_id = 31;
     $generatepdf  = generatepdf($shop_id,$order_id);
     $sendemail  = sendemail($shop_id,$order_id);
 }
