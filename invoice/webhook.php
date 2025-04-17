@@ -107,8 +107,8 @@ if ($topic === 'app/uninstalled') {
 
     if ($currentPlan['price']!='0.00') {
 
-        $generatepdf  = generatepdf($shop_id,$order_id);
-        $sendemail  = sendemail($shop_id,$order_id);
+        $generatepdf  = generatepdf($shop_id,$order_number);
+        $sendemail  = sendemail($shop_id,$order_number);
     }
 
 } elseif ($topic === 'app_subscriptions/update') {  
