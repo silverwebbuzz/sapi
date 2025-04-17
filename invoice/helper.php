@@ -21,11 +21,7 @@ function generatepdf($shop_id,$order_id){
     
         
         // Fetch invoice details
-        $invoice = DBHelper::selectOne(
-            "SELECT * FROM `$invoice_table` WHERE order_id = ?",
-            "s", 
-            [$order_id]
-        );
+        $invoice = DBHelper::selectOne("SELECT * FROM `$invoice_table` WHERE id = ?","s", [$order_id]);
     
         if ($invoice) {
             
