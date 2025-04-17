@@ -41,6 +41,18 @@ $send_email_upgrade_plan_button = "";
 
 if ($currentPlan['price'] == 0.00) {
     $message = "Please upgrade your plan and configure your SMTP settings to send emails from your own email address.";
+    if (isset($currentPlan['order_limit'], $currentPlan['order_used'])) {
+        if ($currentPlan['order_used'] >= $currentPlan['order_limit']) {
+            $gen_invoice_upgrade_plan_button = '<a href="#" class="gen-invoice-btn" onclick="showMessageModal('.$message.')" return false;" class="view-invoice">Upgrade To Generate Invoice</a>';
+        }
+    }
+
+    // Check Email Limit
+    if (isset($currentPlan['email_limit'], $currentPlan['email_used'])) {
+        if ($currentPlan['email_used'] >= $currentPlan['email_limit']) {
+            $send_email_upgrade_plan_button = '<a href="#" class="gen-invoice-btn" onclick="showMessageModal('.$message.')" return false;" class="view-invoice">Upgrade To Send Email</a>';
+        }
+    }
 } elseif ($currentPlan['price'] != 0.00) {
     // Check Order Limit
     if (isset($currentPlan['order_limit'], $currentPlan['order_used'])) {
