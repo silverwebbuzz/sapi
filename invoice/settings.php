@@ -33,6 +33,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['save_email_settings']
     } else {
         $error_message = "Nothing to update! ";
     }
+    ?>
+    <script>window.location.hash = '#email';</script>
+    <?php
 }
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['save_general_settings'])) {
     $auto_invoice_customer = isset($_POST['auto_invoice_customer']) ? 'Yes' : 'No';
@@ -68,6 +71,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['save_invoice_settings
     } else {
         $error_message = "Nothing to update! ";
     }
+    ?>
+    <script>window.location.hash = '#invoice';</script>
+    <?php
 }
 
 
