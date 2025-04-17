@@ -1,4 +1,6 @@
-<?php
+<?php error_reporting(E_ALL);
+ini_set('display_errors', 1);
+ini_set('display_startup_errors', 1);
 require_once '../config/config.php';
 require_once '../config/db.php';
 require_once 'helper.php';
@@ -14,13 +16,13 @@ $shop_data = DBHelper::selectOne(
     "ss", 
     [$shop, "installed"]
 );
-echo $shop_id = $shop_data['id'];
+$shop_id = $shop_data['id'];
 
 $sql_currentPlan = "SELECT * FROM store_subscriptions ss WHERE ss.store_id = ? AND ss.status = 'active'  ORDER BY ss.activated_on DESC LIMIT 1 ";
 $currentPlan = DBHelper::selectOne($sql_currentPlan, "i", [$shop_id]);
-print_r($currentPlan['price']);
+
 if ($currentPlan['price']!='0.00') {
-    echo $order_id = 31;
+    $order_id = 31;
     $generatepdf  = generatepdf($shop_id,$order_id);
     $sendemail  = sendemail($shop_id,$order_id);
 }

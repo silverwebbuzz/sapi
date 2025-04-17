@@ -25,7 +25,7 @@ function generatepdf($shop_id,$order_id){
     
         if ($invoice) {
             
-            if( $_GET['invoicestatus']=='generated')
+            if(isset($_GET['invoicestatus']) && $_GET['invoicestatus']=='generated')
             {
                 ?>
                 <embed src="data:application/pdf;base64,<?= $invoice['pdf_invoice']; ?>" type="application/pdf" width="100%" height="100%" />
