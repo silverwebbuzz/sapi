@@ -121,10 +121,13 @@ $invoices_query = DBHelper::select("SELECT * FROM `$invoice_table` ORDER BY crea
                     <td>
                         <?php if ($invoice['pdf_invoice']!=''){ ?>
                             <a href="#" class="view-invoice-btn" data-invoice-id="<?= $invoice['pdf_invoice']; ?>">View Invoice</a>
+                            <?php echo $send_email_upgrade_plan_button ?>
                             <a href="#" class="email-btn" onclick="sendEmail(<?= $shop_id ?>, <?= $invoice['order_id'] ?>, '<?= $invoice['email_status'] ?>'); return false;">
                             <?= ($invoice['email_status'] == 'pending') ? 'Send Email' : 'Resend Email'; ?>
                             </a>
-                        <?php } else { ?>
+                        <?php } else { 
+                            echo $gen_invoice_upgrade_plan_button;
+                            ?>
                             <a href="#" class="gen-invoice-btn" onclick="generateInvoice(<?= $shop_id ?>, <?= $invoice['order_id'] ?>, '<?= $invoice['invoice_status'] ?>'); return false;" class="view-invoice">
                             <?= ($invoice['invoice_status'] == 'pending') ? 'Generate Invoice' : 'View Invoice'; ?>
                             </a>

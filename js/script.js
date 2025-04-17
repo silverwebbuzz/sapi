@@ -39,7 +39,7 @@ $(document).ready(function() {
             .then(response => response.text())
             .then(data => {
                 showMessage('Email successfully sent.', 'success');
-                setTimeout(() => location.reload(), 6000);
+                setTimeout(() => location.reload(), 4000);
             })
             .catch(error => {
                 showMessage('Failed to send email.', 'error');
@@ -55,7 +55,7 @@ $(document).ready(function() {
 
         setTimeout(() => {
             $box.fadeOut();
-        }, 5000); // ⏱️ 5 seconds
+        }, 3000); // ⏱️ 3 seconds
     };
 
 
@@ -84,6 +84,18 @@ $(document).ready(function() {
         $(this).toggleClass('active');
         $('.horizontal-menu').toggleClass('active');
     });
+
+    // Display Modal
+    function showMessageModal(message) {
+        $('#messageText').text(message);
+        $('#messageModal').show();
+    }
+    // close Modal
+    function closeMessageModal() {
+        $('#messageModal').hide();
+        $('#messageText').text('');
+    }
+
 
     // Mobile Dropdown Toggle
     $('.menu-dropdown > a').on('click', function(e) {
