@@ -91,7 +91,7 @@ if ($isFreePlan) {
 
 // Check Order Limit
 if (isset($currentPlan['order_limit'], $currentPlan['order_used']) && $currentPlan['order_used'] >= $currentPlan['order_limit']) {
-    $orderMessage = $isFreePlan 
+    $message = $isFreePlan 
         ? $message 
         : "Please upgrade your plan to send more invoices.";
     
@@ -100,7 +100,7 @@ if (isset($currentPlan['order_limit'], $currentPlan['order_used']) && $currentPl
 
 // Check Email Limit
 if (isset($currentPlan['email_limit'], $currentPlan['email_used']) && $currentPlan['email_used'] >= $currentPlan['email_limit']) {
-    $emailMessage = $isFreePlan 
+    $message = $isFreePlan 
         ? $message 
         : "Please upgrade your plan to send more emails.";
     
@@ -121,6 +121,6 @@ if (!$isFreePlan && empty($row['smtp_settings'])) {
 
 if(!empty($message)): // You can set this based on your SMTP check logic ?>
 <div id="smtp-warning" class="warning-box">
-    <span style="font-size:18px">⚠</span> <?=$message.$orderMessage.$emailMessage?>
+    <span style="font-size:18px">⚠</span> <?=$message?>
 </div>
 <?php endif; ?>
