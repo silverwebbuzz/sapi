@@ -205,9 +205,16 @@ function sendemail($shop_id,$order_id){
                 [$invoice['order_name'], $invoice['customer_name'], $invoice['total_price'], $invoice['currency'], $invoice['created_at']],
                 $body
             );
-
+            
             // Send email with attachment
             $email_sent = sendEmailWithAttachment($smtp_settings, $to_email,$to_name, $subject, $email_body, $decoded_pdf, "invoice_{$invoice['order_name']}.pdf");
+
+            if($shop_data['auto_invoice_personal']=='Yes')
+            {
+                $send_showowner_invoice_email = $shop_data['email_invoice'] ?? $shop_data['email'] ; 
+                $email_sent = sendEmailWithAttachment($smtp_settings, $send_showowner_invoice_email,$shop_data['shop_owner'], $subject, $email_body, $decoded_pdf, "invoice_{$invoice['order_name']}.pdf");
+            }
+
             $email_status = $email_sent ? 'sent' : 'failed';
 
             // Single database update for both PDF and email status
