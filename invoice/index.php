@@ -33,7 +33,7 @@ $invoices_query = DBHelper::select("SELECT * FROM `$invoice_table` ORDER BY crea
                 <div class="package-stat">
                     <span>Billing Cycle</span>
                     <strong>
-                        <?= ucfirst($currentPlan['billing_interval'] ?? 'month') ?>ly
+                        <?= ucfirst(str_replace("_"," ",$currentPlan['billing_interval']) ?? 'month') ?>
                     </strong>
                 </div>
                 <div class="package-stat">

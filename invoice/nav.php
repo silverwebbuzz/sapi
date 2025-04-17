@@ -35,9 +35,33 @@ print_r($chargedetails);
 
 Array ( [recurring_application_charge] => Array ( [id] => 34950971692 [name] => Premium [price] => 529.99 [billing_on] => 2026-04-23 [status] => active [created_at] => 2025-04-16T02:07:00-07:00 [updated_at] => 2025-04-16T02:07:06-07:00 [activated_on] => 2025-04-16 [return_url] => https://admin.shopify.com/store/silverwebbuzzapp/apps/swb-auto-pdf-invoices/ [test] => 1 [cancelled_on] => [trial_days] => 7 [trial_ends_on] => 2025-04-23 [api_client_id] => 227638050817 [decorated_return_url] => https://admin.shopify.com/store/silverwebbuzzapp/apps/swb-auto-pdf-invoices/?charge_id=34950971692 [currency] => USD ) )
 */
+$message = '';
 
-if($currentPlan['price']>0 && $row['smtp_settings']==''): // You can set this based on your SMTP check logic ?>
+if ($currentPlan['price'] == 0.00) {
+    $message = "Please upgrade your plan and configure your SMTP settings to send emails from your own email address.";
+} elseif ($currentPlan['price'] != 0.00) {
+    // Check Order Limit
+    if (isset($currentPlan['order_limit'], $currentPlan['order_used'])) {
+        if ($currentPlan['order_used'] >= $currentPlan['order_limit']) {
+            $message = "Please upgrade your plan to send more invoices.";
+        }
+    }
+
+    // Check Email Limit
+    if (isset($currentPlan['email_limit'], $currentPlan['email_used'])) {
+        if ($currentPlan['email_used'] >= $currentPlan['email_limit']) {
+            $message = "Please upgrade your plan to send more emails.";
+        }
+    }
+
+    // Check SMTP Settings
+    if (empty($row['smtp_settings'])) {
+        $message .= "Please configure your SMTP settings to send emails from your own email address.";
+    }
+}
+
+if(!empty($message)): // You can set this based on your SMTP check logic ?>
 <div id="smtp-warning" class="warning-box">
-    <span style="font-size:18px">⚠</span> Please <a href="billing">upgrade</a> you plan and set your <a href="settings.php#email">SMTP settings</a> to receive invoice emails from your defined Email Address.
+    <span style="font-size:18px">⚠</span> <?=$message?>
 </div>
 <?php endif; ?>
