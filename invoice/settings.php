@@ -31,7 +31,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['save_email_settings']
     if ($affectedRows) {
         $success_message = "Email settings saved successfully!";
     } else {
-        $error_message = "Failed to save email settings: ";
+        $error_message = "Nothing to update! ";
     }
 }
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['save_general_settings'])) {
@@ -49,7 +49,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['save_general_settings
     if ($affectedRows) {
         $success_message = 'General settings saved successfully!';
     } else {
-        $error_message = 'Failed to save general settings';
+        $error_message = "Nothing to update! ";
     }
 }
 
@@ -66,7 +66,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['save_invoice_settings
     if ($affectedRows) {
         $success_message = 'Invoice settings saved successfully!';
     } else {
-        $error_message = 'Failed to save Invoice settings';
+        $error_message = "Nothing to update! ";
     }
 }
 
