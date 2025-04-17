@@ -1,5 +1,5 @@
 <?php include 'header.php'; 
-include 'nav.php'; 
+
 
 // Simple HTML Purifier Alternative (basic sanitization)
 function sanitizeHtml($html) {
@@ -69,6 +69,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['save_invoice_settings
         $error_message = 'Failed to save Invoice settings';
     }
 }
+
+
+
+include 'nav.php'; 
+
+
 
 // Default email template
 
