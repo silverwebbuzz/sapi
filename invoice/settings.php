@@ -138,7 +138,7 @@ if ($row) {
             <!-- General Settings -->
             <section id="general" class="settings-section active">
                 <h3>General Settings</h3>
-                <form method="POST" class="general-settings-form">
+                <form method="POST" class="general-settings-form" action="settings/#general">
                 <input type="hidden" name="save_general_settings" value="1">
                     <div class="form-group">
                         <label>
@@ -167,7 +167,7 @@ if ($row) {
             <!-- Email Settings -->
             <section id="email" class="settings-section">
                 <h3>Email Settings</h3>
-                <form method="POST" class="settings-form">
+                <form method="POST" class="settings-form" action="settings/#email">
                     <input type="hidden" name="save_email_settings" value="1">
                     <div class="form-group">
                         <label>Email Display Name</label>
@@ -217,7 +217,7 @@ if ($row) {
             <!-- Invoice Settings -->
             <section id="invoice" class="settings-section">
                 <h3>Invoice Settings</h3>
-                <form method="POST" class="settings-form">
+                <form method="POST" class="settings-form" action="settings/#invoice">
                     <input type="hidden" name="save_invoice_settings" value="1">
                     <div class="template-selector">
                         <h4>Choose a Template</h4>
