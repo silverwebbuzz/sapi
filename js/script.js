@@ -85,18 +85,6 @@ $(document).ready(function() {
         $('.horizontal-menu').toggleClass('active');
     });
 
-    // Display Modal
-    function showMessageModal(message) {
-        $('#messageText').text(message);
-        $('#messageModal').show();
-    }
-    // close Modal
-    function closeMessageModal() {
-        $('#messageModal').hide();
-        $('#messageText').text('');
-    }
-
-
     // Mobile Dropdown Toggle
     $('.menu-dropdown > a').on('click', function(e) {
         if ($(window).width() <= 992) {
@@ -185,6 +173,17 @@ $(document).ready(function() {
                 $(hash).addClass('active');
             }
         }
+    }
+
+    // Display Modal
+    function showMessageModal(message) {
+        $('#messageText').text(message);
+        $('#messageModal').show();
+    }
+    // close Modal
+    function closeMessageModal() {
+        $('#messageModal').hide();
+        $('#messageText').text('');
     }
 
     // Run on page load and hash change

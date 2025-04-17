@@ -40,7 +40,7 @@ $gen_invoice_upgrade_plan_button = "";
 $send_email_upgrade_plan_button = "";
 
 if ($currentPlan['price'] == 0.00) {
-    $message = "Please upgrade your plan and configure your SMTP settings to send emails from your own email address.";
+    $message = "'Please upgrade your plan and configure your SMTP settings to send emails from your own email address.'";
     if (isset($currentPlan['order_limit'], $currentPlan['order_used'])) {
         if ($currentPlan['order_used'] >= $currentPlan['order_limit']) {
             $gen_invoice_upgrade_plan_button = '<a href="#" class="gen-invoice-btn" onclick="showMessageModal('.$message.')" class="view-invoice">Upgrade To Generate Invoice</a>';
