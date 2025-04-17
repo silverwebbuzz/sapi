@@ -24,5 +24,5 @@ $currentPlan = DBHelper::selectOne($sql_currentPlan, "i", [$shop_id]);
 if ($currentPlan['price']!='0.00') {
     $order_number = 6308565057836;
     $generatepdf  = generatepdf($shop_id,$order_number);
-    $sendemail  = sendemail($shop_id,$order_id);
+    $sendemail  = sendemail($shop_id,$order_number);
 }
