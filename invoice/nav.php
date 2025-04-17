@@ -7,7 +7,7 @@
             <a href="order">Shopify Orders</a>
         </li>
         <li class="<?= basename($_SERVER['PHP_SELF']) == 'billing.php' ? 'active' : '' ?>">
-            <a href="change-plan"><i class="icon-billing"></i>Change Plans</a>
+            <a href="change-plan">Change Plans</a>
         </li>
         <li class="menu-dropdown <?= in_array(basename($_SERVER['PHP_SELF']), ['settings.php']) ? 'active' : '' ?>">
             <a href="settings">Settings</a>
@@ -35,6 +35,7 @@ print_r($chargedetails);
 
 Array ( [recurring_application_charge] => Array ( [id] => 34950971692 [name] => Premium [price] => 529.99 [billing_on] => 2026-04-23 [status] => active [created_at] => 2025-04-16T02:07:00-07:00 [updated_at] => 2025-04-16T02:07:06-07:00 [activated_on] => 2025-04-16 [return_url] => https://admin.shopify.com/store/silverwebbuzzapp/apps/swb-auto-pdf-invoices/ [test] => 1 [cancelled_on] => [trial_days] => 7 [trial_ends_on] => 2025-04-23 [api_client_id] => 227638050817 [decorated_return_url] => https://admin.shopify.com/store/silverwebbuzzapp/apps/swb-auto-pdf-invoices/?charge_id=34950971692 [currency] => USD ) )
 */
+/*
 $message = '';
 $gen_invoice_upgrade_plan_button = "";
 $send_email_upgrade_plan_button = "";
@@ -75,15 +76,51 @@ if ($currentPlan['price'] == 0.00) {
         $message .= "Please configure your SMTP settings to send emails from your own email address.";
     }
 }
+*/
+
+$message = '';
+$gen_invoice_upgrade_plan_button = '';
+$send_email_upgrade_plan_button = '';
+
+$isFreePlan = ($currentPlan['price'] == 0.00);
+
+// Base message for free plans
+if ($isFreePlan) {
+    $message = "Please upgrade your plan and configure your SMTP settings to send emails from your own email address.";
+}
+
+// Check Order Limit
+if (isset($currentPlan['order_limit'], $currentPlan['order_used']) && $currentPlan['order_used'] >= $currentPlan['order_limit']) {
+    $orderMessage = $isFreePlan 
+        ? $message 
+        : "Please upgrade your plan to send more invoices.";
+    
+    $gen_invoice_upgrade_plan_button = '<a href="change-plan" class="gen-invoice-btn">Upgrade To Generate Invoice</a>';
+}
+
+// Check Email Limit
+if (isset($currentPlan['email_limit'], $currentPlan['email_used']) && $currentPlan['email_used'] >= $currentPlan['email_limit']) {
+    $emailMessage = $isFreePlan 
+        ? $message 
+        : "Please upgrade your plan to send more emails.";
+    
+    $send_email_upgrade_plan_button = '<a href="change-plan" class="gen-invoice-btn">Upgrade To Send Email</a>';
+}
+
+// SMTP settings check for paid plans
+if (!$isFreePlan && empty($row['smtp_settings'])) {
+    $smtpMessage = "Please configure your SMTP settings to send emails from your own email address.";
+    
+    // Append to existing message if already set
+    if ($message) {
+        $message .= " " . $smtpMessage;
+    } else {
+        $message = $smtpMessage;
+    }
+}
 
 if(!empty($message)): // You can set this based on your SMTP check logic ?>
 <div id="smtp-warning" class="warning-box">
     <span style="font-size:18px">⚠</span> <?=$message?>
 </div>
 <?php endif; ?>
-<div id="messageModal" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.5); z-index:1000;">
-    <div style="background:#fff; width:400px; margin:100px auto; padding:20px; border-radius:8px; position:relative;">
-        <p id="messageText" style="margin:0; font-size:16px;"></p>
-        <button onclick="closeMessageModal()" style="margin-top:20px; float:right;">Close</button>
-    </div>
-</div>
