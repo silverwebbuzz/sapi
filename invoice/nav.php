@@ -121,6 +121,6 @@ if (!$isFreePlan && empty($row['smtp_settings'])) {
 
 if(!empty($message)): // You can set this based on your SMTP check logic ?>
 <div id="smtp-warning" class="warning-box">
-    <span style="font-size:18px">⚠</span> <?=$message?>
+    <span style="font-size:18px">⚠</span> <?=$message.$orderMessage.$emailMessage?>
 </div>
 <?php endif; ?>

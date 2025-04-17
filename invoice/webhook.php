@@ -107,8 +107,12 @@ if ($topic === 'app/uninstalled') {
 
     if ($currentPlan['price']!='0.00') {
 
-        $generatepdf  = generatepdf($shop_id,$order_id);
-        $sendemail  = sendemail($shop_id,$order_id);
+        if ($currentPlan['order_used'] <= $currentPlan['order_limit']) {
+            $generatepdf  = generatepdf($shop_id,$order_id);
+            if ($currentPlan['email_used'] <= $currentPlan['email_limit']) {
+                $sendemail  = sendemail($shop_id,$order_id);
+            }
+        }
     }
 
 } elseif ($topic === 'app_subscriptions/update') {  
