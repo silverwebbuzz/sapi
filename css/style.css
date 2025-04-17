@@ -435,7 +435,6 @@ a.view-invoice-btn , .email-btn , .gen-invoice-btn , .upgrade-btn{
 
 .dataTables_wrapper .dataTables_paginate .paginate_button.current {
     background-color: var(--primary);
-    color: var(--white) !important;
     border-color: var(--primary);
 }
 
