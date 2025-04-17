@@ -10,7 +10,6 @@ require_once '../vendor/autoload.php';
 $shop = 'silverwebbuzzapp.myshopify.com';
 
 
-
 $shop_data = DBHelper::selectOne(
     "SELECT id, shop_owner, status FROM stores WHERE `shop` = ? AND `status` = ?",
     "ss", 
@@ -22,7 +21,7 @@ $sql_currentPlan = "SELECT * FROM store_subscriptions ss WHERE ss.store_id = ? A
 $currentPlan = DBHelper::selectOne($sql_currentPlan, "i", [$shop_id]);
 
 if ($currentPlan['price']!='0.00') {
-    $order_number = 6308565057836;
-    $generatepdf  = generatepdf($shop_id,$order_number);
-    $sendemail  = sendemail($shop_id,$order_number);
+
+    $generatepdf  = generatepdf($shop_id,$order_id);
+    $sendemail  = sendemail($shop_id,$order_id);
 }
