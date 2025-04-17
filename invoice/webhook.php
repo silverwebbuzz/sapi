@@ -102,7 +102,7 @@ if ($topic === 'app/uninstalled') {
     );
     $shop_id = $shop_data['id'];
     
-    $sql_currentPlan = "SELECT * FROM store_subscriptions ss WHERE ss.store_id = ? AND ss.status = 'active' AND ss.price > 0  ORDER BY ss.activated_on DESC LIMIT 1 ";
+    $sql_currentPlan = "SELECT * FROM store_subscriptions ss WHERE ss.store_id = ? AND ss.status = 'active' AND ss.price > 0.00  ORDER BY ss.activated_on DESC LIMIT 1 ";
 
     $currentPlan = DBHelper::selectOne($sql_currentPlan, "i", [$shop_id]);
     if (isset($currentPlan) || !empty($currentPlan)) {
