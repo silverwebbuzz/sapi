@@ -84,7 +84,7 @@
       <div class="header_container">
         <div>
           <a href="https://sapi.silverwebbuzz.com/" target="_blank">
-            <img src="./images/SAPI-logo-black.svg" alt="sapi logo img" />
+            <img src="https://sapi.silverwebbuzz.com/images/SAPI-logo-black.svg" alt="sapi logo img" />
           </a>
         </div>
         <div class="menu">

@@ -122,7 +122,7 @@
       <div class="header_container">
         <div>
           <a href="https://sapi.silverwebbuzz.com/" target="_blank">
-            <img src="./images/SAPI-logo-black.svg" alt="sapi logo img" />
+            <img src="https://sapi.silverwebbuzz.com/images/SAPI-logo-black.svg" alt="sapi logo img" />
           </a>
         </div>
         <div class="menu">
@@ -131,7 +131,10 @@
               <a href="https://sapi.silverwebbuzz.com/" target="_blank">Home</a>
             </li>
             <li>
-              <a href="https://sapi.silverwebbuzz.com/">Privacy policy</a>
+              <a href="https://sapi.silverwebbuzz.com/privacy" target="_blank">Privacy Policy</a>
+            </li>
+            <li>
+              <a href="https://sapi.silverwebbuzz.com/faq" target="_blank">FAQs</a>
             </li>
           </ul>
         </div>
