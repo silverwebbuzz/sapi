@@ -5,20 +5,7 @@ require_once 'invoice/shopify_functions.php';
 
 // Handle direct access to the root URL
 if ($_SERVER['REQUEST_METHOD'] === 'GET' && empty($_GET)) {
-    ?>
-    <!DOCTYPE html>
-    <html>
-    <head>
-        <title>Install App</title>
-    </head>
-    <body>
-        <h1>Please install this app via Shopify Admin</h1>
-        <p>If you're a store owner, please <a href="https://www.shopify.com/login" target="_blank">login to Shopify</a> 
-        and install this app from your admin dashboard.</p>
-        <p>If you're being redirected from Shopify Admin, <a href="<?= LIVE_SHOPIFY_APP_URL?>">click here</a> to continue installation.</p>
-    </body>
-    </html>
-    <?php 
+    require_once 'home.php'; 
 }
 
 // Handle OAuth flow
