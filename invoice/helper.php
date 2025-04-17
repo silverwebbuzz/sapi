@@ -179,9 +179,9 @@ function sendemail($shop_id,$order_id){
             $billing_address = json_decode($invoice['billing_address'], true);
 
             // SMTP settings 
-            $smtp_settings = json_decode($shop_data['smtp_settings'], true);
-            if($smtp_settings=="")
-            {
+            if($shop_data['smtp_settings']!=''){
+                $smtp_settings = json_decode($shop_data['smtp_settings'], true);
+            }else{
                 $default_subject = DEFAULT_EMAIL_SUBJECT;
                 $default_body = DEFAULT_EMAIL_BODY;
                 $smtp_settings = [
