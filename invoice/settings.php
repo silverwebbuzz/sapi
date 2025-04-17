@@ -54,6 +54,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['save_general_settings
     } else {
         $error_message = "Nothing to update! ";
     }
+    ?>
+    <script>window.location.hash = '#general';</script>
+    <?php
 }
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['save_invoice_settings'])) {
@@ -76,11 +79,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['save_invoice_settings
     <?php
 }
 
-
-
 include 'nav.php'; 
-
-
 
 // Default email template
 
@@ -123,7 +122,7 @@ if ($row) {
 <main class="main-content">
     <div class="settings-container">
         <h2>Settings</h2>
-        
+
         <!-- Tab Navigation -->
         <div class="settings-tabs">
             <a href="#general" class="settings-tab active"><i class="icon-gear"></i> General</a>
