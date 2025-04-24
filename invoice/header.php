@@ -17,7 +17,7 @@ $store = DBHelper::selectOne(
 );
 $shop_id = $store['id'];
 $shop_owner = $store['shop_owner'];
-$host = $_GET['host'];
+$host = $store['host'];
 
 //Fetch store plan.
 $sql_currentPlan = "

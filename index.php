@@ -41,7 +41,11 @@ if (isset($_GET['hmac']) && isset($_GET['shop']) && isset($_GET['timestamp'])) {
             'expires' => time() + (86400 * 30) // 30 days
         ];
         $encryptedCookie =  setEncryptCookie($cookieData);*/
-        
+        $affectedRows = DBHelper::execute(
+            "UPDATE stores SET host = ? WHERE id = ?",
+            "ssss",
+            [$_GET['host'], $store['id']]
+        );
         // redirect to invoice homepage.
         $dashboard_redirect = "invoice/index.php?shop=".$shop;
         header("Location: $dashboard_redirect ");
