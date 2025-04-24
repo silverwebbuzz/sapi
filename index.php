@@ -5,11 +5,12 @@ require_once 'invoice/shopify_functions.php';
 
 // Handle direct access to the root URL
 if ($_SERVER['REQUEST_METHOD'] === 'GET' && empty($_GET)) {
-    require_once 'home.php'; 
+    handleDirectAccess();
 }
 
 // Handle OAuth flow
 if (isset($_GET['hmac']) && isset($_GET['shop']) && isset($_GET['timestamp'])) {
+    //handleOAuthRequest();
     $installparams = $params = $_GET;
 
     if (!verifyHmac($params, SHOPIFY_API_SECRET)) die('Invalid HMAC');
@@ -30,19 +31,20 @@ if (isset($_GET['hmac']) && isset($_GET['shop']) && isset($_GET['timestamp'])) {
     }
     else 
     {
-        $cookieData = [
+        /*$cookieData = [
             'shop_id' => $store['id'],
             'shop' =>  $shop,
             'shop_owner' => $store['shop_owner'],
             'host' => $_GET['host'],
             'expires' => time() + (86400 * 30) // 30 days
         ];
-        $encryptedCookie =  setEncryptCookie($cookieData);
+        $encryptedCookie =  setEncryptCookie($cookieData);*/
         
         // redirect to invoice homepage.
-        $dashboard_redirect = "invoice/index.php";
+        $dashboard_redirect = "invoice/index.php?shop=".$shop;
         header("Location: $dashboard_redirect ");
     }
 
 }
+handleDirectAccess();
 exit();

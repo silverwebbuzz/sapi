@@ -1,7 +1,6 @@
 <?php // At the top of your PHP page (before any output)
 header("Content-Security-Policy: frame-ancestors https://*.myshopify.com https://admin.shopify.com;");
 
-// Start the session
 error_reporting(E_ALL);
 ini_set('display_errors', 1);
 ini_set('display_startup_errors', 1);
@@ -10,12 +9,15 @@ require_once '../config/config.php';
 require_once '../config/db.php';
 require_once 'shopify_functions.php';
 require_once 'helper.php';
-
-$cookieData = decryptCookie($_COOKIE['swb_auth']);
-$shop_id = $cookieData['shop_id'];
-$shop = $cookieData['shop'];
-$host = $cookieData['host'];
-$shop_owner = $cookieData['shop_owner'];
+$shop = $_GET['shop'];
+$store = DBHelper::selectOne(
+  "SELECT id, shop_owner, status FROM stores WHERE `shop` = ? AND `status` = ?",
+  "ss", 
+  [$shop, "installed"]
+);
+$shop_id = $store['id'];
+$shop_owner = $store['shop_owner'];
+$host = $_GET['host'];
 
 //Fetch store plan.
 $sql_currentPlan = "
