@@ -1,4 +1,7 @@
-<?php // Start the session
+<?php // At the top of your PHP page (before any output)
+header("Content-Security-Policy: frame-ancestors https://*.myshopify.com https://admin.shopify.com;");
+
+// Start the session
 error_reporting(E_ALL);
 ini_set('display_errors', 1);
 ini_set('display_startup_errors', 1);
