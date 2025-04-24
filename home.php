@@ -32,6 +32,17 @@
     const host = new URLSearchParams(window.location.search).get("host");
     const shop = new URLSearchParams(window.location.search).get("shop");
 
+    // Store in localStorage for later use
+    if (shop && host) {
+      localStorage.setItem("shop", shop);
+      localStorage.setItem("host", host);
+    }
+    else
+    {
+        const Shop = localStorage.getItem("shop");
+        alert(Shop);
+    }
+
     const app = createApp({
       apiKey: "376ce2c1e19ffa08ea8ad26e038ff4f5", // Replace with your app's API key
       host: host,
