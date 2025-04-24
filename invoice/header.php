@@ -88,7 +88,7 @@ if (!isset($currentPlan) || empty($currentPlan)) {
                 },
             ],
         });
-        
+        console.log(actions);
         // Set this globally if needed
         window.app = app;
     });
