@@ -22,6 +22,7 @@
 
 <div class="message">
   Welcome to your embedded Shopify app.
+  <a href="home">Home test</a>
 </div>
 
 <script>
