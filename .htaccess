@@ -107,3 +107,7 @@ RewriteRule ^ - [R=404,L]
 #    Header always set Content-Security-Policy "frame-ancestors https://*.shopify.com https://admin.shopify.com;"
 #    Header always set X-Frame-Options "ALLOW-FROM https://admin.shopify.com"
 #</IfModule>
+<IfModule mod_headers.c>
+    Header always set Content-Security-Policy "frame-ancestors https://*.shopify.com https://admin.shopify.com;"
+    Header always unset X-Frame-Options
+</IfModule>
