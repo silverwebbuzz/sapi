@@ -55,6 +55,20 @@ if (!isset($currentPlan) || empty($currentPlan)) {
           forceRedirect: true,
         });
 
+        // Get and send session token
+        utils.getSessionToken(app).then((token) => {
+            fetch('../verify_token.php', {
+                method: 'POST',
+                headers: {
+                    'Authorization': 'Bearer ' + token
+                }
+            }).then(res => res.json()).then(data => {
+                console.log(data.message || 'Verified!');
+            }).catch(err => {
+                console.log('Auth failed: ' + err.message);
+            });
+        });
+
         // Use Navigation instead of NavigationMenu (App Bridge v3+)
         const navigation = actions.Navigation.create(app);
         
@@ -69,20 +83,6 @@ if (!isset($currentPlan) || empty($currentPlan)) {
         navigation.addItem({
             label: 'Settings',
             destination: '/settings?shop=<?php echo $shop; ?>&host=<?php echo $host; ?>',
-        });
-        
-        // Get and send session token
-        utils.getSessionToken(app).then((token) => {
-            fetch('../verify_token.php', {
-                method: 'POST',
-                headers: {
-                    'Authorization': 'Bearer ' + token
-                }
-            }).then(res => res.json()).then(data => {
-                console.log(data.message || 'Verified!');
-            }).catch(err => {
-                console.log('Auth failed: ' + err.message);
-            });
         });
 
         // Set this globally if needed
