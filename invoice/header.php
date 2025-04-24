@@ -11,7 +11,7 @@ require_once 'shopify_functions.php';
 require_once 'helper.php';
 $shop = $_GET['shop'];
 $store = DBHelper::selectOne(
-  "SELECT id, shop_owner, status FROM stores WHERE `shop` = ? AND `status` = ?",
+  "SELECT * FROM stores WHERE `shop` = ? AND `status` = ?",
   "ss", 
   [$shop, "installed"]
 );
