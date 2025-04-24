@@ -48,6 +48,8 @@ if (!isset($currentPlan) || empty($currentPlan)) {
         const createApp = AppBridge.default;
         const actions = AppBridge.actions;
         const utils = window['app-bridge-utils'];
+        // ✅ Get NavigationMenu from actions
+        const NavigationMenu = actions.NavigationMenu;
 
         const app = createApp({
           apiKey: '<?= SHOPIFY_API_KEY?>',
@@ -69,22 +71,24 @@ if (!isset($currentPlan) || empty($currentPlan)) {
             });
         });
 
-        // Use Navigation instead of NavigationMenu (App Bridge v3+)
-        const navigation = actions.Navigation.create(app);
+        // ✅ Now use NavigationMenu
+        const navigationMenu = NavigationMenu.create(app, {
+            items: [
+                {
+                    label: 'Dashboard',
+                    destination: '/index?shop=<?php echo $shop; ?>&host=<?php echo $host; ?>',
+                },
+                {
+                    label: 'Orders List',
+                    destination: '/order?shop=<?php echo $shop; ?>&host=<?php echo $host; ?>',
+                },
+                {
+                    label: 'Settings',
+                    destination: '/settings?shop=<?php echo $shop; ?>&host=<?php echo $host; ?>',
+                },
+            ],
+        });
         
-        navigation.addItem({
-            label: 'Dashboard',
-            destination: '/index?shop=<?php echo $shop; ?>&host=<?php echo $host; ?>',
-        });
-        navigation.addItem({
-            label: 'Orders List',
-            destination: '/order?shop=<?php echo $shop; ?>&host=<?php echo $host; ?>',
-        });
-        navigation.addItem({
-            label: 'Settings',
-            destination: '/settings?shop=<?php echo $shop; ?>&host=<?php echo $host; ?>',
-        });
-
         // Set this globally if needed
         window.app = app;
     });
