@@ -43,7 +43,7 @@ if (isset($_GET['hmac']) && isset($_GET['shop']) && isset($_GET['timestamp'])) {
         $encryptedCookie =  setEncryptCookie($cookieData);*/
         $affectedRows = DBHelper::execute(
             "UPDATE stores SET host = ? WHERE id = ?",
-            "ssss",
+            "ss",
             [$_GET['host'], $store['id']]
         );
         // redirect to invoice homepage.
