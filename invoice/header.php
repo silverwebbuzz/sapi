@@ -40,54 +40,58 @@ if (!isset($currentPlan) || empty($currentPlan)) {
     <script src="https://unpkg.com/@shopify/app-bridge@3"></script>
     <script src="https://unpkg.com/@shopify/app-bridge-utils@3"></script>
     <script>
-    const AppBridge = window['app-bridge'];
-    const createApp = AppBridge.default;
-    const actions = AppBridge.actions;
-    const utils = window['app-bridge-utils'];
+      document.addEventListener("DOMContentLoaded", function() {
+        const AppBridge = window['app-bridge'];
+        const createApp = AppBridge.default;
+        const actions = AppBridge.actions;
+        const utils = window['app-bridge-utils'];
 
-    const app = createApp({
-      apiKey: '<?= SHOPIFY_API_KEY?>',
-      host: '<?= $host?>',
-      forceRedirect: true,
-    });
+        const app = createApp({
+          apiKey: '<?= SHOPIFY_API_KEY?>',
+          host: '<?= $host?>',
+          forceRedirect: true,
+        });
 
-    const NavigationMenu = actions.NavigationMenu;
+        //const NavigationMenu = actions.NavigationMenu;
 
-    NavigationMenu.create(app, {
-      items: [
-        {
-          label: 'Dashboard',
-          destination: '<?= BASE_SHOPIFY_AF_URL;?>index?shop=<?php echo $shop; ?>&host=<?php echo $host; ?>',
-        },
-        {
-          label: 'Orders List',
-          destination: '<?= BASE_SHOPIFY_AF_URL;?>order?shop=<?php echo $shop; ?>&host=<?php echo $host; ?>',
-        },
-        {
-          label: 'Settings',
-          destination: '<?= BASE_SHOPIFY_AF_URL;?>/settings?shop=<?php echo $shop; ?>&host=<?php echo $host; ?>',
-        },
-      ],
-    });
+        const navigationMenu = NavigationMenu.create(app, {
+          items: [
+            {
+              label: 'Dashboard',
+              destination: '/index?shop=<?php echo $shop; ?>&host=<?php echo $host; ?>',
+            },
+            {
+              label: 'Orders List',
+              destination: '/order?shop=<?php echo $shop; ?>&host=<?php echo $host; ?>',
+            },
+            {
+              label: 'Settings',
+              destination: '/settings?shop=<?php echo $shop; ?>&host=<?php echo $host; ?>',
+            },
+          ],
+        });
 
-    navigationMenu.subscribe(NavigationMenu.Action.UPDATE, () => {
-        console.log('Navigation updated!');
-      });
-    // Get and send session token
-    utils.getSessionToken(app).then((token) => {
-      fetch('../verify_token.php', {
-        method: 'POST',
-        headers: {
-          'Authorization': 'Bearer ' + token
-        }
-      })
-      .then(res => res.json())
-      .then(data => {
-        consol.log(data.message || 'Verified!');
-      })
-      .catch(err => {
-        consol.log('Auth failed: ' + err.message);
-      });
+        navigationMenu.subscribe(NavigationMenu.Action.UPDATE, () => {
+            alert('Navigation updated!');
+          });
+        // Get and send session token
+        utils.getSessionToken(app).then((token) => {
+          fetch('../verify_token.php', {
+            method: 'POST',
+            headers: {
+              'Authorization': 'Bearer ' + token
+            }
+          })
+          .then(res => res.json())
+          .then(data => {
+            consol.log(data.message || 'Verified!');
+          })
+          .catch(err => {
+            consol.log('Auth failed: ' + err.message);
+          });
+        });
+      // Set this globally if needed
+    window.app = app;
     });
   </script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
