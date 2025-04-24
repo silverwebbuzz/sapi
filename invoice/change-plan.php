@@ -3,7 +3,18 @@
  ini_set('display_errors', 1);
  ini_set('display_startup_errors', 1);
  
- require_once '../config/config.php';
+require_once '../config/config.php';
+require_once '../config/db.php';
+require_once 'shopify_functions.php';
+require_once 'helper.php';
+$shop = $_GET['shop'];
+$store = DBHelper::selectOne(
+  "SELECT * FROM stores WHERE `shop` = ? AND `status` = ?",
+  "ss", 
+  [$shop, "installed"]
+);
+$host = $store['host'];
+
 $api_key = 'YOUR_SHOPIFY_API_KEY'; // From your app setup
 ?>
 <!DOCTYPE html>
