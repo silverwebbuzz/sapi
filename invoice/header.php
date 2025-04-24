@@ -55,46 +55,38 @@ if (!isset($currentPlan) || empty($currentPlan)) {
           forceRedirect: true,
         });
 
-        //const NavigationMenu = actions.NavigationMenu;
-
-        const navigationMenu = NavigationMenu.create(app, {
-          items: [
-            {
-              label: 'Dashboard',
-              destination: '/index?shop=<?php echo $shop; ?>&host=<?php echo $host; ?>',
-            },
-            {
-              label: 'Orders List',
-              destination: '/order?shop=<?php echo $shop; ?>&host=<?php echo $host; ?>',
-            },
-            {
-              label: 'Settings',
-              destination: '/settings?shop=<?php echo $shop; ?>&host=<?php echo $host; ?>',
-            },
-          ],
+        // Use Navigation instead of NavigationMenu (App Bridge v3+)
+        const navigation = actions.Navigation.create(app);
+        
+        navigation.addItem({
+            label: 'Dashboard',
+            destination: '/index?shop=<?php echo $shop; ?>&host=<?php echo $host; ?>',
         });
-
-        navigationMenu.subscribe(NavigationMenu.Action.UPDATE, () => {
-            alert('Navigation updated!');
-          });
+        navigation.addItem({
+            label: 'Orders List',
+            destination: '/order?shop=<?php echo $shop; ?>&host=<?php echo $host; ?>',
+        });
+        navigation.addItem({
+            label: 'Settings',
+            destination: '/settings?shop=<?php echo $shop; ?>&host=<?php echo $host; ?>',
+        });
+        
         // Get and send session token
         utils.getSessionToken(app).then((token) => {
-          fetch('../verify_token.php', {
-            method: 'POST',
-            headers: {
-              'Authorization': 'Bearer ' + token
-            }
-          })
-          .then(res => res.json())
-          .then(data => {
-            consol.log(data.message || 'Verified!');
-          })
-          .catch(err => {
-            consol.log('Auth failed: ' + err.message);
-          });
+            fetch('../verify_token.php', {
+                method: 'POST',
+                headers: {
+                    'Authorization': 'Bearer ' + token
+                }
+            }).then(res => res.json()).then(data => {
+                console.log(data.message || 'Verified!');
+            }).catch(err => {
+                console.log('Auth failed: ' + err.message);
+            });
         });
-      // Set this globally if needed
-    window.app = app;
+
+        // Set this globally if needed
+        window.app = app;
     });
   </script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
