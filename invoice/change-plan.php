@@ -7,7 +7,10 @@ require_once '../config/config.php';
 require_once '../config/db.php';
 require_once 'shopify_functions.php';
 require_once 'helper.php';
+
 $shop = $_GET['shop'];
+$store_name = explode('.', $shop)[0];
+
 $store = DBHelper::selectOne(
   "SELECT * FROM stores WHERE `shop` = ? AND `status` = ?",
   "ss", 
@@ -41,7 +44,7 @@ $api_key = 'YOUR_SHOPIFY_API_KEY'; // From your app setup
 
       const redirect = Redirect.create(app);
 
-      const pricingPlansUrl = `https://admin.shopify.com/store/<?= $shop?>/charges/<?= SHOPIFY_APP_HANDLE?>/pricing_plans`;
+      const pricingPlansUrl = `https://admin.shopify.com/store/<?= $store_name?>/charges/<?= SHOPIFY_APP_HANDLE?>/pricing_plans`;
 
       // Redirect outside iframe
       redirect.dispatch(Redirect.Action.REMOTE, pricingPlansUrl);
