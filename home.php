@@ -68,7 +68,13 @@
         }
       })
       .then(response => response.json())
-      .then(data => console.log("Token Verified", data))
+      .then(data => {
+        console.log("Token Verified", data);
+        alert(data.shop);
+        const redirect = Redirect.create(app);
+        const pricingPlansUrl = `https://admin.shopify.com/store/<?= $store_name ?>/charges/<?= SHOPIFY_APP_HANDLE ?>/pricing_plans`;
+
+      })
       .catch(error => console.error("Token verification failed", error));
     });
 
