@@ -47,5 +47,4 @@ if (isset($_GET['hmac']) && isset($_GET['shop']) && isset($_GET['timestamp'])) {
     }
 
 }
-handleDirectAccess();
 exit();
