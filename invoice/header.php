@@ -57,15 +57,22 @@ if (!isset($currentPlan) || empty($currentPlan)) {
       items: [
         {
           label: 'Dashboard',
-          destination: '<?= BASE_SHOPIFY_AF_URL;?>index.php?shop=<?php echo $shop; ?>&host=<?php echo $host; ?>',
+          destination: '<?= BASE_SHOPIFY_AF_URL;?>index?shop=<?php echo $shop; ?>&host=<?php echo $host; ?>',
+        },
+        {
+          label: 'Orders List',
+          destination: '<?= BASE_SHOPIFY_AF_URL;?>order?shop=<?php echo $shop; ?>&host=<?php echo $host; ?>',
         },
         {
           label: 'Settings',
-          destination: '<?= BASE_SHOPIFY_AF_URL;?>/settings.php?shop=<?php echo $shop; ?>&host=<?php echo $host; ?>',
+          destination: '<?= BASE_SHOPIFY_AF_URL;?>/settings?shop=<?php echo $shop; ?>&host=<?php echo $host; ?>',
         },
       ],
     });
 
+    navigationMenu.subscribe(NavigationMenu.Action.UPDATE, () => {
+        console.log('Navigation updated!');
+      });
     // Get and send session token
     utils.getSessionToken(app).then((token) => {
       fetch('../verify_token.php', {
