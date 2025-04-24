@@ -1,16 +1,16 @@
 <nav class="horizontal-menu">
     <ul>
         <li class="<?= basename($_SERVER['PHP_SELF']) == 'index' ? 'active' : '' ?>">
-            <a href="index">Dashboard</a>
+            <a href="index?shop=<?php echo $shop; ?>">Dashboard</a>
         </li>
         <li class="<?= basename($_SERVER['PHP_SELF']) == 'order' ? 'active' : '' ?>">
-            <a href="order">Shopify Orders</a>
+            <a href="order?shop=<?php echo $shop; ?>">Shopify Orders</a>
         </li>
         <li class="<?= basename($_SERVER['PHP_SELF']) == 'billing' ? 'active' : '' ?>">
-            <a href="change-plan">Change Plans</a>
+            <a href="change-plan?shop=<?php echo $shop; ?>">Change Plans</a>
         </li>
         <li class="<?= basename($_SERVER['PHP_SELF']) == 'settings' ? 'active' : '' ?>">
-            <a href="settings">Settings</a>
+            <a href="settings?shop=<?php echo $shop; ?>">Settings</a>
         </li>
     </ul>
 </nav>

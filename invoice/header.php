@@ -67,7 +67,7 @@ if (!isset($currentPlan) || empty($currentPlan)) {
                 }
             }).then(res => res.json()).then(data => {
                 console.log(data.message || 'Verified!');
-                alert(data.shop);
+                //alert(data.shop);
                 const redirect = Redirect.create(app);
                 const pricingPlansUrl = `https://admin.shopify.com/store/<?= $store_name ?>/charges/<?= SHOPIFY_APP_HANDLE ?>/pricing_plans`;
                 //redirect.dispatch(Redirect.Action.REMOTE, pricingPlansUrl);

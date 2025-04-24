@@ -25,7 +25,7 @@ $invoices_query = DBHelper::select("SELECT * FROM `$invoice_table` ORDER BY crea
                 <div class="package-stat">
                     <span><?= htmlspecialchars($currentPlan['terms'] ?? 'Automated PDF invoices'); ?></span>
                     <div class="package-stats">
-                        <a href="change-plan" class="upgrade-btn">Upgrade Plan</a>
+                        <a href="change-plan?shop=<?php echo $shop; ?>" class="upgrade-btn">Upgrade Plan</a>
                     </div>
                 </div>
             </div>
