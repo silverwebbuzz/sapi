@@ -5,7 +5,8 @@ require_once 'invoice/shopify_functions.php';
 
 // Handle direct access to the root URL
 if ($_SERVER['REQUEST_METHOD'] === 'GET' && empty($_GET)) {
-    handleDirectAccess();
+    //handleDirectAccess();
+    include_once("home.php");
 }
 
 // Handle OAuth flow
