@@ -1,7 +1,4 @@
-<?php
-// index.php
-// Basic Shopify Embedded App with App Bridge v3 + Navigation + Token Auth
-?>
+<?php print_r($_GET);?>
 <!DOCTYPE html>
 <html>
 <head>
