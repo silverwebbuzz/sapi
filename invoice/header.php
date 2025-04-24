@@ -45,6 +45,7 @@ if (!isset($currentPlan) || empty($currentPlan)) {
         const AppBridge = window['app-bridge'];
         const createApp = AppBridge.default;
         const actions = AppBridge.actions;
+        const Redirect = actions.Redirect;
         const utils = window['app-bridge-utils'];
         // ✅ Get NavigationMenu from actions
         const NavigationMenu = actions.NavigationMenu;
@@ -64,6 +65,11 @@ if (!isset($currentPlan) || empty($currentPlan)) {
                 }
             }).then(res => res.json()).then(data => {
                 console.log(data.message || 'Verified!');
+                alert(data.shop);
+                const redirect = Redirect.create(app);
+                const pricingPlansUrl = `https://admin.shopify.com/store/<?= $store_name ?>/charges/<?= SHOPIFY_APP_HANDLE ?>/pricing_plans`;
+                //redirect.dispatch(Redirect.Action.REMOTE, pricingPlansUrl);
+
             }).catch(err => {
                 console.log('Auth failed: ' + err.message);
             });

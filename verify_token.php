@@ -17,11 +17,11 @@ try {
     }
 
     $decoded = JWT::decode($token, new Key($appSecret, 'HS256'));
-
+    $shop = parse_url($decoded->dest, PHP_URL_HOST);
     echo json_encode([
         'status' => 'success',
         'message' => 'Session token is valid.',
-        'shop' => $decoded->dest ?? null,
+        'shop' => $shop ?? null,
     ]);
 } catch (Exception $e) {
     http_response_code(401);
