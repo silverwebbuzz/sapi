@@ -26,24 +26,34 @@ $api_key = 'YOUR_SHOPIFY_API_KEY'; // From your app setup
   <title>Redirecting...</title>
   <!-- Shopify App Bridge must be first -->
   <script src="https://cdn.shopify.com/shopifycloud/app-bridge.js"></script>
-  <script type="text/javascript">
+<script type="text/javascript">
     document.addEventListener('DOMContentLoaded', function () {
-        // Use the new Shopify namespace
-        const { createApp, actions } = window.shopify.app;
-        const { Redirect } = actions;
+        try {
+            // Debug: Verify variables
+            console.log('API Key:', '<?= SHOPIFY_API_KEY?>');
+            console.log('Host:', '<?= $host?>');
+            console.log('Store Name:', '<?= $store_name?>');
+            console.log('App Handle:', '<?= SHOPIFY_APP_HANDLE?>');
 
-        const app = createApp({
-            apiKey: '<?= SHOPIFY_API_KEY?>',
-            host: '<?= $host?>',
-            forceRedirect: true,
-        });
+            const { createApp, actions } = window.shopify.app;
+            const { Redirect } = actions;
 
-        const redirect = Redirect.create(app);
-        const pricingPlansUrl = `https://admin.shopify.com/store/<?= urlencode($store_name) ?>/charges/<?= urlencode(SHOPIFY_APP_HANDLE) ?>/pricing_plans`;
+            const app = createApp({
+                apiKey: '<?= SHOPIFY_API_KEY?>',
+                host: '<?= $host?>',
+                forceRedirect: true,
+            });
 
-        // Perform the redirect
-        redirect.dispatch(Redirect.Action.REMOTE, pricingPlansUrl);
+            const pricingPlansUrl = `https://admin.shopify.com/store/<?= urlencode($store_name) ?>/charges/<?= urlencode(SHOPIFY_APP_HANDLE) ?>/pricing_plans`;
+            console.log('Redirecting to:', pricingPlansUrl);
+
+            const redirect = Redirect.create(app);
+            redirect.dispatch(Redirect.Action.REMOTE, pricingPlansUrl);
+        } catch (error) {
+            console.error('Error:', error);
+        }
     });
+
 </script>
 </head>
 <body>
