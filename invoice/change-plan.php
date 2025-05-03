@@ -35,7 +35,8 @@ $api_key = 'YOUR_SHOPIFY_API_KEY'; // From your app setup
             console.log('Store Name:', '<?= $store_name?>');
             console.log('App Handle:', '<?= SHOPIFY_APP_HANDLE?>');
 
-            const { createApp, actions } = window.shopify.app;
+            const { createApp, actions } = window.shopifyAppBridge;
+            //const { createApp, actions } = window.shopify.app;
             const { Redirect } = actions;
 
             const app = createApp({

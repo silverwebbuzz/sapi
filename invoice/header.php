@@ -46,7 +46,8 @@ if (!isset($currentPlan) || empty($currentPlan)) {
     <script>
       document.addEventListener("DOMContentLoaded", function() {
         // Access App Bridge through the Shopify namespace
-        const { createApp, actions } = window.shopify.app;
+       // const { createApp, actions } = window.shopify.app;
+        const { createApp, actions } = window.shopifyAppBridge;
         const { getSessionToken } = window.shopify.appBridgeUtils;
         const { Redirect, NavigationMenu } = actions;
 
