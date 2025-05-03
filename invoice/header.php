@@ -79,7 +79,7 @@ if (!isset($currentPlan) || empty($currentPlan)) {
             items: [
                 {
                     label: 'Dashboard',
-                    destination: '/index?shop=<?= $shop ?>&host=<?= $host ?>',
+                    destination: '/swb-auto-pdf-invoices?shop=<?= $shop ?>&host=<?= $host ?>',
                 },
                 {
                     label: 'Orders List',
