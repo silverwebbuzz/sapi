@@ -59,6 +59,18 @@ if (!isset($currentPlan) || empty($currentPlan)) {
                 forceRedirect: true,
             });
 
+            // Function to create the navigation menu after app is created
+            const createNavigationMenu = () => {
+                const navigationMenu = NavigationMenu.create(app, {
+                    items: [
+                        { label: 'Dashboard', destination: '/index?shop=<?= $shop ?>&host=<?= $host ?>' },
+                        { label: 'Orders List', destination: '/order?shop=<?= $shop ?>&host=<?= $host ?>' },
+                        { label: 'Settings', destination: '/settings?shop=<?= $shop ?>&host=<?= $host ?>' }
+                    ]
+                });
+                console.log("Navigation Menu Created:", navigationMenu);
+            };
+
             utils.getSessionToken(app).then((token) => {
                 fetch('../verify_token.php', {
                     method: 'POST',
@@ -68,6 +80,7 @@ if (!isset($currentPlan) || empty($currentPlan)) {
                 }).then(res => res.json()).then(data => {
                     console.log(data.message || 'Verified!');
                     // Redirect logic if needed
+                    createNavigationMenu();
                 }).catch(err => {
                     console.error('Auth failed:', err.message);
                 });
@@ -77,24 +90,6 @@ if (!isset($currentPlan) || empty($currentPlan)) {
         } else {
             console.error('App Bridge Utils not loaded correctly.');
         }
-
-        // Navigation
-        const navigationMenu = NavigationMenu.create(app, {
-        items: [
-            {
-            label: 'Dashboard',
-            destination: '/index?shop=<?= $shop ?>&host=<?= $host ?>',
-            },
-            {
-            label: 'Orders List',
-            destination: '/order?shop=<?= $shop ?>&host=<?= $host ?>',
-            },
-            {
-            label: 'Settings',
-            destination: '/settings?shop=<?= $shop ?>&host=<?= $host ?>',
-            },
-        ],
-        });
 
         window.app = app;
     });
