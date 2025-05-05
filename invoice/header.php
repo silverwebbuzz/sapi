@@ -90,8 +90,6 @@ if (!isset($currentPlan) || empty($currentPlan)) {
         } else {
             console.error('App Bridge Utils not loaded correctly.');
         }
-
-        window.app = app;
     });
     </script>
     <!-- Other scripts and styles -->
