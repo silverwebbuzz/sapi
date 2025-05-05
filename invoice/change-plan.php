@@ -24,21 +24,23 @@ $api_key = 'YOUR_SHOPIFY_API_KEY'; // From your app setup
 <html>
 <head>
   <title>Redirecting...</title>
-  <script src="https://cdn.shopify.com/shopifycloud/app-bridge.js"></script>
-  <script type="text/javascript">
-    document.addEventListener('DOMContentLoaded', function () {
+  <!-- Load App Bridge -->
+<script src="https://cdn.shopify.com/shopifycloud/app-bridge.js"></script>
+
+<script type="text/javascript">
+  document.addEventListener('DOMContentLoaded', function () {
+    function initAppBridge() {
+      if (typeof window.ShopifyAppBridge === 'undefined') {
+        console.warn('App Bridge not ready yet, retrying...');
+        return setTimeout(initAppBridge, 100); // Retry after 100ms
+      }
+
       try {
         const apiKey = '<?= SHOPIFY_API_KEY ?>';
         const host = '<?= $host ?>';
         const storeName = '<?= $store_name ?>';
         const appHandle = '<?= SHOPIFY_APP_HANDLE ?>';
 
-        console.log('API Key:', apiKey);
-        console.log('Host:', host);
-        console.log('Store Name:', storeName);
-        console.log('App Handle:', appHandle);
-
-        // Use the correct global object
         const AppBridge = window.ShopifyAppBridge;
         const actions = AppBridge.actions;
         const Redirect = actions.Redirect;
@@ -50,16 +52,18 @@ $api_key = 'YOUR_SHOPIFY_API_KEY'; // From your app setup
         });
 
         const pricingPlansUrl = `https://admin.shopify.com/store/${encodeURIComponent(storeName)}/charges/${encodeURIComponent(appHandle)}/pricing_plans`;
-        console.log('Redirecting to:', pricingPlansUrl);
 
+        console.log('Redirecting to:', pricingPlansUrl);
         const redirect = Redirect.create(app);
         redirect.dispatch(Redirect.Action.REMOTE, pricingPlansUrl);
-      } catch (error) {
-        console.error('App Bridge Error:', error);
+      } catch (err) {
+        console.error('App Bridge Init Error:', err);
       }
-    });
-  </script>
+    }
 
+    initAppBridge();
+  });
+</script>
 </head>
 <body>
   <p>Redirecting to pricing plans...</p>
