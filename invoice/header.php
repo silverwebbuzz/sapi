@@ -40,60 +40,65 @@ if (!isset($currentPlan) || empty($currentPlan)) {
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>SWB Auto PDF Invoices</title>
-    <!-- Shopify App Bridge must be first -->
+    <!-- Shopify App Bridge must be first and ONLY bridge-related script -->
     <script src="https://cdn.shopify.com/shopifycloud/app-bridge.js"></script>
-    <script src="https://cdn.shopify.com/shopifycloud/app-bridge-utils.js"></script>
     <script>
-      document.addEventListener("DOMContentLoaded", function() {
-        // Access App Bridge through the Shopify namespace
-       // const { createApp, actions } = window.shopify.app;
-        const { createApp, actions } = window.shopifyAppBridge;
-        const { getSessionToken } = window.shopify.appBridgeUtils;
-        const { Redirect, NavigationMenu } = actions;
+      document.addEventListener("DOMContentLoaded", async function() {
+        try {
+          // Use the correct v3+ namespace and methods
+          const { createApp } = window.shopifyAppBridge;
+          const { Redirect, NavigationMenu } = window.shopifyAppBridge.actions;
 
-        const app = createApp({
-          apiKey: '<?= SHOPIFY_API_KEY?>',
-          host: '<?= $host?>',
-          forceRedirect: true,
-        });
+          const app = createApp({
+            apiKey: '<?= SHOPIFY_API_KEY?>',
+            host: '<?= $host?>',
+            forceRedirect: true,
+          });
 
-        // Get and send session token
-        getSessionToken(app).then((token) => {
-            fetch('../verify_token.php', {
-                method: 'POST',
-                headers: {
-                    'Authorization': 'Bearer ' + token
-                }
-            }).then(res => res.json()).then(data => {
-                console.log(data.message || 'Verified!');
-                const redirect = Redirect.create(app);
-                const pricingPlansUrl = `https://admin.shopify.com/store/<?= $store_name ?>/charges/<?= SHOPIFY_APP_HANDLE ?>/pricing_plans`;
-                //redirect.dispatch(Redirect.Action.REMOTE, pricingPlansUrl);
-            }).catch(err => {
-                console.log('Auth failed: ' + err.message);
-            });
-        });
+          // Get session token using new method
+          const token = await app.getSessionToken();
+          
+          // Verify token
+          const response = await fetch('../verify_token.php', {
+              method: 'POST',
+              headers: {
+                  'Authorization': `Bearer ${token}`
+              }
+          });
+          
+          const data = await response.json();
+          console.log(data.message || 'Verified!');
 
-        // Create navigation menu
-        const navigationMenu = NavigationMenu.create(app, {
-            items: [
-                {
-                    label: 'Dashboard',
-                    destination: '/swb-auto-pdf-invoices?shop=<?= $shop ?>&host=<?= $host ?>',
-                },
-                {
-                    label: 'Orders List',
-                    destination: '/order?shop=<?= $shop ?>&host=<?= $host ?>',
-                },
-                {
-                    label: 'Settings',
-                    destination: '/settings?shop=<?= $shop ?>&host=<?= $host ?>',
-                },
-            ],
-        });
+          // Redirect handling
+          const redirect = Redirect.create(app);
+          const pricingPlansUrl = `https://admin.shopify.com/store/<?= $store_name ?>/charges/<?= SHOPIFY_APP_HANDLE ?>/pricing_plans`;
+          redirect.dispatch(Redirect.Action.REMOTE, pricingPlansUrl);
 
-        window.app = app; // Set globally if needed
-    });
+          // Navigation menu setup
+          const navigationMenu = NavigationMenu.create(app, {
+              items: [
+                  {
+                      label: 'Dashboard',
+                      destination: '/index?shop=<?= $shop ?>&host=<?= $host ?>',
+                  },
+                  {
+                      label: 'Orders List',
+                      destination: '/order?shop=<?= $shop ?>&host=<?= $host ?>',
+                  },
+                  {
+                      label: 'Settings',
+                      destination: '/settings?shop=<?= $shop ?>&host=<?= $host ?>',
+                  },
+              ],
+          });
+
+          window.app = app;
+
+        } catch (error) {
+          console.error('App initialization failed:', error);
+          // Add error handling/fallback UI here
+        }
+      });
     </script>
     <!-- Other scripts and styles -->
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
