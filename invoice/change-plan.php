@@ -33,8 +33,8 @@ $api_key = 'YOUR_SHOPIFY_API_KEY'; // From your app setup
   <p>Redirecting to pricing plans...</p>
   <script type="text/javascript">
   document.addEventListener('DOMContentLoaded', function () {
-    const AppBridge = window.appBridge; 
-    const createApp = AppBridge.default;
+    const AppBridge = window['app-bridge'];
+    const createApp = AppBridge.createApp;
     const actions = AppBridge.actions;
     const Redirect = actions.Redirect;
 

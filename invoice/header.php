@@ -47,7 +47,7 @@ if (!isset($currentPlan) || empty($currentPlan)) {
     <script>
     document.addEventListener("DOMContentLoaded", function () {
         const AppBridge = window.appBridge;
-        const createApp = AppBridge.default;
+        const createApp = AppBridge.createApp;
         const { Redirect, NavigationMenu } = AppBridge.actions;
         const utils = window.appBridgeUtils;
 
