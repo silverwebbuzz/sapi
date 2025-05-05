@@ -27,7 +27,7 @@ $api_key = 'YOUR_SHOPIFY_API_KEY'; // From your app setup
   <!-- Load App Bridge -->
   <meta name="shopify-api-key" content="<?= htmlspecialchars(SHOPIFY_API_KEY) ?>" />
   <script src="https://cdn.shopify.com/shopifycloud/app-bridge.js"></script>
-  <script src="https://unpkg.com/@shopify/app-bridge@2.0.0/umd/index.js"></script>
+  <script src="https://unpkg.com/@shopify/app-bridge@3"></script>
 </head>
 <body>
   <p>Redirecting to pricing plans...</p>

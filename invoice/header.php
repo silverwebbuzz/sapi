@@ -42,8 +42,9 @@ if (!isset($currentPlan) || empty($currentPlan)) {
     <title>SWB Auto PDF Invoices</title>
     <meta name="shopify-api-key" content="<?= htmlspecialchars(SHOPIFY_API_KEY) ?>" />
     <script src="https://cdn.shopify.com/shopifycloud/app-bridge.js"></script>
-    <script src="https://unpkg.com/@shopify/app-bridge@2.0.0/umd/index.js"></script>
-    <script src="https://unpkg.com/@shopify/app-bridge-utils@2.0.0/umd/index.js"></script>
+    <script src="https://unpkg.com/@shopify/app-bridge@3"></script>
+    <script src="https://unpkg.com/@shopify/app-bridge-utils@3"></script>
+
     <script>
     document.addEventListener("DOMContentLoaded", function () {
         const AppBridge = window['app-bridge'];
