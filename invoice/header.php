@@ -40,66 +40,62 @@ if (!isset($currentPlan) || empty($currentPlan)) {
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>SWB Auto PDF Invoices</title>
-    <script src="https://unpkg.com/@shopify/app-bridge@3"></script>
-    <script src="https://unpkg.com/@shopify/app-bridge-utils@3"></script>
+    <script src="https://unpkg.com/@shopify/app-bridge@2.0.0/umd/index.js"></script>
+    <script src="https://unpkg.com/@shopify/app-bridge-utils@2.0.0/umd/index.js"></script>
     <script>
-      document.addEventListener("DOMContentLoaded", function() {
-        const AppBridge = window['app-bridge'];
+    document.addEventListener("DOMContentLoaded", function () {
+        const AppBridge = window.appBridge;
         const createApp = AppBridge.default;
-        const actions = AppBridge.actions;
-        const Redirect = actions.Redirect;
-        const utils = window['app-bridge-utils'];
-        // ✅ Get NavigationMenu from actions
-        const NavigationMenu = actions.NavigationMenu;
+        const { Redirect, NavigationMenu } = AppBridge.actions;
+        const utils = window.appBridgeUtils;
 
         const app = createApp({
-          apiKey: '<?= SHOPIFY_API_KEY?>',
-          host: '<?= $host?>',
-          forceRedirect: true,
+        apiKey: '<?= SHOPIFY_API_KEY ?>',
+        host: '<?= $host ?>',
+        forceRedirect: true,
         });
 
-        // Get and send session token
+        // Get and verify session token
         utils.getSessionToken(app).then((token) => {
-            fetch('../verify_token.php', {
-                method: 'POST',
-                headers: {
-                    'Authorization': 'Bearer ' + token
-                }
-            }).then(res => res.json()).then(data => {
-                console.log(data.message || 'Verified!');
-                //alert(data.shop);
-                const redirect = Redirect.create(app);
-                const pricingPlansUrl = `https://admin.shopify.com/store/<?= $store_name ?>/charges/<?= SHOPIFY_APP_HANDLE ?>/pricing_plans`;
-                //redirect.dispatch(Redirect.Action.REMOTE, pricingPlansUrl);
+        fetch('../verify_token.php', {
+            method: 'POST',
+            headers: {
+            'Authorization': 'Bearer ' + token
+            }
+        }).then(res => res.json()).then(data => {
+            console.log(data.message || 'Verified!');
 
-            }).catch(err => {
-                console.log('Auth failed: ' + err.message);
-            });
+            const redirect = Redirect.create(app);
+            const pricingPlansUrl = `https://admin.shopify.com/store/<?= $store_name ?>/charges/<?= SHOPIFY_APP_HANDLE ?>/pricing_plans`;
+            // You can trigger redirect here if needed
+            // redirect.dispatch(Redirect.Action.REMOTE, pricingPlansUrl);
+
+        }).catch(err => {
+            console.error('Auth failed:', err.message);
+        });
         });
 
-        // ✅ Now use NavigationMenu
+        // Navigation
         const navigationMenu = NavigationMenu.create(app, {
-            items: [
-                {
-                    label: 'Dashboard',
-                    destination: '/index?shop=<?php echo $shop; ?>&host=<?php echo $host; ?>',
-                },
-                {
-                    label: 'Orders List',
-                    destination: '/order?shop=<?php echo $shop; ?>&host=<?php echo $host; ?>',
-                },
-                {
-                    label: 'Settings',
-                    destination: '/settings?shop=<?php echo $shop; ?>&host=<?php echo $host; ?>',
-                },
-            ],
+        items: [
+            {
+            label: 'Dashboard',
+            destination: '/index?shop=<?= $shop ?>&host=<?= $host ?>',
+            },
+            {
+            label: 'Orders List',
+            destination: '/order?shop=<?= $shop ?>&host=<?= $host ?>',
+            },
+            {
+            label: 'Settings',
+            destination: '/settings?shop=<?= $shop ?>&host=<?= $host ?>',
+            },
+        ],
         });
-        console.log(actions);
-        // Set this globally if needed
+
         window.app = app;
     });
-  </script>
-
+    </script>
     <!-- Other scripts and styles -->
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/1.11.5/css/jquery.dataTables.css">
