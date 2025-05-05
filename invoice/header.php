@@ -40,32 +40,72 @@ if (!isset($currentPlan) || empty($currentPlan)) {
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>SWB Auto PDF Invoices</title>
-    <!-- Shopify App Bridge must be first and ONLY bridge-related script -->
-    <script src="https://cdn.shopify.com/shopifycloud/app-bridge.js"></script>
-    
+    <script src="https://unpkg.com/@shopify/app-bridge@3"></script>
+    <script src="https://unpkg.com/@shopify/app-bridge-utils@3"></script>
+    <script>
+      document.addEventListener("DOMContentLoaded", function() {
+        const AppBridge = window['app-bridge'];
+        const createApp = AppBridge.default;
+        const actions = AppBridge.actions;
+        const Redirect = actions.Redirect;
+        const utils = window['app-bridge-utils'];
+        // ✅ Get NavigationMenu from actions
+        const NavigationMenu = actions.NavigationMenu;
+
+        const app = createApp({
+          apiKey: '<?= SHOPIFY_API_KEY?>',
+          host: '<?= $host?>',
+          forceRedirect: true,
+        });
+
+        // Get and send session token
+        utils.getSessionToken(app).then((token) => {
+            fetch('../verify_token.php', {
+                method: 'POST',
+                headers: {
+                    'Authorization': 'Bearer ' + token
+                }
+            }).then(res => res.json()).then(data => {
+                console.log(data.message || 'Verified!');
+                //alert(data.shop);
+                const redirect = Redirect.create(app);
+                const pricingPlansUrl = `https://admin.shopify.com/store/<?= $store_name ?>/charges/<?= SHOPIFY_APP_HANDLE ?>/pricing_plans`;
+                //redirect.dispatch(Redirect.Action.REMOTE, pricingPlansUrl);
+
+            }).catch(err => {
+                console.log('Auth failed: ' + err.message);
+            });
+        });
+
+        // ✅ Now use NavigationMenu
+        const navigationMenu = NavigationMenu.create(app, {
+            items: [
+                {
+                    label: 'Dashboard',
+                    destination: '/index?shop=<?php echo $shop; ?>&host=<?php echo $host; ?>',
+                },
+                {
+                    label: 'Orders List',
+                    destination: '/order?shop=<?php echo $shop; ?>&host=<?php echo $host; ?>',
+                },
+                {
+                    label: 'Settings',
+                    destination: '/settings?shop=<?php echo $shop; ?>&host=<?php echo $host; ?>',
+                },
+            ],
+        });
+        console.log(actions);
+        // Set this globally if needed
+        window.app = app;
+    });
+  </script>
+
     <!-- Other scripts and styles -->
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/1.11.5/css/jquery.dataTables.css">
     <link rel="stylesheet" href="../css/style.css">
 </head>
 <body>
-<script>
-    document.addEventListener("DOMContentLoaded", () => {
-      // Verify App Bridge is loaded
-      if (!window.shopifyAppBridge) {
-        console.error("App Bridge not loaded!");
-        return;
-      }
-
-      // Initialize
-      const { createApp } = window.shopifyAppBridge;
-      const app = createApp({
-        apiKey: "YOUR_API_KEY", // Replace with your key
-        host: "YOUR_SHOP_HOST", // e.g., "silverwebbuzzapp.myshopify.com"
-      });
-      console.log("App initialized:", app);
-    });
-  </script>
     <div class="dashboard-container">
         <header class="main-header">
             <h1>SWB Auto PDF Invoices</h1>
