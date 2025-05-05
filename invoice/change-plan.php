@@ -26,35 +26,27 @@ $api_key = 'YOUR_SHOPIFY_API_KEY'; // From your app setup
   <title>Redirecting...</title>
   <!-- Shopify App Bridge must be first -->
   <script src="https://cdn.shopify.com/shopifycloud/app-bridge.js"></script>
-<script type="text/javascript">
-    document.addEventListener('DOMContentLoaded', function () {
-        try {
-            // Debug: Verify variables
-            console.log('API Key:', '<?= SHOPIFY_API_KEY?>');
-            console.log('Host:', '<?= $host?>');
-            console.log('Store Name:', '<?= $store_name?>');
-            console.log('App Handle:', '<?= SHOPIFY_APP_HANDLE?>');
+  <script type="module">
+  import createApp from 'https://cdn.shopify.com/shopifycloud/app-bridge/3.0/index.js';
+  import Redirect from 'https://cdn.shopify.com/shopifycloud/app-bridge/3.0/actions/Redirect.js';
 
-            const { createApp, actions } = window.shopifyAppBridge;
-            //const { createApp, actions } = window.shopify.app;
-            const { Redirect } = actions;
+  document.addEventListener('DOMContentLoaded', function () {
+    try {
+      const app = createApp({
+        apiKey: '<?= SHOPIFY_API_KEY ?>',
+        host: '<?= $host ?>',
+        forceRedirect: true,
+      });
 
-            const app = createApp({
-                apiKey: '<?= SHOPIFY_API_KEY?>',
-                host: '<?= $host?>',
-                forceRedirect: true,
-            });
+      const pricingPlansUrl = `https://admin.shopify.com/store/<?= urlencode($store_name) ?>/charges/<?= urlencode(SHOPIFY_APP_HANDLE) ?>/pricing_plans`;
+      console.log('Redirecting to:', pricingPlansUrl);
 
-            const pricingPlansUrl = `https://admin.shopify.com/store/<?= urlencode($store_name) ?>/charges/<?= urlencode(SHOPIFY_APP_HANDLE) ?>/pricing_plans`;
-            console.log('Redirecting to:', pricingPlansUrl);
-
-            const redirect = Redirect.create(app);
-            redirect.dispatch(Redirect.Action.REMOTE, pricingPlansUrl);
-        } catch (error) {
-            console.error('Error:', error);
-        }
-    });
-
+      const redirect = Redirect.create(app);
+      redirect.dispatch(Redirect.Action.REMOTE, pricingPlansUrl);
+    } catch (error) {
+      console.error('App Bridge Error:', error);
+    }
+  });
 </script>
 </head>
 <body>
