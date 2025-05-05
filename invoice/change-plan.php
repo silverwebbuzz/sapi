@@ -25,40 +25,41 @@ $api_key = 'YOUR_SHOPIFY_API_KEY'; // From your app setup
 <head>
   <title>Redirecting...</title>
   <script src="https://cdn.shopify.com/shopifycloud/app-bridge.js"></script>
-<script type="text/javascript">
-  document.addEventListener('DOMContentLoaded', function () {
-    try {
-      const apiKey = '<?= SHOPIFY_API_KEY ?>';
-      const host = '<?= $host ?>';
-      const storeName = '<?= $store_name ?>';
-      const appHandle = '<?= SHOPIFY_APP_HANDLE ?>';
+  <script type="text/javascript">
+    document.addEventListener('DOMContentLoaded', function () {
+      try {
+        const apiKey = '<?= SHOPIFY_API_KEY ?>';
+        const host = '<?= $host ?>';
+        const storeName = '<?= $store_name ?>';
+        const appHandle = '<?= SHOPIFY_APP_HANDLE ?>';
 
-      console.log('API Key:', apiKey);
-      console.log('Host:', host);
-      console.log('Store Name:', storeName);
-      console.log('App Handle:', appHandle);
+        console.log('API Key:', apiKey);
+        console.log('Host:', host);
+        console.log('Store Name:', storeName);
+        console.log('App Handle:', appHandle);
 
-      const AppBridge = window['app-bridge'];
-      const actions = AppBridge.actions;
-      const Redirect = actions.Redirect;
+        // Use the correct global object
+        const AppBridge = window.ShopifyAppBridge;
+        const actions = AppBridge.actions;
+        const Redirect = actions.Redirect;
 
-      const app = AppBridge.createApp({
-        apiKey: apiKey,
-        host: host,
-        forceRedirect: true,
-      });
+        const app = AppBridge.createApp({
+          apiKey: apiKey,
+          host: host,
+          forceRedirect: true,
+        });
 
-      const redirect = Redirect.create(app);
-      const pricingPlansUrl = `https://admin.shopify.com/store/${encodeURIComponent(storeName)}/charges/${encodeURIComponent(appHandle)}/pricing_plans`;
+        const pricingPlansUrl = `https://admin.shopify.com/store/${encodeURIComponent(storeName)}/charges/${encodeURIComponent(appHandle)}/pricing_plans`;
+        console.log('Redirecting to:', pricingPlansUrl);
 
-      console.log('Redirecting to:', pricingPlansUrl);
+        const redirect = Redirect.create(app);
+        redirect.dispatch(Redirect.Action.REMOTE, pricingPlansUrl);
+      } catch (error) {
+        console.error('App Bridge Error:', error);
+      }
+    });
+  </script>
 
-      redirect.dispatch(Redirect.Action.REMOTE, pricingPlansUrl);
-    } catch (error) {
-      console.error('App Bridge Error:', error);
-    }
-  });
-</script>
 </head>
 <body>
   <p>Redirecting to pricing plans...</p>
