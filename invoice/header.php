@@ -46,7 +46,7 @@ if (!isset($currentPlan) || empty($currentPlan)) {
     <script src="https://unpkg.com/@shopify/app-bridge-utils@2.0.0/umd/index.js"></script>
     <script>
     document.addEventListener("DOMContentLoaded", function () {
-        const AppBridge = window.appBridge;
+        const AppBridge = window['app-bridge'];
         const createApp = AppBridge.createApp;
         const { Redirect, NavigationMenu } = AppBridge.actions;
         const utils = window.appBridgeUtils;
