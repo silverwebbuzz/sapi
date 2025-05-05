@@ -50,33 +50,33 @@ if (!isset($currentPlan) || empty($currentPlan)) {
         const AppBridge = window['app-bridge'];
         const createApp = AppBridge.createApp;
         const { Redirect, NavigationMenu } = AppBridge.actions;
-        const utils = window.appBridgeUtils;
+        const utils = window['app-bridge-utils'];
 
-        const app = createApp({
-        apiKey: '<?= SHOPIFY_API_KEY ?>',
-        host: '<?= $host ?>',
-        forceRedirect: true,
-        });
+        if (utils) {
+            const app = createApp({
+                apiKey: '<?= SHOPIFY_API_KEY ?>',
+                host: '<?= $host ?>',
+                forceRedirect: true,
+            });
 
-        // Get and verify session token
-        utils.getSessionToken(app).then((token) => {
-        fetch('../verify_token.php', {
-            method: 'POST',
-            headers: {
-            'Authorization': 'Bearer ' + token
-            }
-        }).then(res => res.json()).then(data => {
-            console.log(data.message || 'Verified!');
-
-            const redirect = Redirect.create(app);
-            const pricingPlansUrl = `https://admin.shopify.com/store/<?= $store_name ?>/charges/<?= SHOPIFY_APP_HANDLE ?>/pricing_plans`;
-            // You can trigger redirect here if needed
-            // redirect.dispatch(Redirect.Action.REMOTE, pricingPlansUrl);
-
-        }).catch(err => {
-            console.error('Auth failed:', err.message);
-        });
-        });
+            utils.getSessionToken(app).then((token) => {
+                fetch('../verify_token.php', {
+                    method: 'POST',
+                    headers: {
+                        'Authorization': 'Bearer ' + token
+                    }
+                }).then(res => res.json()).then(data => {
+                    console.log(data.message || 'Verified!');
+                    // Redirect logic if needed
+                }).catch(err => {
+                    console.error('Auth failed:', err.message);
+                });
+            }).catch(error => {
+                console.error('Failed to get session token:', error);
+            });
+        } else {
+            console.error('App Bridge Utils not loaded correctly.');
+        }
 
         // Navigation
         const navigationMenu = NavigationMenu.create(app, {
