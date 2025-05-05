@@ -26,38 +26,29 @@ $api_key = 'YOUR_SHOPIFY_API_KEY'; // From your app setup
   <title>Redirecting...</title>
   <!-- Load App Bridge -->
   <meta name="shopify-api-key" content="<?= htmlspecialchars(SHOPIFY_API_KEY) ?>" />
+  <script src="https://cdn.shopify.com/shopifycloud/app-bridge.js"></script>
   <script src="https://unpkg.com/@shopify/app-bridge@2.0.0/umd/index.js"></script>
 </head>
 <body>
   <p>Redirecting to pricing plans...</p>
-  <script>
-  document.addEventListener("DOMContentLoaded", function () {
-    function initAppBridge() {
-      if (!window.appBridge || !window.appBridge.default) {
-        return setTimeout(initAppBridge, 100);
-      }
+  <script type="text/javascript">
+  document.addEventListener('DOMContentLoaded', function () {
+    const AppBridge = window.appBridge; 
+    const createApp = AppBridge.default;
+    const actions = AppBridge.actions;
+    const Redirect = actions.Redirect;
 
-      const apiKey = '<?= SHOPIFY_API_KEY ?>';
-      const host = '<?= $host ?>';
-      const storeName = '<?= $store_name ?>';
-      const appHandle = '<?= SHOPIFY_APP_HANDLE ?>';
+    const app = createApp({
+      apiKey: '<?= SHOPIFY_API_KEY ?>',
+      host: '<?= $host ?>',
+      forceRedirect: true,
+    });
 
-      const createApp = window.appBridge.default;
-      const { Redirect } = window.appBridge.actions;
+    const redirect = Redirect.create(app);
+    const pricingPlansUrl = `https://admin.shopify.com/store/<?= $store_name ?>/charges/<?= SHOPIFY_APP_HANDLE ?>/pricing_plans`;
 
-      const app = createApp({
-        apiKey,
-        host,
-        forceRedirect: true,
-      });
-
-      const redirect = Redirect.create(app);
-      const pricingPlansUrl = `https://admin.shopify.com/store/${encodeURIComponent(storeName)}/charges/${encodeURIComponent(appHandle)}/pricing_plans`;
-
-      redirect.dispatch(Redirect.Action.REMOTE, pricingPlansUrl);
-    }
-
-    initAppBridge();
+    // ✅ Redirect to pricing plans
+    redirect.dispatch(Redirect.Action.REMOTE, pricingPlansUrl);
   });
 </script>
   

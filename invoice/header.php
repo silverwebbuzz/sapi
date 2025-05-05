@@ -40,6 +40,8 @@ if (!isset($currentPlan) || empty($currentPlan)) {
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>SWB Auto PDF Invoices</title>
+    <meta name="shopify-api-key" content="<?= htmlspecialchars(SHOPIFY_API_KEY) ?>" />
+    <script src="https://cdn.shopify.com/shopifycloud/app-bridge.js"></script>
     <script src="https://unpkg.com/@shopify/app-bridge@2.0.0/umd/index.js"></script>
     <script src="https://unpkg.com/@shopify/app-bridge-utils@2.0.0/umd/index.js"></script>
     <script>
