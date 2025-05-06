@@ -359,10 +359,10 @@ function sendEmailWithAttachment($smtp_settings, $to_email, $to_name, $subject, 
            AND status = 'active'
      ", "ii", [$shopId, $newId]);
 
-     echo json_encode([
+     /*echo json_encode([
          'success' => true,
          'subscription_id' => $newId,
          'limits' => $limits
-     ]);
+     ]);*/
  }
 ?>
