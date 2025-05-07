@@ -117,6 +117,15 @@ if (isset($access_token)) {
         $restapi_json, $created_at, $updated_at]
     );
 
+    // create free scubscription.
+    $store_Subscription = DBHelper::insert("
+        INSERT INTO store_subscriptions (
+            store_id, shopify_id
+        ) VALUES (?, ?)", "ii", [
+        $shop_id,                                 // store_id
+        $shopify_id                              // shopify_id
+    ]);
+
     //Create Invoice Table.
     $shop_table_name = preg_replace('/[^a-zA-Z0-9_]/', '_', strtolower($shop)); // Sanitize table name
     $invoice_table = "invoices_" . $shop_table_name;
