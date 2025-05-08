@@ -27,7 +27,7 @@ define('ADMIN_URL_FORMAT', 'https://admin.shopify.com/store/%s/apps/%s');
 define('COOKIE_KEY', 'abcdefghijklmnopqrstuvwxyz123456'); // 32-character random key
 
 define('DEFAULT_EMAIL_SUBJECT', "Invoice #{invoice_number} from {shop_name}");
-$default_body = '
+/*$default_body = '
 <html>
 <head>
     <style>
@@ -47,7 +47,76 @@ $default_body = '
     </div>
 </body>
 </html>
-';
+';*/
+
+$default_body = '<html>
+<head>
+  <style>
+    body {
+      font-family: Segoe UI, Tahoma, Geneva, Verdana, sans-serif;
+      background-color: #f9f9f9;
+      padding: 20px;
+      color: #333;
+    }
+    .container {
+      max-width: 600px;
+      margin: auto;
+      background-color: #ffffff;
+      padding: 30px;
+      border-radius: 10px;
+      box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+    }
+    .header {
+      color: #2c3e50;
+      border-bottom: 1px solid #eee;
+      padding-bottom: 10px;
+      margin-bottom: 20px;
+    }
+    .invoice-info {
+      margin: 20px 0;
+    }
+    .footer {
+      font-size: 12px;
+      color: #777;
+      margin-top: 30px;
+      border-top: 1px solid #eee;
+      padding-top: 15px;
+    }
+    .btn {
+      display: inline-block;
+      padding: 10px 20px;
+      margin-top: 20px;
+      background-color: #3b82f6;
+      color: #fff;
+      text-decoration: none;
+      border-radius: 5px;
+    }
+    .btn:hover {
+      background-color: #2563eb;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h2 class="header">Hi {customer_name},</h2>
+    <p>Thank you for shopping with us! We’re excited to share your invoice for your recent order.</p>
+
+    <div class="invoice-info">
+      <p><strong>Invoice Number:</strong> #{invoice_number}</p>
+      <p><strong>Order Total:</strong> {currency} {total_price}</p>
+      <p><strong>Date:</strong> {created_at}</p>
+    </div>
+
+    <a href="{invoice_link}" class="btn">View Invoice</a>
+
+    <div class="footer">
+      <p>If you have any questions or need assistance, feel free to reach out to our support team anytime.</p>
+      <p>Thank you again for your business!</p>
+      <p><em>This is a computer-generated invoice and does not require a signature.</em></p>
+    </div>
+  </div>
+</body>
+</html>';
 define('DEFAULT_EMAIL_BODY', $default_body);
 
 session_start();
