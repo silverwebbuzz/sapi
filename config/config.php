@@ -107,8 +107,6 @@ $default_body = '<html>
       <p><strong>Date:</strong> {created_at}</p>
     </div>
 
-    <a href="{invoice_link}" class="btn">View Invoice</a>
-
     <div class="footer">
       <p>If you have any questions or need assistance, feel free to reach out to our support team anytime.</p>
       <p>Thank you again for your business!</p>
