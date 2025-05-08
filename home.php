@@ -401,8 +401,8 @@
                 No Technical Skills Required!
               </li>
             </ul>
-            <a href="https://sapi.silverwebbuzz.com/" target="_blank" class="shop_app_btn">
-              <img src="https://sapi.silverwebbuzz.com/images/StoreBadge.png" alt="Shopify app store image" />
+            <a href="https://apps.shopify.com/swb-auto-pdf-invoices" target="_blank" class="shop_app_btn">
+              <img src="https://sapi.silverwebbuzz.com/images/badge-shopify-app-store-dark.svg" alt="SAPI Shopify app store image" />
             </a>
           </div>
           <div class="hero_right">
@@ -474,6 +474,9 @@
           <h2>Get Started Today</h2>
           <p>Start using SWB Auto PDF Invoices and eliminate the stress of post-order paperwork. Empower your business with professional invoicing, customizable designs, and instant delivery. This app is your partner in seamless invoicing.</p>
           <a href="https://sapi.silverwebbuzz.com/" target="_blank" class="cta_btn">Install the App </a>
+          <a href="https://apps.shopify.com/swb-auto-pdf-invoices" target="_blank" class="shop_app_btn">
+              <img src="https://sapi.silverwebbuzz.com/images/badge-shopify-app-store-dark.svg" alt="SAPI Shopify app store image" />
+          </a>
         </div>
       </section>
       <footer>

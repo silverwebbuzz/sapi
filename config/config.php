@@ -16,7 +16,7 @@ define('DB_PASS', 'Sapi@1109');
 define('SHOPIFY_APP_NAME', 'SWB : Auto PDF Invoice');
 define('SHOPIFY_APP_HANDLE', 'swb-auto-pdf-invoices');
 define('SHOPIFY_APP_URL', BASE_URL);
-define('LIVE_SHOPIFY_APP_URL', "https://apps.shopify.com/google");
+define('LIVE_SHOPIFY_APP_URL', "https://apps.shopify.com/swb-auto-pdf-invoices");
 define('SHOPIFY_API_KEY', '376ce2c1e19ffa08ea8ad26e038ff4f5');
 define('SHOPIFY_API_SECRET', 'af6436e75bd208e3ce4dc8c153d5ad6f');
 define('SHOPIFY_API_VERSION', '2025-01');
