@@ -159,7 +159,7 @@ if (isset($access_token)) {
     DBHelper::createTable($create_table_query);
 
     // Fetch last 20 paid orders from Shopify
-    $api_url = "https://{$shop}/admin/api/" . SHOPIFY_API_VERSION . "/orders.json?financial_status=paid&limit=20";
+    $api_url = "https://{$shop}/admin/api/" . SHOPIFY_API_VERSION . "/orders.json?financial_status=paid&limit=100";
     $ch = curl_init($api_url);
     curl_setopt_array($ch, [
         CURLOPT_RETURNTRANSFER => true,
