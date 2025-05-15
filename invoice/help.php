@@ -4,24 +4,53 @@ include 'nav.php';
 
 <main class="main-content">
     <div class="page-header">
-        <h2>Help</h2>
+        <h2>Support</h2>
         <h3>Here you can find all the help you need to use the app.</h3>
-        <!--div class="actions">
-            <button class="btn-export">Export CSV</button>
-            <button class="btn-filter">Filter Orders</button>
-        </div-->
     </div>
 
     <div class="orders-card">
-    <h1>How to Use the Shopify App</h1>
-        <ol>
-        <li>Install the app from the Shopify App Store.</li>
-        <li>Authorize your store during installation.</li>
-        <li>Use the sidebar navigation to access Dashboard, Templates, and Settings.</li>
-        <li>Make sure to activate your subscription plan to unlock all features.</li>
-        </ol>
+    <h1>Need Help Using Our App?</h1>
+    <p>We're Here to Support You – Quickly & Easily</p>
 
-        <embed src="https://www.youtube.com/embed/QLqbBeDTs5E" type="video/mp4" style="width:100%; height:400px;" />
+    <p>Get step-by-step guidance on using the app’s features like invoice generation, templates, and subscription management.
+        Whether you're stuck or just need tips, we’re always available to assist.</p>
+
+        <p>Support Options:</p>
+        <ul>
+        <li>Watch our quick start video for an overview</li>
+        <li>Follow our simple usage instructions</li>
+        <li>Contact our support team anytime for personalized help</li>
+        </ul>
+        <p>We're committed to making your experience smooth and productive.</p>
+        
+        Follow Our Simple Usage Instructions
+
+        <p>1. Free Plan Features</p>
+        <ul>
+        <li>View your order list directly on the dashboard or through the Shopify Orders page.</li>
+        <li>Manually generate invoices and email them to your customers.</li>
+        <li>Customize your invoice design from the Settings > Invoice tab by selecting your preferred template.</li>
+        <li>Easily generate, print, download PDF invoices, or resend them to customers as needed.</li>
+        </ul>
+
+        <p>2. Premium Plan Features (Includes 7-Day Free Trial)</p>
+        <p>Upgrade to unlock automation and advanced customization:</p>   
+
+        <p>a) Automatic Invoice Delivery</p>
+        <ul>
+        <li>Go to Settings > General to enable automatic invoice generation.</li>
+        <li>Choose to send invoices to customers, store owners, or a custom email address.</li>
+        <li>Once enabled, the system will automatically create and email PDF invoices immediately after an order is placed.</li>
+        </ul>
+
+        <p>b) Custom Email Configuration</p>
+        <ul>
+        <li>Navigate to Settings > Email to configure your own SMTP settings.</li>
+        <li>Customize the email template layout and content to match your brand.</li>
+        <li>Ensure customers receive professional, personalized invoice emails with every order.</li>
+        </ul>
+
+        <embed src="https://www.youtube.com/embed/QLqbBeDTs5E" type="video/mp4" style="width:800px; height:400px;" />
 
         <div class="support">
         Need help? Email us at <a href="mailto:support.sapi@silverwebbuzz.com">support.sapi@silverwebbuzz.com</a>
