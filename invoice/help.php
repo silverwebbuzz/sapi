@@ -2,6 +2,12 @@
 include 'nav.php'; 
 ?>
 <style>
+        
+        p {
+        line-height: 1.6;
+        margin-bottom: 16px;
+        font-size: 15px;
+        }
         ul {
             padding-left: 20px;
         }
