@@ -12,6 +12,9 @@
         <li class="<?= basename($_SERVER['PHP_SELF']) == 'settings' ? 'active' : '' ?>">
             <a href="settings?shop=<?php echo $shop; ?>">Settings</a>
         </li>
+        <li class="<?= basename($_SERVER['PHP_SELF']) == 'help' ? 'active' : '' ?>">
+            <a href="settings?shop=<?php echo $shop; ?>">Help</a>
+        </li>
     </ul>
 </nav>
 
