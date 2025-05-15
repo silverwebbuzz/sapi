@@ -12,6 +12,9 @@ include 'nav.php';
         margin-top: 30px;
         margin-bottom: 10px;
         }
+        h4{
+            font-size: 15px;
+        }
         ul {
             padding-left: 20px;
             font-size: 15px;
@@ -55,6 +58,11 @@ include 'nav.php';
         </ul>
 
         <p>We're committed to making your experience smooth and productive.</p>
+        
+        <h2>Watch our quick start video for an overview</h2>
+        <div class="video-container">
+        <embed src="https://www.youtube.com/embed/QLqbBeDTs5E" type="video/mp4" style="width:800px; height:400px;" />
+        </div>
 
         <h2>Follow Our Simple Usage Instructions</h2>
         
@@ -83,9 +91,7 @@ include 'nav.php';
             <li>Ensure customers receive professional, personalized invoice emails with every order.</li>
         </ul>
 
-        <div class="video-container">
-        <embed src="https://www.youtube.com/embed/QLqbBeDTs5E" type="video/mp4" style="width:800px; height:400px;" />
-        </div>
+        
 
         <div class="support-contact">
             Need help? Email us at <a href="mailto:support.sapi@silverwebbuzz.com">support.sapi@silverwebbuzz.com</a>
