@@ -8,11 +8,17 @@ include 'nav.php';
         margin-bottom: 16px;
         font-size: 15px;
         }
+        h2,  h3, h4 {
+        margin-top: 30px;
+        margin-bottom: 10px;
+        }
         ul {
             padding-left: 20px;
+            font-size: 15px;
         }
         li {
             margin-bottom: 10px;
+            font-size: 15px;
         }
         .video-container embed {
             width: 100%;
@@ -22,7 +28,7 @@ include 'nav.php';
         }
         .support-contact {
             margin-top: 40px;
-            font-size: 1.1em;
+            font-size: 15px;
             text-align: center;
         }
         .support-contact a {
