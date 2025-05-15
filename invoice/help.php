@@ -4,12 +4,13 @@ include 'nav.php';
 <style>
         
         p {
-        line-height: 1.6;
-        margin-bottom: 16px;
+        line-height: 1.4;
+        margin-bottom: 10px;
+        margin-top: 10px;
         font-size: 15px;
         }
         h2,  h3, h4 {
-        margin-top: 30px;
+        margin-top: 20px;
         margin-bottom: 10px;
         }
         h4{
