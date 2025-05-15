@@ -1,59 +1,101 @@
 <?php include 'header.php';
 include 'nav.php'; 
 ?>
-
+<style>
+        .help-container {
+            max-width: 900px;
+            margin: 40px auto;
+            padding: 20px;
+            background: #fff;
+            border-radius: 10px;
+        }
+        .help-container h1 {
+            font-size: 2em;
+            margin-bottom: 10px;
+        }
+        .help-container h2 {
+            margin-top: 30px;
+            font-size: 1.5em;
+        }
+        .help-container ul {
+            padding-left: 20px;
+        }
+        .help-container li {
+            margin-bottom: 10px;
+        }
+        .video-container {
+            margin: 30px 0;
+            text-align: center;
+        }
+        .video-container iframe {
+            width: 100%;
+            max-width: 800px;
+            height: 400px;
+            border: none;
+        }
+        .support-contact {
+            margin-top: 40px;
+            font-size: 1.1em;
+            text-align: center;
+        }
+        .support-contact a {
+            color: #007acc;
+            text-decoration: none;
+        }
+    </style>
 <main class="main-content">
     <div class="page-header">
         <h2>Support</h2>
         <h3>Here you can find all the help you need to use the app.</h3>
     </div>
+    <div class="help-container">
+        <h1>Need Help Using Our App?</h1>
+        <p>We're Here to Support You – Quickly & Easily</p>
 
-    <div class="orders-card">
-    <h1>Need Help Using Our App?</h1>
-    <p>We're Here to Support You – Quickly & Easily</p>
+        <p>Get step-by-step guidance on using the app’s features like invoice generation, templates, and subscription management. Whether you're stuck or just need tips, we’re always available to assist.</p>
 
-    <p>Get step-by-step guidance on using the app’s features like invoice generation, templates, and subscription management.
-        Whether you're stuck or just need tips, we’re always available to assist.</p>
-
-        <p>Support Options:</p>
+        <h2>Support Options:</h2>
         <ul>
-        <li>Watch our quick start video for an overview</li>
-        <li>Follow our simple usage instructions</li>
-        <li>Contact our support team anytime for personalized help</li>
+            <li>Watch our quick start video for an overview</li>
+            <li>Follow our simple usage instructions</li>
+            <li>Contact our support team anytime for personalized help</li>
         </ul>
+
         <p>We're committed to making your experience smooth and productive.</p>
+
+        <h2>Follow Our Simple Usage Instructions</h2>
         
-        Follow Our Simple Usage Instructions
-
-        <p>1. Free Plan Features</p>
+        <h3>1. Free Plan Features</h3>
         <ul>
-        <li>View your order list directly on the dashboard or through the Shopify Orders page.</li>
-        <li>Manually generate invoices and email them to your customers.</li>
-        <li>Customize your invoice design from the Settings > Invoice tab by selecting your preferred template.</li>
-        <li>Easily generate, print, download PDF invoices, or resend them to customers as needed.</li>
+            <li>View your order list directly on the dashboard or through the Shopify Orders page.</li>
+            <li>Manually generate invoices and email them to your customers.</li>
+            <li>Customize your invoice design from the <strong>Settings > Invoice</strong> tab by selecting your preferred template.</li>
+            <li>Easily generate, print, download PDF invoices, or resend them to customers as needed.</li>
         </ul>
 
-        <p>2. Premium Plan Features (Includes 7-Day Free Trial)</p>
-        <p>Upgrade to unlock automation and advanced customization:</p>   
+        <h3>2. Premium Plan Features (Includes 7-Day Free Trial)</h3>
+        <p><strong>Upgrade to unlock automation and advanced customization:</strong></p>
 
-        <p>a) Automatic Invoice Delivery</p>
+        <h4>a) Automatic Invoice Delivery</h4>
         <ul>
-        <li>Go to Settings > General to enable automatic invoice generation.</li>
-        <li>Choose to send invoices to customers, store owners, or a custom email address.</li>
-        <li>Once enabled, the system will automatically create and email PDF invoices immediately after an order is placed.</li>
+            <li>Go to <strong>Settings > General</strong> to enable automatic invoice generation.</li>
+            <li>Choose to send invoices to customers, store owners, or a custom email address.</li>
+            <li>Once enabled, the system will automatically create and email PDF invoices immediately after an order is placed.</li>
         </ul>
 
-        <p>b) Custom Email Configuration</p>
+        <h4>b) Custom Email Configuration</h4>
         <ul>
-        <li>Navigate to Settings > Email to configure your own SMTP settings.</li>
-        <li>Customize the email template layout and content to match your brand.</li>
-        <li>Ensure customers receive professional, personalized invoice emails with every order.</li>
+            <li>Navigate to <strong>Settings > Email</strong> to configure your own SMTP settings.</li>
+            <li>Customize the email template layout and content to match your brand.</li>
+            <li>Ensure customers receive professional, personalized invoice emails with every order.</li>
         </ul>
 
+        <div class="video-container">
         <embed src="https://www.youtube.com/embed/QLqbBeDTs5E" type="video/mp4" style="width:800px; height:400px;" />
+        </div>
 
-        <div class="support">
-        Need help? Email us at <a href="mailto:support.sapi@silverwebbuzz.com">support.sapi@silverwebbuzz.com</a>
+        <div class="support-contact">
+            Need help? Email us at <a href="mailto:support.sapi@silverwebbuzz.com">support.sapi@silverwebbuzz.com</a>
         </div>
     </div>
 </main>
