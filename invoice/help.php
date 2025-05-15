@@ -41,13 +41,10 @@ include 'nav.php';
         }
     </style>
 <main class="main-content">
-    <div class="page-header">
-        <h2>Support</h2>
-        <h3>Here you can find all the help you need to use the app.</h3>
-    </div>
+    
     <div class="package-card">
         <h1>Need Help Using Our App?</h1>
-        <p>We're Here to Support You – Quickly & Easily</p>
+        <p>We're Here to Support You - Quickly & Easily</p>
 
         <p>Get step-by-step guidance on using the app’s features like invoice generation, templates, and subscription management. Whether you're stuck or just need tips, we’re always available to assist.</p>
 
