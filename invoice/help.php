@@ -21,7 +21,7 @@ include 'nav.php';
         <li>Make sure to activate your subscription plan to unlock all features.</li>
         </ol>
 
-        <iframe src="https://www.youtube.com/watch?v=QLqbBeDTs5E" allowfullscreen></iframe>
+        <embed src="https://www.youtube.com/embed/dQw4w9WgXcQ" type="video/mp4" style="width:100%; height:400px;" />
 
         <div class="support">
         Need help? Email us at <a href="mailto:support.sapi@silverwebbuzz.com">support.sapi@silverwebbuzz.com</a>
