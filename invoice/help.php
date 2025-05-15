@@ -2,32 +2,13 @@
 include 'nav.php'; 
 ?>
 <style>
-        .help-container {
-            max-width: 900px;
-            margin: 40px auto;
-            padding: 20px;
-            background: #fff;
-            border-radius: 10px;
-        }
-        .help-container h1 {
-            font-size: 2em;
-            margin-bottom: 10px;
-        }
-        .help-container h2 {
-            margin-top: 30px;
-            font-size: 1.5em;
-        }
-        .help-container ul {
+        ul {
             padding-left: 20px;
         }
-        .help-container li {
+        li {
             margin-bottom: 10px;
         }
-        .video-container {
-            margin: 30px 0;
-            text-align: center;
-        }
-        .video-container iframe {
+        .video-container embed {
             width: 100%;
             max-width: 800px;
             height: 400px;
@@ -48,7 +29,7 @@ include 'nav.php';
         <h2>Support</h2>
         <h3>Here you can find all the help you need to use the app.</h3>
     </div>
-    <div class="help-container">
+    <div class="package-card">
         <h1>Need Help Using Our App?</h1>
         <p>We're Here to Support You – Quickly & Easily</p>
 
