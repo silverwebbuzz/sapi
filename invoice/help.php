@@ -58,8 +58,8 @@ include 'nav.php';
         <p>We're committed to making your experience smooth and productive.</p>
         
         <h2>Watch our quick start video for an overview</h2>
-        <div class="video-container">
-        <embed src="https://www.youtube.com/watch?v=eF9gLm6UqA4" type="video/mp4" style="width:800px; height:400px;" />
+        <div class="video-container"> 
+        <embed src="https://www.youtube.com/embed/eF9gLm6UqA4" type="video/mp4" style="width:800px; height:400px;" />
         </div>
 
         <h2>Follow Our Simple Usage Instructions</h2>
