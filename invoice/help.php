@@ -59,7 +59,7 @@ include 'nav.php';
         
         <h2>Watch our quick start video for an overview</h2>
         <div class="video-container">
-        <embed src="https://www.youtube.com/embed/QLqbBeDTs5E" type="video/mp4" style="width:800px; height:400px;" />
+        <embed src="https://www.youtube.com/watch?v=eF9gLm6UqA4" type="video/mp4" style="width:800px; height:400px;" />
         </div>
 
         <h2>Follow Our Simple Usage Instructions</h2>
