@@ -31,7 +31,7 @@ try {
     if (!$token) {
         throw new Exception("Missing token");
     }
-
+    JWT::$leeway = 60;
     $decoded = JWT::decode($token, new Key($appSecret, 'HS256'));
     $shop = parse_url($decoded->dest, PHP_URL_HOST);
     echo json_encode([
