@@ -303,9 +303,6 @@ if ($row) {
                     echo "<pre>";
                     print_r($logos);
                     echo "</pre>";
-                    $images = array_filter($logos, function($file) {
-                        return strpos($file['mime_type'], 'image/') === 0;
-                    });
                 ?>
                 <!-- Modal for selecting logo -->
                 <div class="modal fade" id="logoModal" tabindex="-1" role="dialog" aria-labelledby="logoModalLabel" aria-hidden="true">
