@@ -276,20 +276,7 @@ if ($row) {
                             <label>New Logo</label>
                             <p class="description">Click the button below to select a logo from your Shopify library.</p>
 
-                            <!-- Hidden input to store selected logo URL -->
-                            <input type="hidden" name="logo_url" id="selectedLogoInput" value="<?= $row['logo_url'] ?>">
-
-                            <!-- Button to open modal -->
-                            <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#logoModal">
-                                Select From Shopify Library
-                            </button>
-
-                            <!-- Preview after selection -->
-                            <div style="margin-top: 10px;">
-                                <strong>Preview:</strong><br>
-                                <img id="logoPreview" src="<?= $row['logo_url'] ?>" style="max-height: 100px;">
-                            </div>
-
+                           
                             <!-- Optional fallback file upload -->
                             <p class="description mt-3">Or upload a new logo (optional):</p>
                             <input type="file" name="logo_upload" accept="image/*">
@@ -299,10 +286,10 @@ if ($row) {
                     </form>
                     
                 <?php
-                   $logos = getAllFiles($shop, $row['access_token']);
-                    echo "<pre>";
-                    print_r($logos);
-                    echo "</pre>";
+                   //$logos = getAllFiles($shop, $row['access_token']);
+                    //echo "<pre>";
+                    //print_r($logos);
+                    //echo "</pre>";
                 ?>
                 
 
