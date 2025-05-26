@@ -93,6 +93,13 @@ $(document).ready(function() {
         }
     });
 
+    $(document).on('click', '.selectable-logo', function() {
+        var logoUrl = $(this).data('url');
+        $('#selectedLogoInput').val(logoUrl);
+        $('#logoPreview').attr('src', logoUrl);
+        $('#logoModal').modal('hide');
+    });
+
     // Close menu when clicking outside on mobile
     $(document).on('click', function(e) {
         if ($(window).width() <= 992) {

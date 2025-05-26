@@ -299,7 +299,7 @@ if ($row) {
                     </form>
                     
                 <?php
-                    $logos = getAllFiles($shop, $access_token);
+                    $logos = getAllFiles($shop, $row['access_token']);
                     $images = array_filter($logos, function($file) {
                         return strpos($file['mime_type'], 'image/') === 0;
                     });
