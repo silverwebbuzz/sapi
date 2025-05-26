@@ -6,9 +6,22 @@ use Firebase\JWT\Key;
 
 header('Content-Type: application/json');
 
-//$headers = getallheaders();
-$headers = array_change_key_case(getallheaders(), CASE_LOWER);
-$authHeader = $headers['Authorization'] ?? '';
+$authHeader = '';
+
+if (function_exists('getallheaders')) {
+    $headers = getallheaders();
+    if (isset($headers['Authorization'])) {
+        $authHeader = $headers['Authorization'];
+    } elseif (isset($headers['authorization'])) {
+        $authHeader = $headers['authorization'];
+    }
+}
+
+// Fallback for environments that strip the Authorization header
+if (!$authHeader && isset($_SERVER['HTTP_AUTHORIZATION'])) {
+    $authHeader = $_SERVER['HTTP_AUTHORIZATION'];
+}
+
 $token = str_replace('Bearer ', '', $authHeader);
 
 // Replace with your Shopify App Secret from Partner Dashboard
