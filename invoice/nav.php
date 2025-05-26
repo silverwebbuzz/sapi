@@ -20,7 +20,7 @@
 
 <?php 
 // Fetch existing settings
-$sql_settings = "SELECT access_token, store_name,smtp_settings,auto_invoice_customer, auto_invoice_personal, email_invoice, email, invoice_templates_id FROM stores WHERE id = ?";
+$sql_settings = "SELECT logo_url,access_token, store_name,smtp_settings,auto_invoice_customer, auto_invoice_personal, email_invoice, email, invoice_templates_id FROM stores WHERE id = ?";
 $row = DBHelper::selectOne($sql_settings,"s", [$shop_id]);
 
 /*$webhooks = listWebhooks($shop, $row['access_token']);

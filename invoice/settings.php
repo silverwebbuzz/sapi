@@ -128,6 +128,7 @@ if ($row) {
             <a href="#general" class="settings-tab active"><i class="icon-gear"></i> General</a>
             <a href="#email" class="settings-tab"><i class="icon-email"></i> Email</a>
             <a href="#invoice" class="settings-tab"><i class="icon-invoice"></i> Invoice</a>
+            <a href="#logo" class="settings-tab"><i class="icon-logo"></i> Logo</a>
         </div>
 
         <!-- Display messages -->
@@ -249,18 +250,86 @@ if ($row) {
                                             <?= htmlspecialchars($template['template_name']) ?>
                                         </div>
                                     <?php endif; ?>
-                                    <div class="template-name"><?= htmlspecialchars($template['template_name']) ?></div>
-                                </label>
-                            </div>
+                                <div class="template-name"><?= htmlspecialchars($template['template_name']) ?></div>
+                            </label>
+                        </div>
 
-                        <?php 
-                            endforeach; 
-                        ?>
-                            
+                    <?php 
+                        endforeach; 
+                    ?>   
                         </div>
                         <button type="submit" class="btn-save">Save Template</button>
                     </div>
                 </form>    
+            </section>
+
+            <!-- Logo Settings -->
+            <section id="logo" class="settings-section">
+                <h3>Logo Settings</h3>
+                    <form method="POST" class="settings-form" enctype="multipart/form-data" >
+                        <input type="hidden" name="save_logo_settings" value="1">
+
+                        <p>Current Logo:</p>
+                        <img src="<?= $row['logo_url'] ?>" alt="<?= htmlspecialchars($row['store_name']) ?>" style="max-height: 100px;">
+
+                        <div class="form-group">
+                            <label>New Logo</label>
+                            <p class="description">Click the button below to select a logo from your Shopify library.</p>
+
+                            <!-- Hidden input to store selected logo URL -->
+                            <input type="hidden" name="logo_url" id="selectedLogoInput" value="<?= $row['logo_url'] ?>">
+
+                            <!-- Button to open modal -->
+                            <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#logoModal">
+                                Select From Shopify Library
+                            </button>
+
+                            <!-- Preview after selection -->
+                            <div style="margin-top: 10px;">
+                                <strong>Preview:</strong><br>
+                                <img id="logoPreview" src="<?= $row['logo_url'] ?>" style="max-height: 100px;">
+                            </div>
+
+                            <!-- Optional fallback file upload -->
+                            <p class="description mt-3">Or upload a new logo (optional):</p>
+                            <input type="file" name="logo_upload" accept="image/*">
+                        </div>
+
+                        <button type="submit" class="btn-save">Save Logo</button>
+                    </form>
+                    
+                <?php
+                    $logos = getAllFiles($shop, $access_token);
+                    $images = array_filter($logos, function($file) {
+                        return strpos($file['mime_type'], 'image/') === 0;
+                    });
+                ?>
+                <!-- Modal for selecting logo -->
+                <div class="modal fade" id="logoModal" tabindex="-1" role="dialog" aria-labelledby="logoModalLabel" aria-hidden="true">
+                    <div class="modal-dialog modal-lg" role="document">
+                        <div class="modal-content">
+                        <div class="modal-header">
+                            <h5 class="modal-title">Select a Logo from Shopify Library</h5>
+                            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                            <span>&times;</span>
+                            </button>
+                        </div>
+                        <div class="modal-body">
+                            <div class="row">
+                            <?php foreach ($images as $image): ?>
+                                <div class="col-md-3 mb-3">
+                                <img src="<?= htmlspecialchars($image['public_url']) ?>"
+                                    data-url="<?= htmlspecialchars($image['public_url']) ?>"
+                                    class="img-thumbnail selectable-logo"
+                                    style="cursor:pointer; max-height:100px;">
+                                </div>
+                            <?php endforeach; ?>
+                            </div>
+                        </div>
+                        </div>
+                    </div>
+                </div>
+
             </section>
         </div>
     </div>

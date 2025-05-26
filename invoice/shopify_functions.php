@@ -190,6 +190,24 @@ function getShopLogo($shop, $access_token) {
     return $assets;
 }
 
+function getAllFiles($shop, $access_token) {
+    $url = "https://$shop/admin/api/" . SHOPIFY_API_VERSION . "/files.json";
+
+    $ch = curl_init();
+    curl_setopt($ch, CURLOPT_URL, $url);
+    curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+    curl_setopt($ch, CURLOPT_HTTPHEADER, [
+        'X-Shopify-Access-Token: ' . $access_token,
+        'Content-Type: application/json'
+    ]);
+    $response = curl_exec($ch);
+    curl_close($ch);
+
+    $files = json_decode($response, true);
+    return $files['files'] ?? [];
+}
+
+
 function createRecurringCharge($shop,$access_token, $charge_data){
     $Url = "https://{$shop}/admin/api/" . SHOPIFY_API_VERSION . "/recurring_application_charges.json";
 
