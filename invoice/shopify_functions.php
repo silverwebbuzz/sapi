@@ -223,7 +223,7 @@ function getAllFiles($shop, $access_token) {
     curl_close($ch);
 
     $result = json_decode($response, true);
-
+    return $result;
     // Debug: Uncomment if you want to inspect the response
     // echo "<pre>"; print_r($result); echo "</pre>";
 
