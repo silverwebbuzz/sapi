@@ -73,7 +73,7 @@ if (!isset($currentPlan) || empty($currentPlan)) {
             };
 
             utils.getSessionToken(app).then((token) => {
-                fetch('../verify_token', {
+                fetch('../verify_token.php', {
                     method: 'POST',
                     headers: {
                         'Authorization': 'Bearer ' + token
