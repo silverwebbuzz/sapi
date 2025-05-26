@@ -20,7 +20,7 @@ define('LIVE_SHOPIFY_APP_URL', "https://apps.shopify.com/swb-auto-pdf-invoices")
 define('SHOPIFY_API_KEY', '376ce2c1e19ffa08ea8ad26e038ff4f5');
 define('SHOPIFY_API_SECRET', 'af6436e75bd208e3ce4dc8c153d5ad6f');
 define('SHOPIFY_API_VERSION', '2025-01');
-define('SHOPIFY_APP_SCOPES', 'read_products,read_orders,read_customers,read_assigned_fulfillment_orders,read_merchant_managed_fulfillment_orders,read_third_party_fulfillment_orders,read_themes,read_brand');
+define('SHOPIFY_APP_SCOPES', 'read_products,read_orders,read_customers,read_assigned_fulfillment_orders,read_merchant_managed_fulfillment_orders,read_third_party_fulfillment_orders,read_themes');
 define('SHOPIFY_APP_REDIRECT', true);
 define('ADMIN_URL_FORMAT', 'https://admin.shopify.com/store/%s/apps/%s');
 
