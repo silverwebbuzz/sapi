@@ -197,6 +197,11 @@ function getAllFiles($shop, $access_token) {
     {
       shop {
         brand {
+          logo {
+            image {
+              url
+            }
+          }
         }
       }
     }
