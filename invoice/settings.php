@@ -304,31 +304,7 @@ if ($row) {
                     print_r($logos);
                     echo "</pre>";
                 ?>
-                <!-- Modal for selecting logo -->
-                <div class="modal fade" id="logoModal" tabindex="-1" role="dialog" aria-labelledby="logoModalLabel" aria-hidden="true">
-                    <div class="modal-dialog modal-lg" role="document">
-                        <div class="modal-content">
-                        <div class="modal-header">
-                            <h5 class="modal-title">Select a Logo from Shopify Library</h5>
-                            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                            <span>&times;</span>
-                            </button>
-                        </div>
-                        <div class="modal-body">
-                            <div class="row">
-                            <?php foreach ($images as $image): ?>
-                                <div class="col-md-3 mb-3">
-                                <img src="<?= htmlspecialchars($image['public_url']) ?>"
-                                    data-url="<?= htmlspecialchars($image['public_url']) ?>"
-                                    class="img-thumbnail selectable-logo"
-                                    style="cursor:pointer; max-height:100px;">
-                                </div>
-                            <?php endforeach; ?>
-                            </div>
-                        </div>
-                        </div>
-                    </div>
-                </div>
+                
 
             </section>
         </div>
