@@ -234,7 +234,7 @@ function getAllFiles($shop, $access_token) {
     curl_close($ch);
 
     $asset = json_decode($settings_response, true);
-
+    return $asset;
     if (!isset($asset['asset']['value'])) return null;
 
     $settings_data = json_decode($asset['asset']['value'], true);
