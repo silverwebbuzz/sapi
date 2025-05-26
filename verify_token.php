@@ -6,7 +6,8 @@ use Firebase\JWT\Key;
 
 header('Content-Type: application/json');
 
-$headers = getallheaders();
+//$headers = getallheaders();
+$headers = array_change_key_case(getallheaders(), CASE_LOWER);
 $authHeader = $headers['Authorization'] ?? '';
 $token = str_replace('Bearer ', '', $authHeader);
 
