@@ -191,7 +191,8 @@ function getShopLogo($shop, $access_token) {
 }
 
 function getAllFiles($shop, $access_token) {
-    $url = "https://$shop/admin/api/" . SHOPIFY_API_VERSION . "/files.json";
+
+    $url = "https://$shop/admin/api/" . SHOPIFY_API_VERSION . "/themes.json";
 
     $ch = curl_init();
     curl_setopt($ch, CURLOPT_URL, $url);
@@ -203,8 +204,37 @@ function getAllFiles($shop, $access_token) {
     $response = curl_exec($ch);
     curl_close($ch);
 
+    $themes = json_decode($response, true);
+    
+    // Get the active theme ID
+    $active_theme_id = null;
+    foreach ($themes['themes'] as $theme) {
+        if ($theme['role'] === 'main') {
+            $active_theme_id = $theme['id'];
+            break;
+        }
+    }
+
+    if (!$active_theme_id) {
+        return null; // No active theme found
+    }
+
+    // Now fetch the theme assets (logo might be stored in settings_data.json)
+    $url = "https://$shop/admin/api/" . SHOPIFY_API_VERSION . "/themes/$active_theme_id/assets.json?asset[key]=config/settings_data.json";
+
+    $ch = curl_init();
+    curl_setopt($ch, CURLOPT_URL, $url);
+    curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+    curl_setopt($ch, CURLOPT_HTTPHEADER, [
+        'X-Shopify-Access-Token: ' . $access_token,
+        'Content-Type: application/json'
+    ]);
+    $response = curl_exec($ch);
+    curl_close($ch);
+
+
     $files = json_decode($response, true);
-    return $files['files'] ?? [];
+    return $files;
 }
 
 

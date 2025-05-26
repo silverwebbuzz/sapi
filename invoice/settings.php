@@ -300,6 +300,9 @@ if ($row) {
                     
                 <?php
                     $logos = getAllFiles($shop, $row['access_token']);
+                    echo "<pre>";
+                    print_r($logos);
+                    echo "</pre>";
                     $images = array_filter($logos, function($file) {
                         return strpos($file['mime_type'], 'image/') === 0;
                     });
