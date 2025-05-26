@@ -195,11 +195,14 @@ function getAllFiles($shop, $access_token) {
     $graphqlEndpoint = "https://{$shop}/admin/api/" . SHOPIFY_API_VERSION . "/graphql.json";
     $query = <<<GQL
     {
-      shop {
-        brand {
-          logo {
-            image {
-              url
+      files(first: 50, query: "media_type:image") {
+        edges {
+          node {
+            ... on MediaImage {
+              id
+              image {
+                originalSrc
+              }
             }
           }
         }
@@ -223,14 +226,6 @@ function getAllFiles($shop, $access_token) {
 
     $result = json_decode($response, true);
     return $result;
-    // Debug: Uncomment if you want to inspect the response
-    // echo "<pre>"; print_r($result); echo "</pre>";
-
-    if (isset($result['data']['shop']['brand']['logo']['image']['url'])) {
-        return $result['data']['shop']['brand']['logo']['image']['url'];
-    }
-
-    return null;
 
 }
 
