@@ -299,10 +299,10 @@ if ($row) {
                     </form>
                     
                 <?php
-                    $logos = getAllFiles($shop, $row['access_token']);
-                    echo "<pre>";
-                    print_r($logos);
-                    echo "</pre>";
+                   // $logos = getAllFiles($shop, $row['access_token']);
+                    //echo "<pre>";
+                    //print_r($logos);
+                    //echo "</pre>";
                 ?>
                 
 
