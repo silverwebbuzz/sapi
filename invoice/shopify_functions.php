@@ -191,87 +191,42 @@ function getShopLogo($shop, $access_token) {
 }
 
 function getAllFiles($shop, $access_token) {
+    $endpoint = "https://$shop/admin/api/2024-01/graphql.json";
 
-    $api_version = SHOPIFY_API_VERSION;
-
-    // Step 1: Get list of themes
-    $themes_url = "https://$shop/admin/api/$api_version/themes.json";
+    $query = <<<GQL
+    {
+      brand {
+        logo {
+          image {
+            url
+          }
+        }
+      }
+    }
+    GQL;
 
     $ch = curl_init();
-    curl_setopt($ch, CURLOPT_URL, $themes_url);
+    curl_setopt($ch, CURLOPT_URL, $endpoint);
+    curl_setopt($ch, CURLOPT_POST, true);
+    curl_setopt($ch, CURLOPT_POSTFIELDS, json_encode(['query' => $query]));
     curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
     curl_setopt($ch, CURLOPT_HTTPHEADER, [
-        "X-Shopify-Access-Token: $access_token",
-        "Content-Type: application/json"
+        "Content-Type: application/json",
+        "X-Shopify-Access-Token: $access_token"
     ]);
-    $themes_response = curl_exec($ch);
+
+    $response = curl_exec($ch);
     curl_close($ch);
 
-    $themes = json_decode($themes_response, true);
+    $result = json_decode($response, true);
 
-    // Step 2: Find the main (active) theme
-    $active_theme_id = null;
-    foreach ($themes['themes'] as $theme) {
-        if ($theme['role'] === 'main') {
-            $active_theme_id = $theme['id'];
-            break;
-        }
+    if (isset($result['data']['brand']['logo']['image']['url'])) {
+        return $result['data']['brand']['logo']['image']['url'];
     }
 
-    if (!$active_theme_id) return null;
-
-    // Step 3: Get settings_data.json from active theme
-    $settings_url = "https://$shop/admin/api/$api_version/themes/$active_theme_id/assets.json?asset[key]=config/settings_data.json";
-
-    $ch = curl_init();
-    curl_setopt($ch, CURLOPT_URL, $settings_url);
-    curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
-    curl_setopt($ch, CURLOPT_HTTPHEADER, [
-        "X-Shopify-Access-Token: $access_token",
-        "Content-Type: application/json"
-    ]);
-    $settings_response = curl_exec($ch);
-    curl_close($ch);
-
-    $asset = json_decode($settings_response, true);
-    return $asset;
-    if (!isset($asset['asset']['value'])) return null;
-
-    $settings_data = json_decode($asset['asset']['value'], true);
-
-    // Step 4: Try to extract logo image file
-    $logo_keys = [
-        'logo',                    // Common
-        'logo_image',              // Debut theme
-        'header.logo_image',       // Some themes
-        'sections.header.settings.logo',
-    ];
-
-    foreach ($logo_keys as $key) {
-        // Dot notation to array traversal
-        $value = getValueByDotNotation($settings_data['current'] ?? [], $key);
-        if ($value) {
-            // The logo is usually a filename like "logo.png"
-            return "https://cdn.shopify.com/s/files/1/". explode('.', $shop)[0] . "/files/" . ltrim($value, '/');
-        }
-    }
-
-    return null;
+    return $result;
 
 }
-
-function getValueByDotNotation($array, $path) {
-    $keys = explode('.', $path);
-    foreach ($keys as $key) {
-        if (is_array($array) && isset($array[$key])) {
-            $array = $array[$key];
-        } else {
-            return null;
-        }
-    }
-    return $array;
-}
-
 
 function createRecurringCharge($shop,$access_token, $charge_data){
     $Url = "https://{$shop}/admin/api/" . SHOPIFY_API_VERSION . "/recurring_application_charges.json";
