@@ -128,7 +128,7 @@ if ($row) {
             <a href="#general" class="settings-tab active"><i class="icon-gear"></i> General</a>
             <a href="#email" class="settings-tab"><i class="icon-email"></i> Email</a>
             <a href="#invoice" class="settings-tab"><i class="icon-invoice"></i> Invoice</a>
-            <a href="#logo" class="settings-tab"><i class="icon-logo"></i> Logo</a>
+            <!--a href="#logo" class="settings-tab"><i class="icon-logo"></i> Logo</a>
         </div>
 
         <!-- Display messages -->
