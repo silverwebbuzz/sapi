@@ -12,6 +12,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['save_email_settings']
     $smtp_settings = [
         'host' => $_POST['smtp_host'],
         'port' => $_POST['smtp_port'],
+        'from_email' => $_POST['smtp_from_email'],
         'displayname' => $_POST['smtp_displayname'],
         'username' => $_POST['smtp_user'],
         'password' => $_POST['smtp_pass'],
@@ -98,6 +99,7 @@ $settings = [
 $smtp_settings = [
     'host' => '',
     'port' => '587',
+    'from_email' => '',
     'displayname' => $row['store_name'].' Sapi',
     'username' => '',
     'password' => '',
@@ -175,6 +177,11 @@ if ($row) {
                 <h3>Email Settings</h3>
                 <form method="POST" class="settings-form">
                     <input type="hidden" name="save_email_settings" value="1">
+                    <div class="form-group">
+                        <label>From Email Address</label>
+                        <input type="email" name="smtp_from_email" class="form-input" value="<?= htmlspecialchars($smtp_settings['from_email']) ?>" placeholder="Support@yourdomain.com" required>
+                        <p class="description">The email address that will appear as the sender</p>
+                    </div>
                     <div class="form-group">
                         <label>Email Display Name</label>
                         <input type="text" name="smtp_displayname" class="form-input"  value="<?= htmlspecialchars($smtp_settings['displayname']) ?>"  placeholder="Sapi Support" required>
