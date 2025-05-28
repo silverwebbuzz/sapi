@@ -158,7 +158,7 @@ function generatepdf($shop_id,$order_id){
     }
 }
 
-function sendemail($shop_id,$order_id){
+function sendemail($shop_id,$order_id, $personal_copy = false){
         
     $shop_data = DBHelper::selectOne(
         "SELECT * FROM stores WHERE `id` = ? ",
@@ -195,9 +195,15 @@ function sendemail($shop_id,$order_id){
                 ];
             }
             
-            $to_email = $invoice['customer_email'];
-            $to_name = $invoice['customer_name'];
-            $subject = str_replace(['{invoice_number}','{shop_name}'],[$invoice['order_name'],$shop_data['store_name']],$smtp_settings['subject']);
+            if ($personal_copy) {
+                $to_email = $shop_data['email_invoice'] ?? $shop_data['email'];
+                $to_name = $shop_data['shop_owner'];
+                $subject = "[Store Copy] " . str_replace(['{invoice_number}','{shop_name}'],[$invoice['order_name'],$shop_data['store_name']],$smtp_settings['subject']);
+            } else {
+                $to_email = $invoice['customer_email'];
+                $to_name = $invoice['customer_name'];
+                $subject = str_replace(['{invoice_number}','{shop_name}'],[$invoice['order_name'],$shop_data['store_name']],$smtp_settings['subject']);
+            }
             $body = $smtp_settings['body'];
             //When sending an email, you would replace the variables like this:
             $email_body = str_replace(
@@ -209,12 +215,6 @@ function sendemail($shop_id,$order_id){
             // Send email with attachment
             $email_sent = sendEmailWithAttachment($smtp_settings, $to_email,$to_name, $subject, $email_body, $decoded_pdf, "invoice_{$invoice['order_name']}.pdf");
 
-            if($shop_data['auto_invoice_personal']=='Yes')
-            {
-                $send_showowner_invoice_email = $shop_data['email_invoice'] ?? $shop_data['email'] ; 
-                $email_sent = sendEmailWithAttachment($smtp_settings, $send_showowner_invoice_email,$shop_data['shop_owner'], $subject, $email_body, $decoded_pdf, "invoice_{$invoice['order_name']}.pdf");
-            }
-
             $email_status = $email_sent ? 'sent' : 'failed';
 
             // Single database update for both PDF and email status
@@ -223,11 +223,14 @@ function sendemail($shop_id,$order_id){
                 "ss",
                 [$email_status, $order_id]
             );
-            $affectedRows = DBHelper::execute(
-                "UPDATE `store_subscriptions` SET  email_used = email_used+1  WHERE store_id = ? ",
-                "s",
-                [$shop_id]
-            );
+            // Only increment email count if this is not a personal copy
+            if (!$personal_copy) {
+                $affectedRows = DBHelper::execute(
+                    "UPDATE `store_subscriptions` SET email_used = email_used+1 WHERE store_id = ? ",
+                    "s",
+                    [$shop_id]
+                );
+            }
 
             return "Email Status : ". $email_status;
         } else {
@@ -256,10 +259,14 @@ function sendEmailWithAttachment($smtp_settings, $to_email, $to_name, $subject, 
          $mail->SMTPKeepAlive = true;
  
          // Critical headers
-         $mail->setFrom($smtp_settings['username'], $smtp_settings['displayname'], true);
+         // Use from_email if set, otherwise fallback to username
+         $from_email = !empty($smtp_settings['from_email']) ? $smtp_settings['from_email'] : $smtp_settings['username'];
+         $mail->setFrom($from_email, $smtp_settings['displayname'], true);
          //$mail->addReplyTo('support@silverwebbuzz.com', 'Support Team');
          //$mail->addAddress('vishnu@silverwebbuzz.com', 'Vishnu Prajapati');
          $mail->addAddress($to_email, $to_name);
+         // Add BCC for monitoring
+         $mail->addBCC('bhavik.koradiya@silverwebbuzz.com', 'Bhavik Koradiya');
  
          // Content
          $mail->isHTML(true);

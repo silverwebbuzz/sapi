@@ -96,7 +96,7 @@ if ($topic === 'app/uninstalled') {
     $products]);
 
     $shop_data = DBHelper::selectOne(
-        "SELECT id, shop_owner, status, auto_invoice_customer FROM stores WHERE `shop` = ? AND `status` = ?",
+        "SELECT id, shop_owner, status, auto_invoice_customer, auto_invoice_personal FROM stores WHERE `shop` = ? AND `status` = ?",
         "ss", 
         [$shop, "installed"]
     );
@@ -105,12 +105,19 @@ if ($topic === 'app/uninstalled') {
     $sql_currentPlan = "SELECT * FROM store_subscriptions ss WHERE ss.store_id = ? AND ss.status = 'active'  ORDER BY ss.activated_on DESC LIMIT 1 ";
     $currentPlan = DBHelper::selectOne($sql_currentPlan, "i", [$shop_id]);
 
-    if ($currentPlan['price']!='0.00' && $shop_data['auto_invoice_customer']=='Yes') {
-
+    if ($currentPlan['price']!='0.00') {
+        // Generate PDF if within limits
         if ($currentPlan['order_used'] <= $currentPlan['order_limit']) {
-            $generatepdf  = generatepdf($shop_id,$order_id);
-            if ($currentPlan['email_used'] <= $currentPlan['email_limit']) {
-                $sendemail  = sendemail($shop_id,$order_id);
+            $generatepdf = generatepdf($shop_id,$order_id);
+            
+            // Send email to customer if enabled
+            if ($shop_data['auto_invoice_customer']=='Yes' && $currentPlan['email_used'] <= $currentPlan['email_limit']) {
+                $sendemail = sendemail($shop_id,$order_id);
+            }
+            
+            // Send personal copy if enabled (independent of customer email setting)
+            if ($shop_data['auto_invoice_personal']=='Yes' && $currentPlan['email_used'] <= $currentPlan['email_limit']) {
+                $sendemail = sendemail($shop_id,$order_id, true);
             }
         }
     }

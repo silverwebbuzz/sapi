@@ -158,9 +158,9 @@ if ($row) {
                     <div class="form-group">
                         <label>
                             <input type="checkbox" name="auto_invoice_personal"  <?= $settings['auto_invoice_personal'] === 'Yes' ? 'checked' : '' ?>>
-                            Automatic personal copy (Store Owner)
+                            Send me a copy of every invoice
                         </label>
-                        <p class="description">Email Adddress where you would like to receive a copy of every invoice automatically</p>
+                        <p class="description">Receive a copy of every invoice at your store email address, regardless of customer email settings</p>
                         <input type="email" name="email_invoice" value="<?= htmlspecialchars($settings['email_invoice']) ?>"  placeholder="your-email@example.com" class="form-input">
                     </div>
                     <?php 
