@@ -33,48 +33,7 @@ $(document).ready(function() {
             });
     };
 
-    // Send Email Function
-    window.sendEmail = function (shopId, orderId, emailStatus) {
-        fetch(`${BASE_URL}/invoice/sendemail.php?shop_id=${shopId}&order_id=${orderId}&emailstatus=${emailStatus}`)
-            .then(response => response.json())
-            .then(data => {
-                if (data.status === 'success') {
-                    showMessage(data.message, 'success');
-                    setTimeout(() => location.reload(), 2000);
-                } else {
-                    showMessage(data.message, 'error');
-                    if (data.message.includes('upgrade your plan')) {
-                        setTimeout(() => {
-                            if (confirm('Would you like to upgrade your plan now?')) {
-                                window.location.href = `${BASE_URL}/invoice/change-plan?shop=${shopId}`;
-                            }
-                        }, 1000);
-                    }
-                }
-            })
-            .catch(error => {
-                showMessage('Failed to send email.', 'error');
-            });
-    };
-
-    // Send Email to Store Owner Function
-    window.sendEmailToOwner = function (shopId, orderId) {
-        fetch(`${BASE_URL}/invoice/sendemail.php?shop_id=${shopId}&order_id=${orderId}&personal_copy=true`)
-            .then(response => response.json())
-            .then(data => {
-                if (data.status === 'success') {
-                    showMessage(data.message, 'success');
-                    setTimeout(() => location.reload(), 2000);
-                } else {
-                    showMessage(data.message, 'error');
-                }
-            })
-            .catch(error => {
-                showMessage('Failed to send email to store owner.', 'error');
-            });
-    };
-
-    //Show Message (success or error)
+    // Show Message (success or error)
     window.showMessage = function (message, type = 'success') {
         var $box = $('#message-box');
         $box.text(message)
@@ -86,8 +45,7 @@ $(document).ready(function() {
         }, 3000); // ⏱️ 3 seconds
     };
 
-
-    //View Invoice Button -- Display Invoice in modal
+    // View Invoice Button -- Display Invoice in modal
     $('.view-invoice-btn').on('click', function (e) {
         e.preventDefault();
 
@@ -105,7 +63,6 @@ $(document).ready(function() {
         $('#invoiceModal').hide();
         $('#invoiceFrame').attr('src', '');
     };
-
 
     // Mobile Menu Toggle
     $('.menu-toggle').on('click', function() {
@@ -138,7 +95,6 @@ $(document).ready(function() {
         $(this).addClass('selected');
     });
 
-    
     // Plan Upgrade Buttons
     $('.btn-upgrade').on('click', function() {
         if (!$(this).hasClass('current')) {
@@ -169,9 +125,6 @@ $(document).ready(function() {
 
     // Initialize tooltips if needed
     $('[data-toggle="tooltip"]').tooltip();
-
-});
-
 
     // Tab Functionality
     $('.settings-tab').on('click', function(e) {
@@ -216,3 +169,46 @@ $(document).ready(function() {
 
     // Run on page load and hash change
     $(window).on('load hashchange', activateTabFromHash);
+});
+
+// Move these functions outside document.ready
+// Send Email Function
+window.sendEmail = function (shopId, orderId, emailStatus) {
+    fetch(`${BASE_URL}/invoice/sendemail.php?shop_id=${shopId}&order_id=${orderId}&emailstatus=${emailStatus}`)
+        .then(response => response.json())
+        .then(data => {
+            if (data.status === 'success') {
+                showMessage(data.message, 'success');
+                setTimeout(() => location.reload(), 2000);
+            } else {
+                showMessage(data.message, 'error');
+                if (data.message.includes('upgrade your plan')) {
+                    setTimeout(() => {
+                        if (confirm('Would you like to upgrade your plan now?')) {
+                            window.location.href = `${BASE_URL}/invoice/change-plan?shop=${shopId}`;
+                        }
+                    }, 1000);
+                }
+            }
+        })
+        .catch(error => {
+            showMessage('Failed to send email.', 'error');
+        });
+};
+
+// Send Email to Store Owner Function
+window.sendEmailToOwner = function (shopId, orderId) {
+    fetch(`${BASE_URL}/invoice/sendemail.php?shop_id=${shopId}&order_id=${orderId}&personal_copy=true`)
+        .then(response => response.json())
+        .then(data => {
+            if (data.status === 'success') {
+                showMessage(data.message, 'success');
+                setTimeout(() => location.reload(), 2000);
+            } else {
+                showMessage(data.message, 'error');
+            }
+        })
+        .catch(error => {
+            showMessage('Failed to send email to store owner.', 'error');
+        });
+};
