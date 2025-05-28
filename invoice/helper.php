@@ -233,14 +233,16 @@ function sendemail($shop_id,$order_id, $personal_copy = false){
 
             $email_status = $email_sent ? 'sent' : 'failed';
 
-            // Single database update for both PDF and email status
-            $affectedRows = DBHelper::execute(
-                "UPDATE `$invoice_table` SET email_status = ? WHERE order_id = ? ",
-                "ss",
-                [$email_status, $order_id]
-            );
-            // Only increment email count if this is not a personal copy
+            // Update email status and increment count only for customer emails
             if (!$personal_copy) {
+                // Update email status in invoice table
+                $affectedRows = DBHelper::execute(
+                    "UPDATE `$invoice_table` SET email_status = ? WHERE order_id = ? ",
+                    "ss",
+                    [$email_status, $order_id]
+                );
+                
+                // Increment email usage count
                 $affectedRows = DBHelper::execute(
                     "UPDATE `store_subscriptions` SET email_used = email_used+1 WHERE store_id = ? ",
                     "s",
@@ -250,7 +252,9 @@ function sendemail($shop_id,$order_id, $personal_copy = false){
 
             return json_encode([
                 'status' => 'success',
-                'message' => $email_sent ? 'Email sent successfully.' : 'Failed to send email.',
+                'message' => $personal_copy ? 
+                    ($email_sent ? 'Store copy sent successfully.' : 'Failed to send store copy.') :
+                    ($email_sent ? 'Email sent successfully.' : 'Failed to send email.'),
                 'email_status' => $email_status
             ]);
         } else {
