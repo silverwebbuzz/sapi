@@ -175,6 +175,22 @@ function sendemail($shop_id,$order_id, $personal_copy = false){
 
         if ($invoice) {
             
+            // Check email limits for non-personal copies
+            if (!$personal_copy) {
+                $currentPlan = DBHelper::selectOne(
+                    "SELECT * FROM store_subscriptions WHERE store_id = ? AND status = 'active' ORDER BY activated_on DESC LIMIT 1",
+                    "i",
+                    [$shop_id]
+                );
+                
+                if ($currentPlan['email_used'] >= $currentPlan['email_limit']) {
+                    return json_encode([
+                        'status' => 'error',
+                        'message' => 'Email limit reached. Please upgrade your plan to send more emails.'
+                    ]);
+                }
+            }
+            
             $decoded_pdf = base64_decode($invoice['pdf_invoice']);
             $billing_address = json_decode($invoice['billing_address'], true);
 
@@ -232,12 +248,22 @@ function sendemail($shop_id,$order_id, $personal_copy = false){
                 );
             }
 
-            return "Email Status : ". $email_status;
+            return json_encode([
+                'status' => 'success',
+                'message' => $email_sent ? 'Email sent successfully.' : 'Failed to send email.',
+                'email_status' => $email_status
+            ]);
         } else {
-            return "No invoice found with the specified order ID.";
+            return json_encode([
+                'status' => 'error',
+                'message' => 'No invoice found with the specified order ID.'
+            ]);
         }
     } else {
-        return "No shop found with the specified ID.";
+        return json_encode([
+            'status' => 'error',
+            'message' => 'No shop found with the specified ID.'
+        ]);
     }
 }
 

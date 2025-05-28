@@ -36,10 +36,21 @@ $(document).ready(function() {
     // Send Email Function
     window.sendEmail = function (shopId, orderId, emailStatus) {
         fetch(`${BASE_URL}/invoice/sendemail.php?shop_id=${shopId}&order_id=${orderId}&emailstatus=${emailStatus}`)
-            .then(response => response.text())
+            .then(response => response.json())
             .then(data => {
-                showMessage('Email successfully sent.', 'success');
-                setTimeout(() => location.reload(), 2000);
+                if (data.status === 'success') {
+                    showMessage(data.message, 'success');
+                    setTimeout(() => location.reload(), 2000);
+                } else {
+                    showMessage(data.message, 'error');
+                    if (data.message.includes('upgrade your plan')) {
+                        setTimeout(() => {
+                            if (confirm('Would you like to upgrade your plan now?')) {
+                                window.location.href = `${BASE_URL}/invoice/change-plan?shop=${shopId}`;
+                            }
+                        }, 1000);
+                    }
+                }
             })
             .catch(error => {
                 showMessage('Failed to send email.', 'error');
@@ -49,10 +60,14 @@ $(document).ready(function() {
     // Send Email to Store Owner Function
     window.sendEmailToOwner = function (shopId, orderId) {
         fetch(`${BASE_URL}/invoice/sendemail.php?shop_id=${shopId}&order_id=${orderId}&personal_copy=true`)
-            .then(response => response.text())
+            .then(response => response.json())
             .then(data => {
-                showMessage('Email sent to store owner successfully.', 'success');
-                setTimeout(() => location.reload(), 2000);
+                if (data.status === 'success') {
+                    showMessage(data.message, 'success');
+                    setTimeout(() => location.reload(), 2000);
+                } else {
+                    showMessage(data.message, 'error');
+                }
             })
             .catch(error => {
                 showMessage('Failed to send email to store owner.', 'error');
