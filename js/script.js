@@ -46,6 +46,19 @@ $(document).ready(function() {
             });
     };
 
+    // Send Email to Store Owner Function
+    window.sendEmailToOwner = function (shopId, orderId) {
+        fetch(`${BASE_URL}/invoice/sendemail.php?shop_id=${shopId}&order_id=${orderId}&personal_copy=true`)
+            .then(response => response.text())
+            .then(data => {
+                showMessage('Email sent to store owner successfully.', 'success');
+                setTimeout(() => location.reload(), 2000);
+            })
+            .catch(error => {
+                showMessage('Failed to send email to store owner.', 'error');
+            });
+    };
+
     //Show Message (success or error)
     window.showMessage = function (message, type = 'success') {
         var $box = $('#message-box');

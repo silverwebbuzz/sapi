@@ -125,6 +125,9 @@ $invoices_query = DBHelper::select("SELECT * FROM `$invoice_table` ORDER BY crea
                             <a href="#" class="email-btn" onclick="sendEmail(<?= $shop_id ?>, <?= $invoice['order_id'] ?>, '<?= $invoice['email_status'] ?>'); return false;">
                             <?= ($invoice['email_status'] == 'pending') ? 'Send Email' : 'Resend Email'; ?>
                             </a>
+                            <a href="#" class="email-btn owner" onclick="sendEmailToOwner(<?= $shop_id ?>, <?= $invoice['order_id'] ?>); return false;">
+                            Send to Store Owner
+                            </a>
                             <?php } ?>
                         <?php } else { 
                             if($gen_invoice_upgrade_plan_button!='') echo $gen_invoice_upgrade_plan_button; else {
