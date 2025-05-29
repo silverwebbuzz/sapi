@@ -386,6 +386,8 @@ a.view-invoice-btn , .email-btn , .gen-invoice-btn , .upgrade-btn{
     border-radius: 5px;
     width: max-content;
     font-size: 12px;
+    display: inline-block;
+    margin: 2px;
 }
 
 .status {
