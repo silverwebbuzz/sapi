@@ -64,7 +64,9 @@ function generatepdf($shop_id,$order_id){
     
             // Prepare replacements array
             $replacements = [
-                '{{ Company_Logo }}' => $shop_data['logo_url'],
+                '{{ Company_Logo }}' => !empty($shop_data['logo_url']) ? 
+                    $shop_data['logo_url'] : 
+                    '',  // Empty string will make the image not show, and alt text will be used
                 '{{ Company_Name }}' => $shop_data['store_name'],
                 '{{ Company_Address }}' => $shop_data['address1']."<br/>".$shop_data['address2']."<br/>".$shop_data['city']." ".$shop_data['province']." ".$shop_data['province_code']." ".$shop_data['zip']."<br/>".$shop_data['country_name'] ,
                 '{{ Company_Phone }}' => $shop_data['phone'],

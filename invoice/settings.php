@@ -80,6 +80,55 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['save_invoice_settings
     <?php
 }
 
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['save_logo_settings'])) {
+    $upload_dir = 'uploads/logos/';  // Same level as settings.php
+    if (!file_exists($upload_dir)) {
+        mkdir($upload_dir, 0777, true);
+    }
+
+    $logo_url = $row['logo_url'] ?? ''; // Keep existing logo by default
+
+    if (isset($_FILES['logo_upload']) && $_FILES['logo_upload']['error'] === UPLOAD_ERR_OK) {
+        $file = $_FILES['logo_upload'];
+        $file_ext = strtolower(pathinfo($file['name'], PATHINFO_EXTENSION));
+        $allowed_ext = ['jpg', 'jpeg', 'png', 'gif'];
+
+        if (in_array($file_ext, $allowed_ext)) {
+            $new_filename = 'logo_' . $shop_id . '_' . time() . '.' . $file_ext;
+            $upload_path = $upload_dir . $new_filename;
+
+            if (move_uploaded_file($file['tmp_name'], $upload_path)) {
+                // Delete old logo if exists
+                if (!empty($row['logo_url'])) {
+                    // Extract filename from the full URL
+                    $old_filename = basename($row['logo_url']);
+                    $old_file_path = $upload_dir . $old_filename;
+                    if (file_exists($old_file_path)) {
+                        unlink($old_file_path);
+                    }
+                }
+                $logo_url = BASE_OWNER_STORE_LOGO_URL . $new_filename;
+            }
+        }
+    }
+
+    // Update database
+    $affectedRows = DBHelper::execute(
+        "UPDATE stores SET logo_url = ? WHERE id = ?",
+        "ss",
+        [$logo_url, $shop_id]
+    );
+
+    if ($affectedRows) {
+        $success_message = "Logo settings saved successfully!";
+    } else {
+        $error_message = "Nothing to update!";
+    }
+    ?>
+    <script>window.location.hash = '#logo';</script>
+    <?php
+}
+
 include 'nav.php'; 
 
 // Default email template
@@ -273,33 +322,29 @@ if ($row) {
             <!-- Logo Settings -->
             <section id="logo" class="settings-section">
                 <h3>Logo Settings</h3>
-                    <form method="POST" class="settings-form" enctype="multipart/form-data" >
-                        <input type="hidden" name="save_logo_settings" value="1">
+                <form method="POST" class="settings-form" enctype="multipart/form-data">
+                    <input type="hidden" name="save_logo_settings" value="1">
 
-                        <p>Current Logo:</p>
-                        <img src="<?= $row['logo_url'] ?>" alt="<?= htmlspecialchars($row['store_name']) ?>" style="max-height: 100px;">
+                    <div class="form-group">
+                        <label>Current Logo</label>
+                        <?php if (!empty($row['logo_url'])): ?>
+                            <div class="current-logo">
+                                <img src="<?= '../' . htmlspecialchars($row['logo_url']) ?>" alt="Current Logo" style="max-height: 100px; margin: 10px 0;">
+                            </div>
+                        <?php else: ?>
+                            <p>No logo uploaded yet. Your store name will be used instead.</p>
+                        <?php endif; ?>
+                    </div>
 
-                        <div class="form-group">
-                            <label>New Logo</label>
-                            <p class="description">Click the button below to select a logo from your Shopify library.</p>
+                    <div class="form-group">
+                        <label>Upload New Logo</label>
+                        <p class="description">Upload a new logo (recommended size: 200x100px, max size: 2MB)</p>
+                        <input type="file" name="logo_upload" accept="image/*" class="form-input">
+                        <p class="description">Supported formats: JPG, JPEG, PNG, GIF</p>
+                    </div>
 
-                           
-                            <!-- Optional fallback file upload -->
-                            <p class="description mt-3">Or upload a new logo (optional):</p>
-                            <input type="file" name="logo_upload" accept="image/*">
-                        </div>
-
-                        <button type="submit" class="btn-save">Save Logo</button>
-                    </form>
-                    
-                <?php
-                   //$logos = getAllFiles($shop, $row['access_token']);
-                    //echo "<pre>";
-                    //print_r($logos);
-                    //echo "</pre>";
-                ?>
-                
-
+                    <button type="submit" class="btn-save">Save Logo</button>
+                </form>
             </section>
         </div>
     </div>
