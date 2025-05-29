@@ -329,7 +329,7 @@ if ($row) {
                         <label>Current Logo</label>
                         <?php if (!empty($row['logo_url'])): ?>
                             <div class="current-logo">
-                                <img src="<?= '../' . htmlspecialchars($row['logo_url']) ?>" alt="Current Logo" style="max-height: 100px; margin: 10px 0;">
+                                <img src="<?= htmlspecialchars($row['logo_url']) ?>" alt="Current Logo" style="max-height: 100px; margin: 10px 0;">
                             </div>
                         <?php else: ?>
                             <p>No logo uploaded yet. Your store name will be used instead.</p>
