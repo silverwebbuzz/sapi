@@ -55,7 +55,10 @@ class DBHelper {
             $stmt->bind_param($types, ...$params);
         }
         
-        $stmt->execute();
+        if(!$stmt->execute()){
+            echo "Error: ".$stmt->error;
+            exit;
+        }
         return $conn->insert_id;
     }
 
@@ -71,7 +74,10 @@ class DBHelper {
             $stmt->bind_param($types, ...$params);
         }
         
-        $stmt->execute();
+        if(!$stmt->execute()){
+            echo "Error: ".$stmt->error;
+            exit;
+        }
         return $stmt->affected_rows;
     }
 
