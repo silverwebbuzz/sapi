@@ -45,39 +45,84 @@ class DBHelper {
 
     public static function insert($query, $types = "", $params = []) {
         $conn = DB::getInstance();
+    
         $stmt = $conn->prepare($query);
-        
+    
         if (!$stmt) {
-            return false;
+            die("Prepare failed: " . $conn->error);
         }
-        
+    
         if (!empty($params)) {
+            if(strlen($types) !== count($params)){
+                echo "<h3>Bind Param Error</h3>";
+                echo "Type count: ".strlen($types)."<br>";
+                echo "Param count: ".count($params)."<br>";
+                echo "<pre>";
+                print_r($params);
+                echo "</pre>";
+                exit;
+            }
+    
             $stmt->bind_param($types, ...$params);
         }
-        
+    
         if(!$stmt->execute()){
-            echo "Error: ".$stmt->error;
+            echo "<h3>SQL Execute Error</h3>";
+            echo "Error: ".$stmt->error."<br>";
+    
+            echo "<b>Query:</b><br>";
+            echo "<pre>".$query."</pre>";
+    
+            echo "<b>Params:</b>";
+            echo "<pre>";
+            print_r($params);
+            echo "</pre>";
+    
             exit;
         }
+    
         return $conn->insert_id;
     }
-
+    
+    
     public static function execute($query, $types = "", $params = []) {
         $conn = DB::getInstance();
+    
         $stmt = $conn->prepare($query);
-        
+    
         if (!$stmt) {
-            return false;
+            die("Prepare failed: " . $conn->error);
         }
-        
+    
         if (!empty($params)) {
+            if(strlen($types) !== count($params)){
+                echo "<h3>Bind Param Error</h3>";
+                echo "Type count: ".strlen($types)."<br>";
+                echo "Param count: ".count($params)."<br>";
+                echo "<pre>";
+                print_r($params);
+                echo "</pre>";
+                exit;
+            }
+    
             $stmt->bind_param($types, ...$params);
         }
-        
+    
         if(!$stmt->execute()){
-            echo "Error: ".$stmt->error;
+            echo "<h3>SQL Execute Error</h3>";
+            echo "Error: ".$stmt->error."<br>";
+    
+            echo "<b>Query:</b><br>";
+            echo "<pre>".$query."</pre>";
+    
+            echo "<b>Params:</b>";
+            echo "<pre>";
+            print_r($params);
+            echo "</pre>";
+    
             exit;
         }
+    
         return $stmt->affected_rows;
     }
 

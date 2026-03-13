@@ -64,7 +64,9 @@ if (isset($access_token)) {
     $restapi_json                           = $shopDetailsResponse_json;
     $created_at                             = $shopDetailsResponse['shop']['created_at'] ?? '';
     $updated_at                             = $shopDetailsResponse['shop']['updated_at'] ?? '';
-
+    $created_at = date('Y-m-d H:i:s', strtotime($created_at));
+    $updated_at = date('Y-m-d H:i:s', strtotime($updated_at));
+    
     // Step 4: Insert or Update Store Information
     $query = "INSERT INTO stores 
     (shop, domain, access_token, shopify_id, store_name, shop_owner, logo_url, email, phone, 
