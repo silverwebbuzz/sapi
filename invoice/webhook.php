@@ -74,7 +74,12 @@ if ($topic === 'app/uninstalled') {
     $shipping_cost = isset($order['total_shipping_price_set']['shop_money']['amount']) ? $order['total_shipping_price_set']['shop_money']['amount'] : 0.00;
     $billing_address = json_encode($order['billing_address'] ?? []);
     $shipping_address = json_encode($order['shipping_address'] ?? []);
-    $payment_method = $order['gateway'] ?? 'Unknown';
+    // orders/create often does not include a finalized payment/transaction.
+    // Prefer the official array field when present.
+    $payment_method = 'Unknown';
+    if (!empty($order['payment_gateway_names']) && is_array($order['payment_gateway_names'])) {
+        $payment_method = implode(', ', $order['payment_gateway_names']);
+    }
     $order_status = $order['financial_status'] ?? 'pending';
     $products = json_encode($order['line_items'], JSON_UNESCAPED_UNICODE);
 
@@ -119,6 +124,56 @@ if ($topic === 'app/uninstalled') {
             if ($shop_data['auto_invoice_personal']=='Yes' && $currentPlan['email_used'] <= $currentPlan['email_limit']) {
                 $sendemail = sendemail($shop_id,$order_id, true);
             }
+        }
+    }
+
+} elseif ($topic === 'orders/paid') {
+    // When the order is paid, payment method + transaction details are more likely to be available.
+    $order_id = $order['id'] ?? null;
+    if ($order_id) {
+        $shop_data = DBHelper::selectOne(
+            "SELECT id, access_token, status FROM stores WHERE `shop` = ? LIMIT 1",
+            "s",
+            [$shop]
+        );
+
+        if ($shop_data && $shop_data['status'] === 'installed') {
+            $shop_name = preg_replace('/[^a-zA-Z0-9_]/', '_', strtolower($shop));
+            $invoice_table = "invoices_" . $shop_name;
+
+            $payment_method = 'Unknown';
+            if (!empty($order['payment_gateway_names']) && is_array($order['payment_gateway_names'])) {
+                $payment_method = implode(', ', $order['payment_gateway_names']);
+            }
+
+            // If still unknown, try transactions API (best-effort)
+            if ($payment_method === 'Unknown' && !empty($shop_data['access_token'])) {
+                $transactions = getOrderTransactionsRestAPI($shop, $shop_data['access_token'], $order_id);
+                if (is_array($transactions) && !empty($transactions)) {
+                    // pick a reasonable transaction (sale/capture/authorization)
+                    foreach ($transactions as $tx) {
+                        $kind = strtolower($tx['kind'] ?? '');
+                        if (in_array($kind, ['sale', 'capture', 'authorization'], true)) {
+                            if (!empty($tx['gateway'])) {
+                                $payment_method = $tx['gateway'];
+                                break;
+                            }
+                        }
+                    }
+                    // fallback to first tx gateway
+                    if ($payment_method === 'Unknown' && !empty($transactions[0]['gateway'])) {
+                        $payment_method = $transactions[0]['gateway'];
+                    }
+                }
+            }
+
+            $order_status = $order['financial_status'] ?? 'paid';
+
+            DBHelper::execute(
+                "UPDATE `$invoice_table` SET payment_method = ?, order_status = ? WHERE order_id = ?",
+                "sss",
+                [$payment_method, $order_status, (string)$order_id]
+            );
         }
     }
 

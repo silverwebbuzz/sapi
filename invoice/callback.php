@@ -217,7 +217,10 @@ if (isset($access_token)) {
         $shipping_cost = isset($order['total_shipping_price_set']['shop_money']['amount']) ? $order['total_shipping_price_set']['shop_money']['amount'] : 0.00;
         $billing_address = json_encode($order['billing_address'] ?? []);
         $shipping_address = json_encode($order['shipping_address'] ?? []);
-        $payment_method = $order['gateway'] ?? 'Unknown';
+        $payment_method = 'Unknown';
+        if (!empty($order['payment_gateway_names']) && is_array($order['payment_gateway_names'])) {
+            $payment_method = implode(', ', $order['payment_gateway_names']);
+        }
         $order_status = $order['financial_status'] ?? 'pending';
         $products = json_encode($order['line_items'], JSON_UNESCAPED_UNICODE);
 

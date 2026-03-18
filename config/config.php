@@ -100,7 +100,7 @@ $default_body = '<html>
 <body>
   <div class="container">
     <h2 class="header">Hi {customer_name},</h2>
-    <p>Thank you for shopping with us! We’re excited to share your invoice for your recent order.</p>
+    <p>Thank you for shopping with us! We are excited to share your invoice for your recent order.</p>
 
     <div class="invoice-info">
       <p><strong>Invoice Number:</strong> #{invoice_number}</p>

@@ -137,6 +137,30 @@ function getShopDetailsRestAPI($shop,$access_token){
     return $shopDetailsResponse_json;
 }
 
+// Get order transactions via REST API
+function getOrderTransactionsRestAPI($shop, $access_token, $order_id) {
+    $url = "https://{$shop}/admin/api/" . SHOPIFY_API_VERSION . "/orders/{$order_id}/transactions.json";
+    $ch = curl_init($url);
+    curl_setopt_array($ch, [
+        CURLOPT_RETURNTRANSFER => true,
+        CURLOPT_HTTPHEADER => [
+            "X-Shopify-Access-Token: {$access_token}",
+            "Content-Type: application/json"
+        ]
+    ]);
+    $response = curl_exec($ch);
+    $http_code = curl_getinfo($ch, CURLINFO_HTTP_CODE);
+    curl_close($ch);
+
+    if ($http_code !== 200) {
+        error_log("Failed to fetch transactions for order {$order_id}: HTTP {$http_code} - {$response}");
+        return null;
+    }
+
+    $decoded = json_decode($response, true);
+    return $decoded['transactions'] ?? [];
+}
+
 function getShopLogo($shop, $access_token) {
     $url = "https://$shop/admin/api/" . SHOPIFY_API_VERSION . "/themes.json";
 
