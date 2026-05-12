@@ -409,16 +409,39 @@ $(document).ready(function() {
         });
     });
 
-    // View an already-generated packing slip in the modal (lazy-load — the
-    // PDF blob is big so we fetch only when the user actually wants it).
+    // View an already-generated packing slip in the modal. We fetch the
+    // base64 PDF via AJAX and feed it into an embed as a data: URL — that's
+    // the same pattern the View Invoice button uses. Doing it this way
+    // avoids the frame-ancestors CSP blocking a same-domain HTTP framing
+    // (the app runs inside Shopify's iframe, and our CSP doesn't list
+    // sapi.silverwebbuzz.com as an allowed ancestor).
     $(document).on('click', '.js-view-packing-slip', function (e) {
         e.preventDefault();
         var shopId  = $(this).data('shop-id');
         var orderId = $(this).data('order-id');
-        var url = BASE_URL + '/invoice/generate-packing-slip.php?shop_id=' + encodeURIComponent(shopId)
-                + '&order_id=' + encodeURIComponent(orderId) + '&view=1';
-        $('#invoiceFrame').attr('src', url);
+
+        // Show modal immediately with a loading state.
+        $('#invoiceFrame').attr('src', '');
         $('#invoiceModal').show();
+        showMessage('Loading packing slip…', 'success');
+
+        $.ajax({
+            url: BASE_URL + '/invoice/generate-packing-slip.php',
+            method: 'GET',
+            data: { shop_id: shopId, order_id: orderId, view: 1 },
+            dataType: 'json',
+            timeout: 30000
+        }).done(function (resp) {
+            if (resp && resp.status === 'success' && resp.pdf_base64) {
+                $('#invoiceFrame').attr('src', 'data:application/pdf;base64,' + resp.pdf_base64);
+            } else {
+                $('#invoiceModal').hide();
+                showMessage((resp && resp.message) || 'Could not load packing slip.', 'error');
+            }
+        }).fail(function () {
+            $('#invoiceModal').hide();
+            showMessage('Could not load packing slip.', 'error');
+        });
     });
 
     // Bulk Generate / Regenerate Packing Slips

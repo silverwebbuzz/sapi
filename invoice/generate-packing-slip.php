@@ -57,12 +57,19 @@ if ($view) {
     );
     if (!$row || empty($row['packing_slip_pdf'])) {
         http_response_code(404);
-        die('Packing slip not generated yet.');
+        header('Content-Type: application/json');
+        echo json_encode(['status' => 'error', 'message' => 'Packing slip not generated yet.']);
+        exit;
     }
-    // Inline preview, same pattern generatepdf.php uses for generated invoices.
-    ?>
-    <embed src="data:application/pdf;base64,<?= $row['packing_slip_pdf']; ?>" type="application/pdf" width="100%" height="100%" />
-    <?php
+    // Return the base64 PDF as JSON so the page can render it via a
+    // data: URL inside the modal. We avoid serving the embed inline
+    // because the app's CSP (frame-ancestors) blocks same-domain HTTP
+    // framing inside the Shopify iframe.
+    header('Content-Type: application/json');
+    echo json_encode([
+        'status' => 'success',
+        'pdf_base64' => $row['packing_slip_pdf'],
+    ]);
     exit;
 }
 
