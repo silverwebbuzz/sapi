@@ -412,79 +412,135 @@ function sendEmailWithAttachment($smtp_settings, $to_email, $to_name, $subject, 
 
 
 
- function store_app_subscriptions($shopId,$chargeId)
- {
-     // Get store data in shopify table its save as 	shopify_id
-     $store = DBHelper::selectOne("SELECT id, shop, access_token FROM stores WHERE shopify_id = ?  LIMIT 1", "i", [$shopId]);
-        
-     if (!$store) {
-         throw new Exception("Store not found");
-     }
-     
-     // Get FULL subscription details via GraphQL
-     $subscriptionData = fetchSubscriptionWithGraphQL($store['shop'],$store['access_token'],$chargeId);
-     
-     if (!$subscriptionData) {
-         throw new Exception("Failed to fetch subscription details");
-     }
+/**
+ * Persist an app_subscriptions/update webhook payload into store_subscriptions.
+ *
+ * The full payload from Shopify already contains everything we need
+ * (name, status, price, interval, created_at, currency), so we use it
+ * directly instead of making a separate GraphQL round-trip that may
+ * race with Shopify's own propagation.
+ *
+ * Behaviour:
+ *  - UPSERT on charge_id (unique key) so re-deliveries are idempotent
+ *  - When a new ACTIVE subscription lands, any other active row for
+ *    the same store is moved to 'cancelled'
+ */
+function subscription_log($label, $data = null) {
+    $line = '[' . date('Y-m-d H:i:s') . '] ' . $label;
+    if ($data !== null) {
+        $line .= ' :: ' . (is_scalar($data) ? var_export($data, true) : json_encode($data, JSON_UNESCAPED_SLASHES));
+    }
+    error_log($line . "\n", 3, __DIR__ . '/webhook_debug.log');
+}
 
-     // Determine plan limits based on your requirements
-     $limits = calculatePlanLimits($subscriptionData['name'], $subscriptionData['price'], $subscriptionData['billing_interval']);
+function store_app_subscriptions($shopId, array $subscription)
+{
+    subscription_log('store_app_subscriptions called', ['shopId' => $shopId, 'payload' => $subscription]);
 
-     // Clean up optional fields if not set
-     $trialEndsOn = !empty($subscriptionData['trial_ends_on']) ? $subscriptionData['trial_ends_on'] : null;
-     $cappedAmount = !empty($subscriptionData['capped_amount']) ? $subscriptionData['capped_amount'] : null;
-     $terms = !empty($subscriptionData['terms']) ? $subscriptionData['terms'] : null;
+    // shopify_id is bigint — bind as string to avoid 32-bit int truncation
+    $store = DBHelper::selectOne(
+        "SELECT id FROM stores WHERE shopify_id = ? LIMIT 1",
+        "s",
+        [(string)$shopId]
+    );
+    if (!$store) {
+        subscription_log('STORE NOT FOUND', $shopId);
+        throw new Exception("Store not found for shopify_id $shopId");
+    }
+    subscription_log('store found', ['internal_id' => $store['id']]);
 
-     // Insert new subscription
-     // Insert new subscription
-     $newId = DBHelper::insert("
-         INSERT INTO store_subscriptions (
-             store_id, shopify_id, charge_id,
-             plan_name, status, price, currency, billing_interval,
-             interval_count, capped_amount, terms,
-             activated_on, current_period_end, trial_ends_on, billing_on,
-             order_limit, email_limit, order_used, email_used,
-             is_test
-         ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
-     ", "iisssssssssssssiiiii", [
-         $store['id'],                             // store_id
-         $shopId,                                  // shopify_id
-         $subscriptionData['id'],                  // charge_id
-         $subscriptionData['name'],                // plan_name
-         strtolower($subscriptionData['status']),  // status
-         $subscriptionData['price'],               // price
-         $subscriptionData['currency'],            // currency
-         $subscriptionData['billing_interval'],    // billing_interval
-         $subscriptionData['interval_count'],      // interval_count
-         $cappedAmount,                            // capped_amount
-         $terms,                                   // terms
-         $subscriptionData['activated_on'],        // activated_on
-         $subscriptionData['current_period_end'],  // current_period_end
-         $trialEndsOn,                             // trial_ends_on
-         null,                                     // billing_on
-         $limits['order_limit'],                   // order_limit
-         $limits['email_limit'],                   // email_limit
-         0,                                        // order_used
-         0,                                        // email_used
-         $subscriptionData['is_test']              // is_test
-     ]);
-     
-     // 8. Cancel old subscriptions (except the one we just created)
-     DBHelper::execute("
-         UPDATE store_subscriptions 
-         SET status = 'cancelled',
-             cancelled_on = NOW(),
-             updated_at = NOW()
-         WHERE shopify_id = ? 
-           AND id != ?
-           AND status = 'active'
-     ", "ii", [$shopId, $newId]);
+    $chargeId = extractIdFromGql($subscription['admin_graphql_api_id'] ?? '');
+    if (!$chargeId) {
+        throw new Exception("Missing charge id in webhook payload");
+    }
 
-     /*echo json_encode([
-         'success' => true,
-         'subscription_id' => $newId,
-         'limits' => $limits
-     ]);*/
- }
+    $planName        = $subscription['name'] ?? '';
+    $status          = strtolower($subscription['status'] ?? 'active');
+    $price           = $subscription['price'] ?? 0;
+    $currency        = $subscription['currency'] ?? 'USD';
+    $rawInterval     = strtolower($subscription['interval'] ?? '');
+    $isAnnual        = ($rawInterval === 'annual');
+    $billingInterval = $isAnnual ? 'annual' : 'every_30_days';
+    $isTest          = !empty($subscription['test']) ? 1 : 0;
+
+    $activatedOn = !empty($subscription['created_at'])
+        ? date('Y-m-d H:i:s', strtotime($subscription['created_at']))
+        : date('Y-m-d H:i:s');
+
+    $limits = calculatePlanLimits($planName, (float)$price, $isAnnual ? 'annual' : 'monthly');
+
+    $row = [
+        'store_id'         => (int)$store['id'],
+        'shopify_id'       => (string)$shopId,
+        'charge_id'        => (string)$chargeId,
+        'plan_name'        => $planName,
+        'status'           => $status,
+        'price'            => $price,
+        'currency'         => $currency,
+        'billing_interval' => $billingInterval,
+        'activated_on'     => $activatedOn,
+        'order_limit'      => (int)$limits['order_limit'],
+        'email_limit'      => (int)$limits['email_limit'],
+        'is_test'          => $isTest,
+    ];
+    subscription_log('upserting', $row);
+
+    // UPSERT on charge_id (UNIQUE KEY unique_charge). All bigint columns are
+    // bound as strings (`s`) to avoid 32-bit PHP int truncation on values
+    // like shopify_id=105544581452.
+    $sql = "
+        INSERT INTO store_subscriptions
+            (store_id, shopify_id, charge_id, plan_name, status, price, currency,
+             billing_interval, interval_count, activated_on,
+             order_limit, email_limit, is_test)
+        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+        ON DUPLICATE KEY UPDATE
+            plan_name        = VALUES(plan_name),
+            status           = VALUES(status),
+            price            = VALUES(price),
+            currency         = VALUES(currency),
+            billing_interval = VALUES(billing_interval),
+            order_limit      = VALUES(order_limit),
+            email_limit      = VALUES(email_limit),
+            is_test          = VALUES(is_test),
+            updated_at       = NOW()
+    ";
+
+    DBHelper::insert(
+        $sql,
+        "isssssssisiii",
+        [
+            $row['store_id'],
+            $row['shopify_id'],
+            $row['charge_id'],
+            $row['plan_name'],
+            $row['status'],
+            $row['price'],
+            $row['currency'],
+            $row['billing_interval'],
+            1,                        // interval_count
+            $row['activated_on'],
+            $row['order_limit'],
+            $row['email_limit'],
+            $row['is_test'],
+        ]
+    );
+    subscription_log('upsert ok');
+
+    // When a new active subscription arrives, cancel any other active rows
+    // for the same store (handles plan upgrades — old Growth -> new Premium,
+    // and clears the Lifetime Free row created at install time).
+    if ($status === 'active') {
+        DBHelper::execute(
+            "UPDATE store_subscriptions
+                SET status = 'cancelled', cancelled_on = NOW()
+              WHERE shopify_id = ?
+                AND (charge_id IS NULL OR charge_id != ?)
+                AND status = 'active'",
+            "ss",
+            [(string)$shopId, (string)$chargeId]
+        );
+        subscription_log('cancelled previous active rows for shopify_id', $shopId);
+    }
+}
 ?>

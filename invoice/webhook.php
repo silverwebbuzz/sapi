@@ -177,24 +177,29 @@ if ($topic === 'app/uninstalled') {
         }
     }
 
-} elseif ($topic === 'app_subscriptions/update') {  
+} elseif ($topic === 'app_subscriptions/update') {
 
     try {
-        $subscription = $webhook['app_subscription'];
-        $chargeId = extractIdFromGql($subscription['admin_graphql_api_id']);  // Returns 34950971692
-        $shopId = extractIdFromGql($subscription['admin_graphql_api_shop_id']);  // Returns 92496724
-        
-        store_app_subscriptions($shopId,$chargeId); // call funcatio to add row insubscription.
+        $subscription = $webhook['app_subscription'] ?? null;
+        if (!$subscription) {
+            throw new Exception('Missing app_subscription in payload');
+        }
 
-        http_response_code(200);
-        
-    } catch (Exception $e) {
-        http_response_code(200);
-        error_log("Subscription processing failed: " . $e->getMessage());
-        echo json_encode([
-            'success' => false,
-            'error' => $e->getMessage()
-        ]);
+        $shopId = extractIdFromGql($subscription['admin_graphql_api_shop_id'] ?? '');
+        if (!$shopId) {
+            throw new Exception('Missing shop id in payload');
+        }
+
+        // Hand the FULL payload to the persister — Shopify gives us everything
+        // we need (name, status, price, interval, created_at) directly, so we
+        // don't need a second GraphQL call that can race with propagation.
+        store_app_subscriptions($shopId, $subscription);
+
+    } catch (\Throwable $e) {
+        error_log("[" . date('Y-m-d H:i:s') . "] app_subscriptions/update FAILED: "
+            . $e->getMessage()
+            . " | payload=" . substr($data, 0, 1000)
+            . "\n", 3, __DIR__ . '/webhook_debug.log');
     }
 }
 

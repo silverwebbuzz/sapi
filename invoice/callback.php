@@ -165,14 +165,22 @@ $shop_id = DBHelper::insert($query, "sssssssssssssssssssssssssssssss",
     $restapi_json, $created_at, $updated_at]
 );
 
-// create free subscription.
-$store_Subscription = DBHelper::insert("
-    INSERT INTO store_subscriptions (
-        store_id, shopify_id
-    ) VALUES (?, ?)", "ii", [
-    $shop_id,
-    $shopify_id
-]);
+// Create the free "Lifetime Free" subscription row, but ONLY if this store
+// has no subscription history yet. Re-running the OAuth callback (e.g. after
+// a reinstall or scope change) must NOT add a second free row alongside an
+// existing paid plan.
+$existing = DBHelper::selectOne(
+    "SELECT id FROM store_subscriptions WHERE store_id = ? LIMIT 1",
+    "i",
+    [$shop_id]
+);
+if (!$existing) {
+    DBHelper::insert(
+        "INSERT INTO store_subscriptions (store_id, shopify_id) VALUES (?, ?)",
+        "is",
+        [$shop_id, (string)$shopify_id]
+    );
+}
 
 // Create Invoice Table.
 $shop_table_name = preg_replace('/[^a-zA-Z0-9_]/', '_', strtolower($shop));
