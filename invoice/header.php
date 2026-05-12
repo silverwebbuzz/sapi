@@ -68,6 +68,7 @@ if (!isset($currentPlan) || empty($currentPlan)) {
                         { label: 'Dashboard', destination: '/index?shop=<?= $shop ?>&host=<?= $host ?>' },
                         { label: 'Orders List', destination: '/order?shop=<?= $shop ?>&host=<?= $host ?>' },
                         { label: 'Bulk Download', destination: '/bulk-download?shop=<?= $shop ?>&host=<?= $host ?>' },
+                        { label: 'Packing Slips', destination: '/packing-slip?shop=<?= $shop ?>&host=<?= $host ?>' },
                         { label: 'Settings', destination: '/settings?shop=<?= $shop ?>&host=<?= $host ?>' },
                         { label: 'Help', destination: '/help?shop=<?= $shop ?>&host=<?= $host ?>' }
                     ]

@@ -1,0 +1,241 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <title>Packing Slip {{ Order_Number }}</title>
+    <style>
+      @page { margin: 30px 36px; }
+      body {
+        font-family: 'DejaVu Sans', Arial, Helvetica, sans-serif;
+        font-size: 13px;
+        line-height: 1.45;
+        color: #222;
+        margin: 0;
+      }
+      .header { width: 100%; border-collapse: collapse; margin-bottom: 24px; }
+      .header td { vertical-align: top; }
+      .header .title {
+        font-size: 28px;
+        font-weight: bold;
+        letter-spacing: 2px;
+        text-align: right;
+        color: #111;
+      }
+      .header .meta { font-size: 12px; text-align: right; margin-top: 6px; }
+      .header .meta strong { display: inline-block; min-width: 80px; }
+
+      .addresses { width: 100%; border-collapse: collapse; margin-bottom: 20px; }
+      .addresses td {
+        vertical-align: top;
+        padding: 10px 12px;
+        font-size: 12px;
+      }
+      .addresses .ship-to {
+        width: 60%;
+        background: #f7faf8;
+        border: 1px solid #1a7a4c;
+        border-radius: 8px;
+        padding: 14px 16px;
+      }
+      .addresses .bill-to {
+        width: 40%;
+        font-size: 11px;
+        color: #555;
+        padding-left: 14px;
+      }
+      .addresses .label {
+        font-weight: bold;
+        font-size: 11px;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+        color: #1a7a4c;
+        display: block;
+        margin-bottom: 4px;
+      }
+      .addresses .bill-to .label { color: #555; }
+      .ship-to-name {
+        font-size: 16px;
+        font-weight: 700;
+        color: #111;
+        margin-top: 2px;
+      }
+
+      .items {
+        width: 100%;
+        border-collapse: collapse;
+        margin-bottom: 12px;
+        table-layout: fixed;
+      }
+      .items th {
+        background: #f2f2f2;
+        font-size: 11px;
+        font-weight: bold;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        padding: 10px 8px;
+        border-bottom: 2px solid #999;
+        text-align: left;
+      }
+      .items td {
+        font-size: 12px;
+        padding: 10px 8px;
+        border-bottom: 1px solid #ddd;
+        vertical-align: top;
+        word-wrap: break-word;
+        overflow-wrap: break-word;
+      }
+      .items .col-check { width: 32px; text-align: center; }
+      .items .col-sku   { width: 16%; }
+      .items .col-qty,
+      .items .col-shipped { width: 70px; text-align: center; }
+      .items .check-box {
+        display: inline-block;
+        width: 14px;
+        height: 14px;
+        border: 1.5px solid #555;
+        border-radius: 3px;
+      }
+      .items .qty-num { font-weight: 600; font-size: 13px; }
+      .items .shipped-blank {
+        display: inline-block;
+        min-width: 40px;
+        border-bottom: 1px solid #999;
+        height: 16px;
+      }
+      .item-variant {
+        display: block;
+        color: #555;
+        font-size: 11px;
+        margin-top: 2px;
+      }
+
+      .totals-row {
+        margin-top: 8px;
+        font-size: 13px;
+        font-weight: 600;
+        text-align: right;
+        padding: 8px 0;
+        border-top: 1px solid #ddd;
+      }
+
+      .signature {
+        margin-top: 40px;
+        width: 100%;
+        border-collapse: collapse;
+      }
+      .signature td {
+        font-size: 11px;
+        color: #555;
+        vertical-align: bottom;
+        padding-top: 18px;
+      }
+      .signature .sig-line {
+        border-bottom: 1px solid #555;
+        display: inline-block;
+        min-width: 200px;
+        height: 14px;
+        margin-left: 8px;
+      }
+      .signature .date-line {
+        border-bottom: 1px solid #555;
+        display: inline-block;
+        min-width: 100px;
+        height: 14px;
+        margin-left: 8px;
+      }
+
+      .note {
+        font-size: 10px;
+        color: #888;
+        margin-top: 30px;
+        border-top: 1px solid #eee;
+        padding-top: 8px;
+        text-align: center;
+      }
+    </style>
+  </head>
+  <body>
+    <table class="header">
+      <tr>
+        <td style="width: 55%;">
+          <img src="{{ Company_Logo }}" style="max-width: 180px; max-height: 70px;" alt="{{ Company_Name }}" /><br/>
+          <span style="font-size: 11px; color: #555;">
+            {{ Company_Name }}<br/>
+            {{ Company_Address }}<br/>
+            {{ Company_Phone }}
+          </span>
+        </td>
+        <td style="width: 45%;">
+          <div class="title">PACKING SLIP</div>
+          <div class="meta">
+            <div><strong>Order No:</strong> {{ Order_Number }}</div>
+            <div><strong>Order Date:</strong> {{ Invoice_Date }}</div>
+            <div><strong>Ship Date:</strong> {{ Ship_Date }}</div>
+          </div>
+        </td>
+      </tr>
+    </table>
+
+    <table class="addresses">
+      <tr>
+        <td class="ship-to">
+          <span class="label">Ship To</span>
+          <div class="ship-to-name">{{ Shipping_Name }}</div>
+          <div>
+            {{ Shipping_Address1 }}<br/>
+            {{ Shipping_Address2 }}<br/>
+            {{ Shipping_City }}, {{ Shipping_State }} {{ Shipping_Zip }}<br/>
+            {{ Shipping_Country }}
+          </div>
+        </td>
+        <td class="bill-to">
+          <span class="label">Bill To</span>
+          {{ Billing_Name }}<br/>
+          {{ Billing_City }}, {{ Billing_State }} {{ Billing_Zip }}<br/>
+          {{ Billing_Country }}
+        </td>
+      </tr>
+    </table>
+
+    <table class="items">
+      <colgroup>
+        <col class="col-check" />
+        <col class="col-sku" />
+        <col />
+        <col class="col-qty" />
+        <col class="col-shipped" />
+      </colgroup>
+      <thead>
+        <tr>
+          <th>&nbsp;</th>
+          <th>SKU</th>
+          <th>Item</th>
+          <th style="text-align: center;">Qty Ordered</th>
+          <th style="text-align: center;">Qty Shipped</th>
+        </tr>
+      </thead>
+      <tbody>
+        {{ Packing_Items }}
+      </tbody>
+    </table>
+
+    <div class="totals-row">
+      Total items in this shipment: {{ Total_Items }}
+    </div>
+
+    <table class="signature">
+      <tr>
+        <td style="width: 60%;">
+          Picked &amp; packed by: <span class="sig-line"></span>
+        </td>
+        <td style="width: 40%; text-align: right;">
+          Date: <span class="date-line"></span>
+        </td>
+      </tr>
+    </table>
+
+    <div class="note">
+      This is a packing slip — not an invoice. No payment is required.
+    </div>
+  </body>
+</html>

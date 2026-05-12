@@ -2,51 +2,102 @@
 include 'header.php';
 include 'nav.php';
 
-// Free plans see the list but cannot trigger the download.
 $isFreePlan = ((float)($currentPlan['price'] ?? 0) == 0.00);
 
-// Only list invoices that already have a generated PDF — bulk download
-// just zips what exists, never (re)generates on the fly.
+// Which document type to bulk-download. Whitelist the value so users
+// can't inject an arbitrary column name into the query.
+$type = isset($_GET['type']) && $_GET['type'] === 'packing_slip' ? 'packing_slip' : 'invoice';
+
 $invoice_table = "invoices_" . preg_replace('/[^a-zA-Z0-9_]/', '_', strtolower($shop));
-$generated_invoices = DBHelper::select(
-    "SELECT order_id, order_number, order_name, customer_name, currency, total_price, created_at
-       FROM `$invoice_table`
-      WHERE invoice_status = 'generated'
-        AND pdf_invoice IS NOT NULL
-        AND pdf_invoice != ''
-      ORDER BY created_at DESC",
-    "",
-    []
-);
+
+// Check whether packing-slip columns exist for this store. If not yet
+// migrated, we still show the toggle but warn on the Packing Slips view.
+$cols = DBHelper::select("SHOW COLUMNS FROM `$invoice_table`", "", []);
+$colNames = array_column($cols ?: [], 'Field');
+$packingSlipReady = in_array('packing_slip_pdf', $colNames, true)
+                 && in_array('packing_slip_status', $colNames, true);
+
+if ($type === 'packing_slip' && $packingSlipReady) {
+    $generated = DBHelper::select(
+        "SELECT order_id, order_number, order_name, customer_name, currency, total_price, created_at
+           FROM `$invoice_table`
+          WHERE packing_slip_status = 'generated'
+            AND packing_slip_pdf IS NOT NULL
+            AND packing_slip_pdf != ''
+          ORDER BY created_at DESC",
+        "",
+        []
+    );
+    $heading      = 'Bulk Download Packing Slips';
+    $subheading   = 'Select multiple generated packing slips and download them as a single ZIP file.';
+    $generateHref = 'packing-slip?shop=' . htmlspecialchars($shop);
+    $generateLabel = 'Packing Slips page';
+    $emptyMessage = 'No generated packing slips yet. Generate them from the';
+} else {
+    if ($type === 'packing_slip' && !$packingSlipReady) {
+        // Force the type back to invoice if migration hasn't run yet.
+        $type = 'invoice';
+    }
+    $generated = DBHelper::select(
+        "SELECT order_id, order_number, order_name, customer_name, currency, total_price, created_at
+           FROM `$invoice_table`
+          WHERE invoice_status = 'generated'
+            AND pdf_invoice IS NOT NULL
+            AND pdf_invoice != ''
+          ORDER BY created_at DESC",
+        "",
+        []
+    );
+    $heading      = 'Bulk Download Invoices';
+    $subheading   = 'Select multiple generated invoices and download them as a single ZIP file.';
+    $generateHref = 'index?shop=' . htmlspecialchars($shop);
+    $generateLabel = 'Dashboard';
+    $emptyMessage = 'No generated invoices yet. Generate invoices from the';
+}
 ?>
 
 <main class="main-content">
     <div class="page-header">
-        <h2>Bulk Download Invoices</h2>
-        <h3>Select multiple generated invoices and download them as a single ZIP file.</h3>
+        <h2><?= htmlspecialchars($heading) ?></h2>
+        <h3><?= htmlspecialchars($subheading) ?></h3>
     </div>
 
-    <?php if ($isFreePlan): ?>
+    <!-- Type toggle -->
+    <div class="bulk-type-toggle">
+        <a href="bulk-download?shop=<?= htmlspecialchars($shop) ?>&type=invoice"
+           class="<?= $type === 'invoice' ? 'active' : '' ?>">Invoices</a>
+        <a href="bulk-download?shop=<?= htmlspecialchars($shop) ?>&type=packing_slip"
+           class="<?= $type === 'packing_slip' ? 'active' : '' ?>">Packing Slips</a>
+    </div>
+
+    <?php if ($type === 'packing_slip' && !$packingSlipReady): ?>
+        <div class="bulk-upgrade-banner" style="background:#fef2f2; border-color:#fca5a5;">
+            <div>
+                <strong style="color:#991b1b;">Packing slips not enabled yet.</strong>
+                <p style="color:#7f1d1d;">A one-time database update is required to enable packing slips for your store. Please contact support.</p>
+            </div>
+        </div>
+    <?php elseif ($isFreePlan): ?>
         <div class="bulk-upgrade-banner">
             <div>
                 <strong>Bulk download is a paid feature.</strong>
-                <p>You can preview the list of generated invoices below, but downloading multiple invoices at once requires a paid plan.</p>
+                <p>You can preview the list below, but downloading multiple files at once requires a paid plan.</p>
             </div>
             <a href="change-plan?shop=<?= htmlspecialchars($shop) ?>" class="upgrade-btn">Upgrade Plan</a>
         </div>
     <?php endif; ?>
 
     <div class="orders-card">
-        <?php if (empty($generated_invoices)): ?>
+        <?php if (empty($generated)): ?>
             <p style="padding: 24px; text-align: center; color: #6b7280; font-size: 14px;">
-                No generated invoices yet. Generate invoices from the
-                <a href="index?shop=<?= htmlspecialchars($shop) ?>" style="color: #111827; text-decoration: underline;">Dashboard</a>
-                or <a href="order?shop=<?= htmlspecialchars($shop) ?>" style="color: #111827; text-decoration: underline;">Shopify Orders</a>
-                page first, then come back here to bulk download them.
+                <?= htmlspecialchars($emptyMessage) ?>
+                <a href="<?= $generateHref ?>" style="color: #111827; text-decoration: underline;"><?= htmlspecialchars($generateLabel) ?></a>
+                first, then come back here to bulk download.
             </p>
         <?php else: ?>
             <form id="bulk-download-form" method="post" action="bulk-download-zip" target="_blank">
                 <input type="hidden" name="shop_id" value="<?= htmlspecialchars($shop_id) ?>">
+                <input type="hidden" name="type" value="<?= htmlspecialchars($type) ?>">
 
                 <div class="bulk-toolbar">
                     <label class="bulk-select-all">
@@ -77,21 +128,21 @@ $generated_invoices = DBHelper::select(
                         </tr>
                     </thead>
                     <tbody>
-                        <?php foreach ($generated_invoices as $inv): ?>
+                        <?php foreach ($generated as $row): ?>
                             <tr>
                                 <td>
                                     <input
                                         type="checkbox"
                                         name="order_ids[]"
-                                        value="<?= htmlspecialchars($inv['order_id']) ?>"
+                                        value="<?= htmlspecialchars($row['order_id']) ?>"
                                         class="bulk-row-check"
                                         <?= $isFreePlan ? 'disabled' : '' ?>
                                     >
                                 </td>
-                                <td><?= htmlspecialchars($inv['order_name'] ?? ('#' . $inv['order_number'])) ?></td>
-                                <td><?= htmlspecialchars($inv['created_at']) ?></td>
-                                <td><?= htmlspecialchars($inv['customer_name']) ?></td>
-                                <td><?= htmlspecialchars($inv['currency']) ?> <?= number_format((float)$inv['total_price'], 2) ?></td>
+                                <td><?= htmlspecialchars($row['order_name'] ?? ('#' . $row['order_number'])) ?></td>
+                                <td><?= htmlspecialchars($row['created_at']) ?></td>
+                                <td><?= htmlspecialchars($row['customer_name']) ?></td>
+                                <td><?= htmlspecialchars($row['currency']) ?> <?= number_format((float)$row['total_price'], 2) ?></td>
                             </tr>
                         <?php endforeach; ?>
                     </tbody>

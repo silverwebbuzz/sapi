@@ -243,6 +243,143 @@ function generatepdf($shop_id,$order_id){
     }
 }
 
+/**
+ * Generate a packing-slip PDF for one order and store it in the
+ * packing_slip_pdf column of invoices_<shop>.
+ *
+ * Notes:
+ *  - Does NOT count against the plan's order_limit. Packing slips are
+ *    operational documents, not billable invoices.
+ *  - Same row, separate column from the invoice PDF.
+ *  - Reuses the same dompdf options as generatepdf().
+ */
+function generatePackingSlip($shop_id, $order_id) {
+    $shop_data = DBHelper::selectOne(
+        "SELECT * FROM stores WHERE `id` = ?",
+        "s",
+        [$shop_id]
+    );
+    if (!$shop_data) {
+        return ['status' => 'error', 'message' => 'No shop found with the specified ID.'];
+    }
+
+    $shop_name = preg_replace('/[^a-zA-Z0-9_]/', '_', strtolower($shop_data['shop']));
+    $invoice_table = "invoices_" . $shop_name;
+
+    $invoice = DBHelper::selectOne(
+        "SELECT * FROM `$invoice_table` WHERE order_id = ?",
+        "s",
+        [$order_id]
+    );
+    if (!$invoice) {
+        return ['status' => 'error', 'message' => 'No order found with the specified ID.'];
+    }
+
+    // Build the items rows (no prices, with SKU + checkbox).
+    $billing_address  = json_decode($invoice['billing_address'], true) ?: [];
+    $shipping_address = json_decode($invoice['shipping_address'], true) ?: [];
+    $products         = json_decode($invoice['products'], true) ?: [];
+
+    $items_html = '';
+    $total_items = 0;
+    foreach ($products as $item) {
+        $qty   = isset($item['quantity']) ? (int)$item['quantity'] : 1;
+        $total_items += $qty;
+        $sku   = trim((string)($item['sku'] ?? ''));
+        $name  = (string)($item['name'] ?? $item['title'] ?? '');
+        $variant = trim((string)($item['variant_title'] ?? ''));
+
+        // Skip Shopify internal property noise but include real options as variant text.
+        if ($variant === '' && !empty($item['properties']) && is_array($item['properties'])) {
+            $parts = [];
+            foreach ($item['properties'] as $p) {
+                $pname = (string)($p['name'] ?? '');
+                if ($pname === '' || $pname[0] === '_') { continue; }
+                $parts[] = $pname . ': ' . ($p['value'] ?? '');
+            }
+            if (!empty($parts)) {
+                $variant = implode(' | ', $parts);
+            }
+        }
+
+        $items_html .= '<tr>';
+        $items_html .= '<td style="text-align: center;"><span class="check-box"></span></td>';
+        $items_html .= '<td>' . htmlspecialchars($sku !== '' ? $sku : '—') . '</td>';
+        $items_html .= '<td>' . htmlspecialchars($name);
+        if ($variant !== '') {
+            $items_html .= '<span class="item-variant">' . htmlspecialchars($variant) . '</span>';
+        }
+        $items_html .= '</td>';
+        $items_html .= '<td style="text-align: center;"><span class="qty-num">' . $qty . '</span></td>';
+        $items_html .= '<td style="text-align: center;"><span class="shipped-blank">&nbsp;</span></td>';
+        $items_html .= '</tr>';
+    }
+    if ($items_html === '') {
+        $items_html = '<tr><td colspan="5" style="text-align: center; color: #777;">No items.</td></tr>';
+    }
+
+    $replacements = [
+        '{{ Company_Logo }}'    => !empty($shop_data['logo_url']) ? $shop_data['logo_url'] : '',
+        '{{ Company_Name }}'    => $shop_data['store_name'] ?? '',
+        '{{ Company_Address }}' => trim(
+            ($shop_data['address1'] ?? '') . ' '
+            . ($shop_data['address2'] ?? '') . ', '
+            . ($shop_data['city'] ?? '') . ' '
+            . ($shop_data['zip'] ?? '') . ', '
+            . ($shop_data['country_name'] ?? ''),
+            ' ,'
+        ),
+        '{{ Company_Phone }}'   => $shop_data['phone'] ?? '',
+        '{{ Order_Number }}'    => $invoice['order_name'] ?? ('#' . ($invoice['order_number'] ?? '')),
+        '{{ Invoice_Date }}'    => date('d/m/Y', strtotime($invoice['created_at'] ?? 'now')),
+        '{{ Ship_Date }}'       => date('d/m/Y'),
+        '{{ Shipping_Name }}'    => $shipping_address['name']     ?? ($billing_address['name']     ?? ''),
+        '{{ Shipping_Address1 }}'=> $shipping_address['address1'] ?? ($billing_address['address1'] ?? ''),
+        '{{ Shipping_Address2 }}'=> $shipping_address['address2'] ?? ($billing_address['address2'] ?? ''),
+        '{{ Shipping_City }}'    => $shipping_address['city']     ?? ($billing_address['city']     ?? ''),
+        '{{ Shipping_State }}'   => $shipping_address['province'] ?? ($billing_address['province'] ?? ''),
+        '{{ Shipping_Zip }}'     => $shipping_address['zip']      ?? ($billing_address['zip']      ?? ''),
+        '{{ Shipping_Country }}' => $shipping_address['country']  ?? ($billing_address['country']  ?? ''),
+        '{{ Billing_Name }}'    => $billing_address['name']     ?? '',
+        '{{ Billing_City }}'    => $billing_address['city']     ?? '',
+        '{{ Billing_State }}'   => $billing_address['province'] ?? '',
+        '{{ Billing_Zip }}'     => $billing_address['zip']      ?? '',
+        '{{ Billing_Country }}' => $billing_address['country']  ?? '',
+        '{{ Packing_Items }}'   => $items_html,
+        '{{ Total_Items }}'     => $total_items,
+    ];
+
+    $template_path = __DIR__ . '/invoice_templates/html/packing-slip-1.html';
+    if (!is_readable($template_path)) {
+        return ['status' => 'error', 'message' => 'Packing slip template not found.'];
+    }
+    $template = file_get_contents($template_path);
+    $html = str_replace(array_keys($replacements), array_values($replacements), $template);
+
+    $options = new \Dompdf\Options();
+    $options->set('isRemoteEnabled', true);
+    $options->set('defaultFont', 'DejaVu Sans');
+    $options->set('dpi', 96);
+
+    $dompdf = new \Dompdf\Dompdf($options);
+    $dompdf->loadHtml($html);
+    $dompdf->setPaper('A4', 'portrait');
+    $dompdf->render();
+
+    $pdf_output = $dompdf->output();
+    $encoded_pdf = base64_encode($pdf_output);
+
+    DBHelper::execute(
+        "UPDATE `$invoice_table`
+            SET packing_slip_pdf = ?, packing_slip_status = 'generated'
+          WHERE order_id = ?",
+        "ss",
+        [$encoded_pdf, $order_id]
+    );
+
+    return ['status' => 'success', 'message' => 'Packing slip generated.'];
+}
+
 function sendemail($shop_id,$order_id, $personal_copy = false){
         
     $shop_data = DBHelper::selectOne(

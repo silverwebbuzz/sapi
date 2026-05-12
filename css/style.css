@@ -1481,3 +1481,89 @@ a.view-invoice-btn , .email-btn , .gen-invoice-btn , .upgrade-btn{
 .bulk-progress-close:hover {
     background: #1f2937;
 }
+
+/* ============================================================
+   Bulk download type toggle (Invoices / Packing Slips)
+   ============================================================ */
+.bulk-type-toggle {
+    display: inline-flex;
+    background: #f3f4f6;
+    border-radius: 999px;
+    padding: 4px;
+    margin-bottom: 18px;
+    gap: 2px;
+}
+.bulk-type-toggle a {
+    padding: 6px 16px;
+    border-radius: 999px;
+    text-decoration: none;
+    font-size: 13px;
+    font-weight: 500;
+    color: #4b5563;
+    transition: background 0.15s ease, color 0.15s ease;
+}
+.bulk-type-toggle a:hover {
+    color: #111827;
+}
+.bulk-type-toggle a.active {
+    background: #111827;
+    color: #fff;
+}
+
+/* Packing slips page — share the same look as the bulk invoices table */
+#packingSlipsTable {
+    width: 100% !important;
+    border-collapse: separate;
+    border-spacing: 0;
+    border: 1px solid #e5e7eb;
+    border-radius: 8px;
+    overflow: hidden;
+}
+#packingSlipsTable thead th {
+    background: #f9fafb;
+    color: #4b5563;
+    font-size: 11px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.6px;
+    padding: 14px 16px;
+    border-bottom: 1px solid #e5e7eb;
+    text-align: left;
+    white-space: nowrap;
+}
+#packingSlipsTable tbody td {
+    padding: 14px 16px;
+    font-size: 13px;
+    color: #1f2937;
+    border-bottom: 1px solid #f1f5f9;
+    vertical-align: middle;
+}
+#packingSlipsTable tbody tr:hover {
+    background: #fafbfc;
+}
+#packingSlipsTable input[type="checkbox"] {
+    width: 16px;
+    height: 16px;
+    cursor: pointer;
+}
+#packingSlipsTable input[type="checkbox"]:disabled {
+    cursor: not-allowed;
+    opacity: 0.5;
+}
+/* Action buttons on the packing slip page */
+#packingSlipsTable a.view-invoice-btn,
+#packingSlipsTable a.gen-invoice-btn {
+    background: #111827;
+    color: #fff;
+    text-decoration: none;
+    padding: 6px 12px;
+    border-radius: 6px;
+    font-size: 12px;
+    font-weight: 500;
+    display: inline-block;
+    margin: 2px 4px 2px 0;
+}
+#packingSlipsTable a.view-invoice-btn:hover,
+#packingSlipsTable a.gen-invoice-btn:hover {
+    background: #1f2937;
+}

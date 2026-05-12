@@ -9,6 +9,9 @@
         <li class="<?= basename($_SERVER['PHP_SELF']) == 'bulk-download' ? 'active' : '' ?>">
             <a href="bulk-download?shop=<?php echo $shop; ?>">Bulk Download</a>
         </li>
+        <li class="<?= basename($_SERVER['PHP_SELF']) == 'packing-slip' ? 'active' : '' ?>">
+            <a href="packing-slip?shop=<?php echo $shop; ?>">Packing Slips</a>
+        </li>
         <li class="<?= basename($_SERVER['PHP_SELF']) == 'billing' ? 'active' : '' ?>">
             <a href="change-plan?shop=<?php echo $shop; ?>">Change Plans</a>
         </li>

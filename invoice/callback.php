@@ -208,6 +208,8 @@ $create_table_query = "CREATE TABLE IF NOT EXISTS `$invoice_table` (
     `invoice_status` enum('pending','generated') DEFAULT 'pending',
     `email_status` enum('pending','sent') DEFAULT 'pending',
     `pdf_invoice` LONGTEXT DEFAULT NULL,
+    `packing_slip_pdf` LONGTEXT DEFAULT NULL,
+    `packing_slip_status` ENUM('pending','generated') NOT NULL DEFAULT 'pending',
      UNIQUE KEY (`order_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;";
 

@@ -56,6 +56,19 @@ $(document).ready(function() {
         });
     }
 
+    // Packing slips table — same shape as bulk invoices.
+    if ($('#packingSlipsTable').length) {
+        $('#packingSlipsTable').DataTable({
+            "order": [[2, 'desc']],
+            "pageLength": 25,
+            "lengthMenu": [10, 25, 50, 100],
+            "language": dtLanguage,
+            "columnDefs": [
+                { "orderable": false, "searchable": false, "targets": 0 }
+            ]
+        });
+    }
+
     //Generate Invoice Function
     window.generateInvoice = function (shopId, orderId, invoiceStatus) {
         fetch(`${BASE_URL}/invoice/generatepdf.php?shop_id=${shopId}&order_id=${orderId}&invoicestatus=${invoiceStatus}`)
@@ -195,17 +208,19 @@ $(document).ready(function() {
         updateOrdersBulkState();
     });
 
-    // Client-driven batching. We hit the existing generatepdf.php one at a
-    // time so any single timeout only affects one invoice, not the whole batch.
-    // The user has to keep the tab open — that's stated in the modal text.
-    var bulkState = { cancelled: false, inFlight: null };
+    // Client-driven batching engine, used by both Shopify Orders (bulk
+    // invoice generate) and Packing Slips (bulk packing slip generate).
+    // We hit the per-item endpoint one at a time so any single timeout only
+    // affects one item, not the whole batch. User must keep the tab open.
+    var bulkState = { cancelled: false, inFlight: null, noun: 'invoice' };
 
-    function showBulkModal(total) {
+    function showBulkModal(total, noun) {
         bulkState.cancelled = false;
-        $('#bulkProgressTitle').text('Generating invoices…');
+        bulkState.noun = noun || 'invoice';
+        $('#bulkProgressTitle').text('Generating ' + bulkState.noun + 's…');
         $('#bulkProgressStatus').text('Starting…');
         $('#bulkProgressFill').css('width', '0%');
-        $('#bulkProgressMeta').text('Please keep this tab open while we process your ' + total + ' invoice' + (total === 1 ? '' : 's') + '.');
+        $('#bulkProgressMeta').text('Please keep this tab open while we process your ' + total + ' ' + bulkState.noun + (total === 1 ? '' : 's') + '.');
         $('#bulkProgressCancel').prop('disabled', false).show();
         $('#bulkProgressClose').hide();
         $('#bulkProgressModal').show();
@@ -222,11 +237,12 @@ $(document).ready(function() {
         $('#bulkProgressCancel').hide();
         $('#bulkProgressClose').show();
         var msg;
+        var noun = bulkState.noun;
         if (bulkState.cancelled) {
             msg = 'Stopped at ' + done + ' of ' + total + '.';
             $('#bulkProgressTitle').text('Stopped');
         } else if (failures === 0) {
-            msg = 'All ' + done + ' invoice' + (done === 1 ? '' : 's') + ' generated successfully.';
+            msg = 'All ' + done + ' ' + noun + (done === 1 ? '' : 's') + ' generated successfully.';
             $('#bulkProgressTitle').text('Done');
         } else {
             msg = done + ' completed, ' + failures + ' failed. Try again for the failed ones.';
@@ -279,11 +295,11 @@ $(document).ready(function() {
             return;
         }
 
-        showBulkModal(selections.length);
-        runBulkSequentially(shopId, selections);
+        showBulkModal(selections.length, 'invoice');
+        runBulkSequentially(BASE_URL + '/invoice/generatepdf.php', shopId, selections);
     });
 
-    function runBulkSequentially(shopId, selections) {
+    function runBulkSequentially(endpointUrl, shopId, selections) {
         var total = selections.length;
         var done = 0;
         var failures = 0;
@@ -298,7 +314,7 @@ $(document).ready(function() {
             $('#bulkProgressStatus').text('Processing ' + (i) + ' of ' + total + ' — ' + item.label);
 
             bulkState.inFlight = $.ajax({
-                url: BASE_URL + '/invoice/generatepdf.php',
+                url: endpointUrl,
                 method: 'GET',
                 data: { shop_id: shopId, order_id: item.id },
                 timeout: 60000
@@ -310,12 +326,125 @@ $(document).ready(function() {
                 updateBulkProgress(done + failures, total, item.label, false);
             }).always(function () {
                 bulkState.inFlight = null;
-                // small breather so a stuck server doesn't get pounded
                 setTimeout(next, 150);
             });
         }
         next();
     }
+
+    // -------- Packing Slips page --------
+    function updatePackingSlipBulkState() {
+        var $boxes = $('.ps-row-check');
+        var $checked = $boxes.filter(':checked');
+        $('#ps-selected-count').text($checked.length + ' selected');
+
+        var $master = $('#ps-select-all');
+        if ($boxes.length === 0 || $checked.length === 0) {
+            $master.prop('checked', false).prop('indeterminate', false);
+        } else if ($checked.length === $boxes.length) {
+            $master.prop('checked', true).prop('indeterminate', false);
+        } else {
+            $master.prop('checked', false).prop('indeterminate', true);
+        }
+        $('#ps-bulk-generate-btn').prop('disabled', $checked.length === 0);
+
+        // ZIP button needs at least one selected row that ALREADY has a slip.
+        var zipCount = $checked.filter('[data-has-slip="1"]').length;
+        $('#ps-bulk-zip-btn').prop('disabled', zipCount === 0);
+
+        // Keep the ZIP form's order_ids[] inputs in sync with current selection
+        // of already-generated rows. We rebuild on every change rather than
+        // duplicate the checkboxes inside the form.
+        var $form = $('#ps-bulk-zip-form');
+        if ($form.length) {
+            $form.find('input[name="order_ids[]"]').remove();
+            $checked.filter('[data-has-slip="1"]').each(function () {
+                $('<input>', { type: 'hidden', name: 'order_ids[]', value: $(this).val() }).appendTo($form);
+            });
+        }
+    }
+
+    $(document).on('change', '#ps-select-all', function () {
+        $('.ps-row-check:not(:disabled)').prop('checked', $(this).prop('checked'));
+        updatePackingSlipBulkState();
+    });
+
+    $(document).on('change', '.ps-row-check', function () {
+        updatePackingSlipBulkState();
+    });
+
+    $(document).on('submit', '#ps-bulk-zip-form', function (e) {
+        if ($(this).find('input[name="order_ids[]"]').length === 0) {
+            e.preventDefault();
+            showMessage('Select at least one already-generated packing slip to download.', 'error');
+        }
+    });
+
+    // Single-row Generate / Re-Generate Packing Slip
+    $(document).on('click', '.js-generate-packing-slip', function (e) {
+        e.preventDefault();
+        var $a = $(this);
+        var shopId  = $a.data('shop-id');
+        var orderId = $a.data('order-id');
+        var originalText = $a.text();
+        $a.text('Generating…').css('pointer-events', 'none');
+
+        $.ajax({
+            url: BASE_URL + '/invoice/generate-packing-slip.php',
+            method: 'GET',
+            data: { shop_id: shopId, order_id: orderId },
+            dataType: 'json',
+            timeout: 60000
+        }).done(function (resp) {
+            if (resp && resp.status === 'success') {
+                showMessage('Packing slip generated.', 'success');
+                setTimeout(function () { location.reload(); }, 1200);
+            } else {
+                showMessage((resp && resp.message) || 'Failed to generate packing slip.', 'error');
+                $a.text(originalText).css('pointer-events', '');
+            }
+        }).fail(function () {
+            showMessage('Failed to generate packing slip.', 'error');
+            $a.text(originalText).css('pointer-events', '');
+        });
+    });
+
+    // View an already-generated packing slip in the modal (lazy-load — the
+    // PDF blob is big so we fetch only when the user actually wants it).
+    $(document).on('click', '.js-view-packing-slip', function (e) {
+        e.preventDefault();
+        var shopId  = $(this).data('shop-id');
+        var orderId = $(this).data('order-id');
+        var url = BASE_URL + '/invoice/generate-packing-slip.php?shop_id=' + encodeURIComponent(shopId)
+                + '&order_id=' + encodeURIComponent(orderId) + '&view=1';
+        $('#invoiceFrame').attr('src', url);
+        $('#invoiceModal').show();
+    });
+
+    // Bulk Generate / Regenerate Packing Slips
+    $(document).on('click', '#ps-bulk-generate-btn', function () {
+        var $btn = $(this);
+        var shopId = $btn.data('shop-id');
+        var cap = parseInt($btn.data('batch-cap'), 10) || 50;
+
+        var selections = $('.ps-row-check:checked').map(function () {
+            return { id: $(this).val(), label: $(this).data('order-label') || ('#' + $(this).val()) };
+        }).get();
+
+        if (selections.length === 0) {
+            showMessage('Please select at least one order.', 'error');
+            return;
+        }
+        if (selections.length > cap) {
+            if (!confirm('You can process up to ' + cap + ' at a time.\n\nProcess the first ' + cap + ' and skip the rest?')) {
+                return;
+            }
+            selections = selections.slice(0, cap);
+        }
+
+        showBulkModal(selections.length, 'packing slip');
+        runBulkSequentially(BASE_URL + '/invoice/generate-packing-slip.php', shopId, selections);
+    });
 
     // Mobile Menu Toggle
     $('.menu-toggle').on('click', function() {
