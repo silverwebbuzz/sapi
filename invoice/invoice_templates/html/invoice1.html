@@ -61,6 +61,7 @@
               <th style="background-color: #f2f2f2; font-weight: bold; border: 1px solid #ddd; text-align: left">DESCRIPTION</th>
               <th style="background-color: #f2f2f2; font-weight: bold; border: 1px solid #ddd; text-align: left">PRICE</th>
               <th style="background-color: #f2f2f2; font-weight: bold; border: 1px solid #ddd; text-align: left">QTY</th>
+              <th style="background-color: #f2f2f2; font-weight: bold; border: 1px solid #ddd; text-align: left">{{ Tax_Column_Label }}</th>
               <th style="background-color: #f2f2f2; font-weight: bold; border: 1px solid #ddd; text-align: left">TOTAL</th>
             </tr>
             {{ Order_Items }}
@@ -83,17 +84,15 @@
               <td style="font-weight: bold; border: 1px solid #ddd; text-align: right">{{ Subtotal }}</td>
             </tr>
             <tr>
+              <td style="font-weight: bold; border: 1px solid #ddd; text-align: right; background-color: #f2f2f2">{{ Tax_Label }}</td>
+              <td style="font-weight: bold; border: 1px solid #ddd; text-align: right">{{ Tax_Amount }}</td>
+            </tr>
+            <tr>
               <td style="font-weight: bold; border: 1px solid #ddd; text-align: right; background-color: #f2f2f2">Shipping</td>
               <td style="font-weight: bold; border: 1px solid #ddd; text-align: right">{{ Shipping_Cost }}</td>
             </tr>
-            <tr>
-              <td style="font-weight: bold; border: 1px solid #ddd; text-align: right; background-color: #f2f2f2">Discount</td>
-              <td style="font-weight: bold; border: 1px solid #ddd; text-align: right">{{ Discount_Amount }}</td>
-            </tr>
-            <tr>
-              <td style="font-weight: bold; border: 1px solid #ddd; text-align: right; background-color: #f2f2f2">Tax</td>
-              <td style="font-weight: bold; border: 1px solid #ddd; text-align: right">{{ Tax_Amount }}</td>
-            </tr>
+            {{ Shipping_Tax_Block }}
+            {{ Discount_Block }}
             <tr>
               <td style="font-weight: bold; border: 1px solid #ddd; text-align: right; background-color: #f2f2f2">Grand Total</td>
               <td style="font-weight: bold; border: 1px solid #ddd; text-align: right; background-color: #f2f2f2">{{ Total_Amount }}</td>

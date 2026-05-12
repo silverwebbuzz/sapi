@@ -40,20 +40,41 @@ function generatepdf($shop_id,$order_id){
             // Prepare order items HTML
             $items_html = '';
             $counter = 1;
+            $subtotal_ex_tax = 0.0;
+            $item_tax_total = 0.0;
+            $tax_label = '';
+            $tax_rate = null;
+
             foreach ($products as $item) {
-                $tax_rate = 0;
-                $tax_amount = 0;
-                
-                // Get tax information if available
+                $tax_amount = 0.0;
+                $item_tax_rate = null;
+                $item_tax_title = '';
+
                 if (isset($item['tax_lines']) && !empty($item['tax_lines'])) {
-                    $tax_rate = $item['tax_lines'][0]['rate'] * 100;
-                    $tax_amount = $item['tax_lines'][0]['price'];
+                    $item_tax_rate = $item['tax_lines'][0]['rate'];
+                    $tax_amount = floatval($item['tax_lines'][0]['price']);
+                    $item_tax_title = $item['tax_lines'][0]['title'] ?? '';
+                    if ($tax_label === '' && !empty($item_tax_title)) {
+                        $tax_label = $item_tax_title;
+                        $tax_rate = $item_tax_rate;
+                    }
                 }
 
-                // Use presentment/shop money values when available, fallback to price
-                $unit_price = isset($item['price_set']['shop_money']['amount']) ? $item['price_set']['shop_money']['amount'] : $item['price'];
-                $quantity = isset($item['quantity']) ? $item['quantity'] : 1;
-                $line_total = floatval($unit_price) * floatval($quantity);
+                $unit_price = isset($item['price_set']['shop_money']['amount']) ? floatval($item['price_set']['shop_money']['amount']) : floatval($item['price']);
+                $quantity = isset($item['quantity']) ? floatval($item['quantity']) : 1.0;
+                $line_total_gross = $unit_price * $quantity;
+                $unit_price_ex_tax = $line_total_gross;
+                if ($tax_amount > 0) {
+                    $unit_price_ex_tax = max(0, ($line_total_gross - $tax_amount) / max(1.0, $quantity));
+                }
+                $line_total_ex_tax = $unit_price_ex_tax * $quantity;
+                $subtotal_ex_tax += $line_total_ex_tax;
+                $item_tax_total += $tax_amount;
+
+                if ($tax_label === '' && !empty($item_tax_title)) {
+                    $tax_label = $item_tax_title;
+                    $tax_rate = $item_tax_rate;
+                }
 
                 // Build description from variant title and properties
                 $description_parts = [];
@@ -72,11 +93,34 @@ function generatepdf($shop_id,$order_id){
                 $items_html .= '<tr style="font-size: 10px; border-bottom: 1px solid #ddd">';
                 $items_html .= '<td style="text-align: left">'.htmlspecialchars($item['name']).'</td>';
                 $items_html .= '<td style="text-align: left">'.htmlspecialchars($description).'</td>';
-                $items_html .= '<td style="text-align: left">'.$invoice['currency'].' '.number_format(floatval($unit_price), 2).'</td>';
+                $items_html .= '<td style="text-align: left">'.$invoice['currency'].' '.number_format($unit_price_ex_tax, 2).'</td>';
                 $items_html .= '<td style="text-align: left">'.number_format($quantity, 0).'</td>';
-                $items_html .= '<td style="text-align: left">'.$invoice['currency'].' '.number_format($line_total, 2).'</td>';
+                $items_html .= '<td style="text-align: left">'.$invoice['currency'].' '.number_format($tax_amount, 2).'</td>';
+                $items_html .= '<td style="text-align: left">'.$invoice['currency'].' '.number_format($line_total_gross, 2).'</td>';
                 $items_html .= '</tr>';
                 $counter++;
+            }
+
+            $shipping_tax_amount = floatval($invoice['tax_amount']) - $item_tax_total;
+            if ($shipping_tax_amount < 0) {
+                $shipping_tax_amount = 0;
+            }
+
+            if ($tax_label === '') {
+                $tax_label = 'Tax';
+            }
+            $tax_rate_text = $tax_rate !== null ? ' (' . round($tax_rate * 100, 2) . '%)' : '';
+            $tax_label_full = $tax_label . $tax_rate_text;
+            $shipping_tax_label = 'Shipping ' . $tax_label_full;
+
+            $discount_row = '';
+            if (floatval($invoice['discount_amount']) != 0) {
+                $discount_row = '<tr><td style="font-weight: bold; border: 1px solid #ddd; text-align: right; background-color: #f2f2f2">Discount</td><td style="font-weight: bold; border: 1px solid #ddd; text-align: right">' . $invoice['currency'] . ' ' . number_format(floatval($invoice['discount_amount']), 2) . '</td></tr>';
+            }
+
+            $shipping_tax_block = '';
+            if ($shipping_tax_amount > 0) {
+                $shipping_tax_block = '<tr><td style="font-weight: bold; border: 1px solid #ddd; text-align: right; background-color: #f2f2f2">' . htmlspecialchars($shipping_tax_label) . '</td><td style="font-weight: bold; border: 1px solid #ddd; text-align: right">' . $invoice['currency'] . ' ' . number_format($shipping_tax_amount, 2) . '</td></tr>';
             }
     
             // Prepare replacements array
@@ -110,10 +154,13 @@ function generatepdf($shop_id,$order_id){
                 '{{ Shipping_Zip }}' => isset($shipping_address['zip']) ? $shipping_address['zip'] : ($billing_address['zip'] ?? ''),
                 '{{ Shipping_Country }}' => isset($shipping_address['country']) ? $shipping_address['country'] : ($billing_address['country'] ?? ''),
                 '{{ Order_Items }}' => $items_html,
-                '{{ Subtotal }}' => $invoice['currency'].' '.number_format($invoice['subtotal_price'], 2),
+                '{{ Subtotal }}' => $invoice['currency'].' '.number_format($subtotal_ex_tax, 2),
+                '{{ Tax_Column_Label }}' => htmlspecialchars($tax_label_full),
+                '{{ Tax_Label }}' => htmlspecialchars($tax_label_full),
                 '{{ Tax_Amount }}' => $invoice['currency'].' '.number_format($invoice['tax_amount'], 2),
                 '{{ Shipping_Cost }}' => $invoice['currency'].' '.number_format($invoice['shipping_cost'], 2),
-                '{{ Discount_Amount }}' => $invoice['currency'].' '.number_format($invoice['discount_amount'], 2),
+                '{{ Shipping_Tax_Block }}' => $shipping_tax_block,
+                '{{ Discount_Block }}' => $discount_row,
                 '{{ Total_Amount }}' => $invoice['currency'].' '.number_format($invoice['total_price'], 2),
                 '{{ Payment_Method }}' => $invoice['payment_method'] ?? 'Unknown',
                 '{{ Payment_Status }}' => ucfirst($invoice['order_status'])

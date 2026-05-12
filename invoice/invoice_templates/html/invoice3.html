@@ -82,6 +82,7 @@
               <th style="background-color: #f2f2f2; font-weight: bold; text-align: left">DESCRIPTION</th>
               <th style="background-color: #f2f2f2; font-weight: bold; text-align: left">PRICE</th>
               <th style="background-color: #f2f2f2; font-weight: bold; text-align: left">QTY</th>
+              <th style="background-color: #f2f2f2; font-weight: bold; text-align: left">{{ Tax_Column_Label }}</th>
               <th style="background-color: #f2f2f2; font-weight: bold; text-align: left">TOTAL</th>
             </tr>
             {{ Order_Items }}
@@ -97,26 +98,26 @@
                 >
               </td>
               <td style="border: 1px solid #ddd; font-size: 12px; background: #ededed">
-                <span style="display: block; width: 100%">
-                  <span style="font-weight: bold; text-align: left; display: inline-block; width: 49%">Subtotal</span>
-                  <span style="font-weight: bold; text-align: right; display: inline-block; width: 49%">{{ Subtotal }}</span>
-                </span>
-                <span style="border-top: 1px solid #ddd; display: block; width: 100%; margin-top: 10px; padding-top: 10px">
-                  <span style="font-weight: bold; text-align: left; display: inline-block; width: 49%">Shipping</span>
-                  <span style="font-weight: bold; text-align: right; display: inline-block; width: 49%">{{ Shipping_Cost }}</span>
-                </span>
-                <span style="border-top: 1px solid #ddd; display: block; width: 100%; margin-top: 10px; padding-top: 10px">
-                  <span style="font-weight: bold; text-align: left; display: inline-block; width: 49%">Discount</span>
-                  <span style="font-weight: bold; text-align: right; display: inline-block; width: 49%">{{ Discount_Amount }}</span>
-                </span>
-                <span style="border-top: 1px solid #ddd; display: block; width: 100%; margin-top: 10px; padding-top: 10px">
-                  <span style="font-weight: bold; text-align: left; display: inline-block; width: 49%">Tax</span>
-                  <span style="font-weight: bold; text-align: right; display: inline-block; width: 49%">{{ Tax_Amount }}</span>
-                </span>
-                <span style="border-top: 1px solid #ddd; display: block; width: 100%; margin-top: 10px; padding-top: 10px">
-                  <span style="font-weight: bold; text-align: left; display: inline-block; width: 49%">Grand Total</span>
-                  <span style="font-weight: bold; text-align: right; display: inline-block; width: 49%">{{ Total_Amount }}</span>
-                </span>
+                <table cellpadding="10" width="100%">
+                  <tr>
+                    <td style="font-weight: bold; border: 1px solid #ddd; text-align: right; background-color: #f2f2f2">Subtotal</td>
+                    <td style="font-weight: bold; border: 1px solid #ddd; text-align: right">{{ Subtotal }}</td>
+                  </tr>
+                  <tr>
+                    <td style="font-weight: bold; border: 1px solid #ddd; text-align: right; background-color: #f2f2f2">{{ Tax_Label }}</td>
+                    <td style="font-weight: bold; border: 1px solid #ddd; text-align: right">{{ Tax_Amount }}</td>
+                  </tr>
+                  <tr>
+                    <td style="font-weight: bold; border: 1px solid #ddd; text-align: right; background-color: #f2f2f2">Shipping</td>
+                    <td style="font-weight: bold; border: 1px solid #ddd; text-align: right">{{ Shipping_Cost }}</td>
+                  </tr>
+                  {{ Shipping_Tax_Block }}
+                  {{ Discount_Block }}
+                  <tr>
+                    <td style="font-weight: bold; border: 1px solid #ddd; text-align: right; background-color: #f2f2f2">Grand Total</td>
+                    <td style="font-weight: bold; border: 1px solid #ddd; text-align: right">{{ Total_Amount }}</td>
+                  </tr>
+                </table>
               </td>
             </tr>
           </table>
