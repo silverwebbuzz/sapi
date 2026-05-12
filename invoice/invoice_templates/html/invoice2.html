@@ -11,7 +11,7 @@
       }
     </style>
   </head>
-  <body style="font-family: Arial, Helvetica, sans-serif; margin: 0">
+  <body style="font-family: 'DejaVu Sans', Arial, Helvetica, sans-serif; margin: 0">
     <table class="invoice-table" width="100%">
       <tr>
         <td>
@@ -41,7 +41,7 @@
       </tr>
       <tr>
         <td>
-          <span style="display: block; font-weight: bold">INVOICE TO:</span>
+          <span style="display: block; font-weight: bold">MERCHANT:</span>
           <span style="display: block; font-size: 11px">
             {{ Company_Name }}<br />
             {{ Company_Address }}<br />
@@ -50,12 +50,22 @@
           >
         </td>
         <td colspan="2" style="text-align: right">
-          <span style="display: block; font-weight: bold">PAY TO:</span>
+          <span style="display: block; font-weight: bold">BILL TO:</span>
           <span style="display: block; font-size: 11px">
             {{ Billing_Name }}<br />
-            {{ Billing_Address1 }},<br />
-            {{ Billing_City }}, {{ Billing_Country }}<br />
+            {{ Billing_Address1 }}<br />
+            {{ Billing_Address2 }}<br />
+            {{ Billing_City }}, {{ Billing_State }} {{ Billing_Zip }}<br />
+            {{ Billing_Country }}<br />
             {{ Billing_Email }}</span
+          >
+          <span style="display: block; margin-top: 10px; font-weight: bold">SHIP TO:</span>
+          <span style="display: block; font-size: 11px">
+            {{ Shipping_Name }}<br />
+            {{ Shipping_Address1 }}<br />
+            {{ Shipping_Address2 }}<br />
+            {{ Shipping_City }}, {{ Shipping_State }} {{ Shipping_Zip }}<br />
+            {{ Shipping_Country }}</span
           >
         </td>
       </tr>

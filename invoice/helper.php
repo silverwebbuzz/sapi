@@ -106,12 +106,25 @@ function generatepdf($shop_id,$order_id){
                 $shipping_tax_amount = 0;
             }
 
+            $has_tax = floatval($invoice['tax_amount']) > 0;
             if ($tax_label === '') {
                 $tax_label = 'Tax';
             }
             $tax_rate_text = $tax_rate !== null ? ' (' . round($tax_rate * 100, 2) . '%)' : '';
-            $tax_label_full = $tax_label . $tax_rate_text;
-            $shipping_tax_label = 'Shipping ' . $tax_label_full;
+            $tax_label_full = $has_tax ? $tax_label . $tax_rate_text : '';
+            if ($has_tax) {
+                $lc_tax_label = strtolower($tax_label);
+                if (strpos($lc_tax_label, 'vat') !== false) {
+                    $shipping_tax_label = 'Shipping VAT' . $tax_rate_text;
+                } elseif (strpos($lc_tax_label, 'gst') !== false) {
+                    $shipping_tax_label = 'Shipping GST' . $tax_rate_text;
+                } else {
+                    $shipping_tax_label = 'Shipping ' . $tax_label . $tax_rate_text;
+                }
+            } else {
+                $shipping_tax_label = '';
+            }
+            $tax_amount_display = $has_tax ? $invoice['currency'].' '.number_format($invoice['tax_amount'], 2) : '';
 
             $discount_row = '';
             if (floatval($invoice['discount_amount']) != 0) {
@@ -157,7 +170,7 @@ function generatepdf($shop_id,$order_id){
                 '{{ Subtotal }}' => $invoice['currency'].' '.number_format($subtotal_ex_tax, 2),
                 '{{ Tax_Column_Label }}' => htmlspecialchars($tax_label_full),
                 '{{ Tax_Label }}' => htmlspecialchars($tax_label_full),
-                '{{ Tax_Amount }}' => $invoice['currency'].' '.number_format($invoice['tax_amount'], 2),
+                '{{ Tax_Amount }}' => $tax_amount_display,
                 '{{ Shipping_Cost }}' => $invoice['currency'].' '.number_format($invoice['shipping_cost'], 2),
                 '{{ Shipping_Tax_Block }}' => $shipping_tax_block,
                 '{{ Discount_Block }}' => $discount_row,
@@ -183,6 +196,7 @@ function generatepdf($shop_id,$order_id){
             $options = new Options();
             $options->set('isRemoteEnabled', true); // Enable external images (if needed)
             $options->set('defaultFont', 'DejaVu Sans'); // Set default font
+            $options->set('dpi', 300); // Higher DPI for crisper output
 
             // Initialize DomPDF with options
             $dompdf = new Dompdf($options);
