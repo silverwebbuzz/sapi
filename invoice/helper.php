@@ -201,7 +201,7 @@ function generatepdf($shop_id,$order_id){
             $options = new Options();
             $options->set('isRemoteEnabled', true); // Enable external images (if needed)
             $options->set('defaultFont', 'DejaVu Sans'); // Set default font
-            $options->set('dpi', 300); // Higher DPI for crisper output
+            $options->set('dpi', 96); // DomPDF's default — keeps CSS px sizes visually correct on A4
 
             // Initialize DomPDF with options
             $dompdf = new Dompdf($options);

@@ -109,6 +109,7 @@
                     <td style="font-weight: bold; border: 1px solid #ccc; text-align: right; background-color: #ddd">Subtotal</td>
                     <td style="font-weight: bold; border: 1px solid #ccc; text-align: right">{{ Subtotal }}</td>
                   </tr>
+                  {{ Discount_Block }}
                   <tr>
                     <td style="font-weight: bold; border: 1px solid #ccc; text-align: right; background-color: #ddd">{{ Tax_Label }}</td>
                     <td style="font-weight: bold; border: 1px solid #ccc; text-align: right">{{ Tax_Amount }}</td>
@@ -118,7 +119,6 @@
                     <td style="font-weight: bold; border: 1px solid #ccc; text-align: right">{{ Shipping_Cost }}</td>
                   </tr>
                   {{ Shipping_Tax_Block }}
-                  {{ Discount_Block }}
                   <tr>
                     <td style="font-weight: bold; border: 1px solid #ccc; text-align: right; background-color: #ddd">Grand Total</td>
                     <td style="font-weight: bold; border: 1px solid #ccc; text-align: right">{{ Total_Amount }}</td>
