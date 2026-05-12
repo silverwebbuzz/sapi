@@ -1070,21 +1070,49 @@ a.view-invoice-btn , .email-btn , .gen-invoice-btn , .upgrade-btn{
     margin-bottom: 16px;
 }
 
-.orders-card table#ordersTable {
+.orders-card table#ordersTable,
+.orders-card table.dataTable {
     width: 100% !important;
-    border-collapse: separate;
+    border-collapse: separate !important;
     border-spacing: 0;
+    border: 1px solid #e5e7eb;
+    border-radius: 8px;
+    overflow: hidden;
 }
-.orders-card table#ordersTable thead th {
-    background: #f9fafb;
-    color: #4b5563;
-    font-size: 11px;
-    font-weight: 600;
+/* Override DataTables 1.11.5 default thead styling.
+   Selectors are deliberately specific enough to win against
+   `table.dataTable thead .sorting` from jquery.dataTables.css. */
+.orders-card table#ordersTable thead th,
+.orders-card table.dataTable thead th,
+.orders-card table.dataTable thead td {
+    background: #f9fafb !important;
+    color: #4b5563 !important;
+    font-size: 11px !important;
+    font-weight: 600 !important;
     text-transform: uppercase;
     letter-spacing: 0.6px;
-    padding: 12px 14px;
-    border-bottom: 1px solid #e5e7eb;
+    padding: 14px 16px !important;
+    border-bottom: 1px solid #e5e7eb !important;
+    border-top: none !important;
     text-align: left;
+    white-space: nowrap;
+}
+/* Right-padding for sortable headers so DataTables' sort arrow has room
+   but doesn't push text into the next column. */
+.orders-card table.dataTable thead .sorting,
+.orders-card table.dataTable thead .sorting_asc,
+.orders-card table.dataTable thead .sorting_desc,
+.orders-card table.dataTable thead .sorting_asc_disabled,
+.orders-card table.dataTable thead .sorting_desc_disabled {
+    padding-right: 28px !important;
+    background-position: right 10px center !important;
+}
+/* Round the top corners of the first/last header */
+.orders-card table#ordersTable thead th:first-child {
+    border-top-left-radius: 8px;
+}
+.orders-card table#ordersTable thead th:last-child {
+    border-top-right-radius: 8px;
 }
 .orders-card table#ordersTable tbody td {
     padding: 14px;
