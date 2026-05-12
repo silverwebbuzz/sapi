@@ -1,14 +1,10 @@
 <?php
 // ============ DEBUG LOGGING (remove once issue is identified) ============
-ini_set('display_errors', 1);
-ini_set('display_startup_errors', 1);
+ini_set('display_errors', 0);          // do NOT echo to browser — kills session_start
+ini_set('display_startup_errors', 0);
 ini_set('log_errors', 1);
 ini_set('error_log', __DIR__ . '/callback_debug.log');
 error_reporting(E_ALL);
-
-// Disable output buffering so partial output reaches the browser on crash
-while (ob_get_level() > 0) { ob_end_flush(); }
-@ob_implicit_flush(true);
 
 function dbg($label, $data = null) {
     $line = '[' . date('Y-m-d H:i:s') . '] ' . $label;
@@ -16,9 +12,6 @@ function dbg($label, $data = null) {
         $line .= ' :: ' . (is_scalar($data) ? var_export($data, true) : json_encode($data, JSON_UNESCAPED_SLASHES));
     }
     error_log($line . "\n", 3, __DIR__ . '/callback_debug.log');
-    // TEMP: also echo to browser so we can debug without log file access
-    echo htmlspecialchars($line) . "<br>\n";
-    @flush();
 }
 
 // Catch every fatal so we always see the cause
