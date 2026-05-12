@@ -207,11 +207,18 @@ function getShopLogo($shop, $access_token) {
     if (isset($assets['asset']['value'])) {
         $settings_data = json_decode($assets['asset']['value'], true);
         if (isset($settings_data['current']['logo'])) {
-            return $settings_data['current']['logo'];
+            $logo = $settings_data['current']['logo'];
+            if (is_string($logo)) {
+                return $logo;
+            }
+            // Some themes store logo as an object/array (e.g. {"src":"..."})
+            if (is_array($logo)) {
+                return $logo['src'] ?? $logo['value'] ?? null;
+            }
         }
     }
 
-    return $assets;
+    return null;
 }
 
 function getAllFiles($shop, $access_token) {

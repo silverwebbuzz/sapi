@@ -30,14 +30,12 @@ register_shutdown_function(function () {
     dbg('END');
 });
 
-if (session_status() === PHP_SESSION_NONE) {
-    session_start();
-    dbg('session_start called');
-}
-dbg('START', ['get' => $_GET, 'session_id' => session_id() ?: '(none)', 'session_data' => $_SESSION ?? []]);
+dbg('START', ['get' => $_GET]);
 // ========================================================================
 
 require_once '../config/config.php';
+// config.php handles session_start()
+dbg('session', ['session_id' => session_id() ?: '(none)', 'session_data' => $_SESSION ?? []]);
 dbg('after config.php');
 require_once '../config/db.php';
 dbg('after db.php');
@@ -65,7 +63,7 @@ dbg('access_token result', $access_token ? 'GOT TOKEN (len=' . strlen($access_to
 
 if (isset($access_token)) {
     $_SESSION['shop'] = $shop;
-    $_SESSION['access_token'] = $accessToken;
+    $_SESSION['access_token'] = $access_token;
     // Step 2: Fetch Store Details via shopify Rest API
     dbg('fetching shop details');
     $shopDetailsResponse_json = getShopDetailsRestAPI($shop,$access_token); //return value in json
@@ -79,13 +77,14 @@ if (isset($access_token)) {
 
     $shop                                   = $shopDetailsResponse['shop']['myshopify_domain'];
     $domain                                 = $shopDetailsResponse['shop']['domain'] ?? $shop;
-    
+
     //Fetch Store logo details via shopify Graphql
     $logo_data = getShopLogo($shop, $access_token);
-    if(isset($logo_data)){
+    dbg('logo_data', $logo_data);
+    if (is_string($logo_data) && $logo_data !== '') {
         $logo_url = "https://".$domain."/cdn/shop/files/".str_replace('shopify://shop_images/', '', $logo_data);
     } else {
-        $logo_url = ''; 
+        $logo_url = '';
     }
 
     // Step 3: Define Data
