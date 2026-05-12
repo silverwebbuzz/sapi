@@ -90,13 +90,14 @@ function generatepdf($shop_id,$order_id){
                 }
                 $description = !empty($description_parts) ? implode(' | ', $description_parts) : '';
 
-                $items_html .= '<tr style="font-size: 10px; border-bottom: 1px solid #ddd">';
-                $items_html .= '<td style="text-align: left">'.htmlspecialchars($item['name']).'</td>';
-                $items_html .= '<td style="text-align: left">'.htmlspecialchars($description).'</td>';
+                $items_html .= '<tr style="font-size: 11px; border-bottom: 1px solid #ddd">';
+                $row_tax_text = $item_tax_rate !== null ? round($item_tax_rate * 100, 2) . '%' : '';
+                $items_html .= '<td style="text-align: left; word-wrap: break-word; white-space: normal">'.htmlspecialchars($item['name']).'</td>';
+                $items_html .= '<td style="text-align: left; word-wrap: break-word; white-space: normal">'.htmlspecialchars($description).'</td>';
                 $items_html .= '<td style="text-align: left">'.$invoice['currency'].' '.number_format($unit_price_ex_tax, 2).'</td>';
                 $items_html .= '<td style="text-align: left">'.number_format($quantity, 0).'</td>';
-                $items_html .= '<td style="text-align: left">'.$invoice['currency'].' '.number_format($tax_amount, 2).'</td>';
-                $items_html .= '<td style="text-align: left">'.$invoice['currency'].' '.number_format($line_total_gross, 2).'</td>';
+                $items_html .= '<td style="text-align: left">'.htmlspecialchars($row_tax_text).'</td>';
+                $items_html .= '<td style="text-align: left">'.$invoice['currency'].' '.number_format($line_total_ex_tax, 2).'</td>';
                 $items_html .= '</tr>';
                 $counter++;
             }

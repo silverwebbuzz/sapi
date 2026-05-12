@@ -5,14 +5,20 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Invoice3</title>
     <style>
+      body {
+        font-size: 13px;
+      }
       table {
         width: 100%;
         border-collapse: separate;
         border-spacing: 0;
       }
+      table, td, th {
+        font-size: 12px;
+      }
     </style>
   </head>
-  <body style="font-family: 'DejaVu Sans', Arial, Helvetica, sans-serif; margin: 0">
+  <body style="font-family: 'DejaVu Sans', Arial, Helvetica, sans-serif; font-size: 13px; margin: 0">
     <table style="padding: 20px; background-color: #aaaaaa">
       <tr>
         <td>
@@ -86,20 +92,20 @@
     <table>
       <tr>
         <td colspan="3">
-          <table style="border: 1px solid #ddd; border-collapse: collapse; border-radius: 10px" width="100%" cellpadding="10">
+          <table style="border: 1px solid #ddd; border-collapse: collapse; border-radius: 10px; table-layout: fixed;" width="100%" cellpadding="10">
             <tr style="font-size: 10px; border-bottom: 1px solid #ddd">
-              <th style="background-color: #f2f2f2; font-weight: bold; text-align: left">ITEM</th>
-              <th style="background-color: #f2f2f2; font-weight: bold; text-align: left">DESCRIPTION</th>
-              <th style="background-color: #f2f2f2; font-weight: bold; text-align: left">PRICE</th>
-              <th style="background-color: #f2f2f2; font-weight: bold; text-align: left">QTY</th>
-              <th style="background-color: #f2f2f2; font-weight: bold; text-align: left">{{ Tax_Column_Label }}</th>
-              <th style="background-color: #f2f2f2; font-weight: bold; text-align: left">TOTAL</th>
+              <th style="width: 15%; background-color: #f2f2f2; font-weight: bold; text-align: left">ITEM</th>
+              <th style="width: 38%; background-color: #f2f2f2; font-weight: bold; text-align: left">DESCRIPTION</th>
+              <th style="width: 12%; background-color: #f2f2f2; font-weight: bold; text-align: left">PRICE</th>
+              <th style="width: 8%; background-color: #f2f2f2; font-weight: bold; text-align: left">QTY</th>
+              <th style="width: 13%; background-color: #f2f2f2; font-weight: bold; text-align: left">{{ Tax_Column_Label }}</th>
+              <th style="width: 14%; background-color: #f2f2f2; font-weight: bold; text-align: left">TOTAL</th>
             </tr>
             {{ Order_Items }}
           </table>
           <table cellpadding="10" width="100%" style="border-collapse: collapse; margin-top: 10px">
             <tr>
-              <td style="border: 1px solid #ddd">
+              <td style="border: 1px solid #ddd; vertical-align: top; width: 55%">
                 <span style="display: block; font-weight: bold; font-size: 12px">PAYMENT INFO:</span>
                 <br />
                 <span style="display: block; font-size: 11px"
@@ -107,8 +113,8 @@
                   {{ Payment_Status }}</span
                 >
               </td>
-              <td style="border: 1px solid #ddd; font-size: 12px; background: #ededed">
-                <table cellpadding="10" width="100%">
+              <td style="border: 1px solid #ddd; font-size: 12px; background: #ededed; width: 45%; vertical-align: top">
+                <table cellpadding="10" width="100%" style="margin-left:auto; border-collapse: collapse;">
                   <tr>
                     <td style="font-weight: bold; border: 1px solid #ddd; text-align: right; background-color: #f2f2f2">Subtotal</td>
                     <td style="font-weight: bold; border: 1px solid #ddd; text-align: right">{{ Subtotal }}</td>
