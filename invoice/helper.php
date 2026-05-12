@@ -49,15 +49,32 @@ function generatepdf($shop_id,$order_id){
                     $tax_rate = $item['tax_lines'][0]['rate'] * 100;
                     $tax_amount = $item['tax_lines'][0]['price'];
                 }
-                
+
+                // Use presentment/shop money values when available, fallback to price
+                $unit_price = isset($item['price_set']['shop_money']['amount']) ? $item['price_set']['shop_money']['amount'] : $item['price'];
+                $quantity = isset($item['quantity']) ? $item['quantity'] : 1;
+                $line_total = floatval($unit_price) * floatval($quantity);
+
+                // Build description from variant title and properties
+                $description_parts = [];
+                if (!empty($item['variant_title'])) {
+                    $description_parts[] = $item['variant_title'];
+                }
+                if (!empty($item['properties']) && is_array($item['properties'])) {
+                    foreach ($item['properties'] as $property) {
+                        if (!in_array($property['name'], ['_itemKey', '_optionSetId'], true)) {
+                            $description_parts[] = $property['name'] . ': ' . $property['value'];
+                        }
+                    }
+                }
+                $description = !empty($description_parts) ? implode(' | ', $description_parts) : '';
+
                 $items_html .= '<tr style="font-size: 10px; border-bottom: 1px solid #ddd">';
-                $items_html .= '<td style="text-align: left">'.$item['name'].'</td>';
-                $items_html .= '<td style="text-align: left">'.$item['variant_title'].'</td>';
-                $items_html .= '<td style="text-align: left">'.$invoice['currency'].' '.number_format($item['price'], 2).'</td>';
-                $items_html .= '<td style="text-align: left">'.$item['quantity'].'</td>';
-                //$items_html .= '<td class="text-right">'.$tax_rate.'%</td>';
-                //$items_html .= '<td class="text-right">'.$invoice['currency'].' '.number_format($tax_amount, 2).'</td>';
-                $items_html .= '<td style="text-align: left">'.$invoice['currency'].' '.number_format($item['price'] * $item['quantity'], 2).'</td>';
+                $items_html .= '<td style="text-align: left">'.htmlspecialchars($item['name']).'</td>';
+                $items_html .= '<td style="text-align: left">'.htmlspecialchars($description).'</td>';
+                $items_html .= '<td style="text-align: left">'.$invoice['currency'].' '.number_format(floatval($unit_price), 2).'</td>';
+                $items_html .= '<td style="text-align: left">'.number_format($quantity, 0).'</td>';
+                $items_html .= '<td style="text-align: left">'.$invoice['currency'].' '.number_format($line_total, 2).'</td>';
                 $items_html .= '</tr>';
                 $counter++;
             }
