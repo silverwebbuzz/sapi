@@ -1,29 +1,81 @@
 <?php
+// ============ DEBUG LOGGING (remove once issue is identified) ============
+ini_set('display_errors', 1);
+ini_set('display_startup_errors', 1);
+ini_set('log_errors', 1);
+ini_set('error_log', __DIR__ . '/callback_debug.log');
+error_reporting(E_ALL);
+
+function dbg($label, $data = null) {
+    $line = '[' . date('Y-m-d H:i:s') . '] ' . $label;
+    if ($data !== null) {
+        $line .= ' :: ' . (is_scalar($data) ? var_export($data, true) : json_encode($data, JSON_UNESCAPED_SLASHES));
+    }
+    error_log($line . "\n", 3, __DIR__ . '/callback_debug.log');
+}
+
+// Catch every fatal so we always see the cause
+set_error_handler(function ($severity, $message, $file, $line) {
+    dbg('PHP_ERROR', ['severity' => $severity, 'message' => $message, 'file' => $file, 'line' => $line]);
+    return false; // let PHP also handle it
+});
+set_exception_handler(function ($e) {
+    dbg('UNCAUGHT_EXCEPTION', ['message' => $e->getMessage(), 'file' => $e->getFile(), 'line' => $e->getLine(), 'trace' => $e->getTraceAsString()]);
+});
+register_shutdown_function(function () {
+    $err = error_get_last();
+    if ($err && in_array($err['type'], [E_ERROR, E_PARSE, E_CORE_ERROR, E_COMPILE_ERROR, E_USER_ERROR], true)) {
+        dbg('FATAL_SHUTDOWN', $err);
+    }
+    dbg('END');
+});
+
+if (session_status() === PHP_SESSION_NONE) {
+    session_start();
+    dbg('session_start called');
+}
+dbg('START', ['get' => $_GET, 'session_id' => session_id() ?: '(none)', 'session_data' => $_SESSION ?? []]);
+// ========================================================================
+
 require_once '../config/config.php';
+dbg('after config.php');
 require_once '../config/db.php';
+dbg('after db.php');
 require_once 'shopify_functions.php';
+dbg('after shopify_functions.php');
 require_once 'helper.php';
+dbg('after helper.php');
 
 $params = $_GET;
-if (!verifyHmac($params, SHOPIFY_API_SECRET)) die('Invalid HMAC');
+dbg('verifying hmac');
+if (!verifyHmac($params, SHOPIFY_API_SECRET)) { dbg('HMAC FAILED'); die('Invalid HMAC'); }
+dbg('hmac ok');
 
-// Validate nonce       
-if ($_SESSION['nonce'] !== $_GET['state']) die('Invalid nonce');
-    
+// Validate nonce
+dbg('nonce check', ['session_nonce' => $_SESSION['nonce'] ?? '(missing)', 'state' => $_GET['state'] ?? '(missing)']);
+if (!isset($_SESSION['nonce']) || $_SESSION['nonce'] !== $_GET['state']) { dbg('NONCE FAILED'); die('Invalid nonce'); }
+dbg('nonce ok');
+
 $shop = $_GET['shop'];
 $code = $_GET['code'];
 // Shopify code for access token
-$access_token = getAccessToken($shop, $code); 
+dbg('requesting access token', ['shop' => $shop]);
+$access_token = getAccessToken($shop, $code);
+dbg('access_token result', $access_token ? 'GOT TOKEN (len=' . strlen($access_token) . ')' : 'EMPTY/NULL');
 
 if (isset($access_token)) {
     $_SESSION['shop'] = $shop;
     $_SESSION['access_token'] = $accessToken;
     // Step 2: Fetch Store Details via shopify Rest API
+    dbg('fetching shop details');
     $shopDetailsResponse_json = getShopDetailsRestAPI($shop,$access_token); //return value in json
+    dbg('shop details raw', substr((string)$shopDetailsResponse_json, 0, 500));
     $shopDetailsResponse = json_decode($shopDetailsResponse_json, true);
     if (!isset($shopDetailsResponse['shop'])) {
+        dbg('SHOP DETAILS MISSING', $shopDetailsResponse);
         die("Error: Failed to retrieve shop details.");
     }
+    dbg('shop details ok', ['id' => $shopDetailsResponse['shop']['id'] ?? null, 'name' => $shopDetailsResponse['shop']['name'] ?? null]);
 
     $shop                                   = $shopDetailsResponse['shop']['myshopify_domain'];
     $domain                                 = $shopDetailsResponse['shop']['domain'] ?? $shop;
@@ -110,23 +162,37 @@ if (isset($access_token)) {
     app_install_date = NOW(),
     id = LAST_INSERT_ID(id)";
     
-    $shop_id = DBHelper::insert($query,"sssssssssssssssssssssssssssssss",
-        [$shop, $domain, $access_token, $shopify_id, $store_name, $shop_owner, $logo_url, $email, $phone, 
-        $plan_display_name, $plan_name, $country, $currency, $timezone, $iana_timezone, 
-        $country_code, $country_name, $address1, $address2, $city, $zip, $province, 
-        $province_code, $primary_locale, $money_format, $money_with_currency_format, 
-        $money_in_emails_format, $money_with_currency_in_emails_format, 
-        $restapi_json, $created_at, $updated_at]
-    );
+    dbg('inserting store');
+    try {
+        $shop_id = DBHelper::insert($query,"sssssssssssssssssssssssssssssss",
+            [$shop, $domain, $access_token, $shopify_id, $store_name, $shop_owner, $logo_url, $email, $phone,
+            $plan_display_name, $plan_name, $country, $currency, $timezone, $iana_timezone,
+            $country_code, $country_name, $address1, $address2, $city, $zip, $province,
+            $province_code, $primary_locale, $money_format, $money_with_currency_format,
+            $money_in_emails_format, $money_with_currency_in_emails_format,
+            $restapi_json, $created_at, $updated_at]
+        );
+        dbg('store insert result', ['shop_id' => $shop_id]);
+    } catch (\Throwable $e) {
+        dbg('STORE INSERT EXCEPTION', ['msg' => $e->getMessage(), 'line' => $e->getLine()]);
+        throw $e;
+    }
 
-    // create free scubscription.
-    $store_Subscription = DBHelper::insert("
-        INSERT INTO store_subscriptions (
-            store_id, shopify_id
-        ) VALUES (?, ?)", "ii", [
-        $shop_id,                                 // store_id
-        $shopify_id                              // shopify_id
-    ]);
+    // create free subscription.
+    dbg('inserting subscription', ['shop_id' => $shop_id, 'shopify_id' => $shopify_id]);
+    try {
+        $store_Subscription = DBHelper::insert("
+            INSERT INTO store_subscriptions (
+                store_id, shopify_id
+            ) VALUES (?, ?)", "ii", [
+            $shop_id,
+            $shopify_id
+        ]);
+        dbg('subscription insert result', $store_Subscription);
+    } catch (\Throwable $e) {
+        dbg('SUBSCRIPTION INSERT EXCEPTION', ['msg' => $e->getMessage(), 'line' => $e->getLine()]);
+        throw $e;
+    }
 
     //Create Invoice Table.
     $shop_table_name = preg_replace('/[^a-zA-Z0-9_]/', '_', strtolower($shop)); // Sanitize table name
@@ -158,10 +224,13 @@ if (isset($access_token)) {
          UNIQUE KEY (`order_id`)
     ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;";
         
+    dbg('creating invoice table', $invoice_table);
     DBHelper::createTable($create_table_query);
+    dbg('invoice table ok');
 
     // Fetch last 20 paid orders from Shopify
     $api_url = "https://{$shop}/admin/api/" . SHOPIFY_API_VERSION . "/orders.json?financial_status=paid&limit=100";
+    dbg('fetching orders', $api_url);
     $ch = curl_init($api_url);
     curl_setopt_array($ch, [
         CURLOPT_RETURNTRANSFER => true,
@@ -172,12 +241,16 @@ if (isset($access_token)) {
 
     $response = curl_exec($ch);
     $http_code = curl_getinfo($ch, CURLINFO_HTTP_CODE);
+    $curl_err = curl_error($ch);
     curl_close($ch);
+    dbg('orders response', ['http' => $http_code, 'curl_err' => $curl_err, 'body_preview' => substr((string)$response, 0, 500)]);
     if ($http_code != 200) {
+        dbg('ORDERS API FAILED');
         die("Shopify API error: HTTP Code $http_code - Response: " . $response);
     }
 
     $orders = json_decode($response, true)['orders'] ?? [];
+    dbg('orders count', count($orders));
 
     // Insert orders into the database
     $invoice_qry = "
@@ -204,11 +277,13 @@ if (isset($access_token)) {
     ";
 
     foreach ($orders as $order) {
-        $order_id = $order['id']; 
+        try {
+        dbg('processing order', $order['id'] ?? '(no id)');
+        $order_id = $order['id'];
         $order_number = $order['order_number'];
         $order_name = $order['name'];
-        $customer_name = $order['customer']['first_name'] . ' ' . $order['customer']['last_name'];
-        $customer_email = $order['customer']['email'];
+        $customer_name = isset($order['customer']) ? trim(($order['customer']['first_name'] ?? '') . ' ' . ($order['customer']['last_name'] ?? '')) : '';
+        $customer_email = $order['customer']['email'] ?? '';
         $currency = $order['currency'];
         $subtotal_price = $order['subtotal_price'];
         $total_price = $order['total_price'];
@@ -228,25 +303,31 @@ if (isset($access_token)) {
         [$order_id,
         $order_number,
         $order_name,
-        $customer_name, 
-        $customer_email, 
-        $billing_address, 
-        $shipping_address, 
-        $currency, 
-        $subtotal_price, 
-        $total_price, 
-        $tax_amount, 
-        $discount_amount, 
+        $customer_name,
+        $customer_email,
+        $billing_address,
+        $shipping_address,
+        $currency,
+        $subtotal_price,
+        $total_price,
+        $tax_amount,
+        $discount_amount,
         $shipping_cost,
         $payment_method,
         $order_status,
         $products]
         );
+        } catch (\Throwable $e) {
+            dbg('ORDER LOOP EXCEPTION', ['order_id' => $order['id'] ?? null, 'msg' => $e->getMessage(), 'line' => $e->getLine()]);
+        }
     }
+    dbg('orders loop done');
 
     // Create webhook
+    dbg('registering webhooks');
     $shopify_webhook = registerShopifyWebhooks($shop, $access_token);
-    
+    dbg('webhook result', $shopify_webhook);
+
     if ($shopify_webhook==1) {
         $redirect_url = "https://{$shop}/admin/apps/" . SHOPIFY_API_KEY;
         header("Location: " . $redirect_url);
