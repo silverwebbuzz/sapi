@@ -116,8 +116,8 @@ $invoices_query = DBHelper::select("SELECT * FROM `$invoice_table` ORDER BY crea
                     <td><?= $invoice['created_at'] ?></td>
                     <td><?= htmlspecialchars($invoice['customer_name']) ?></td>
                     <td><?= $invoice['currency']?> <?= number_format($invoice['total_price'], 2) ?></td>
-                    <td><span class="status completed"><?= ucfirst($invoice['invoice_status']) ?></span></td>
-                    <td><span class="status completed"><?= ucfirst($invoice['email_status']) ?></span></td>
+                    <td><span class="status <?= htmlspecialchars($invoice['invoice_status']) ?>"><?= ucfirst($invoice['invoice_status']) ?></span></td>
+                    <td><span class="status <?= htmlspecialchars($invoice['email_status']) ?>"><?= ucfirst($invoice['email_status']) ?></span></td>
                     <td>
                         <?php if ($invoice['pdf_invoice']!=''){ ?>
                             <a href="#" class="view-invoice-btn" data-invoice-id="<?= $invoice['pdf_invoice']; ?>">View Invoice</a>

@@ -45,17 +45,15 @@ $(document).ready(function() {
         }, 3000); // ⏱️ 3 seconds
     };
 
-    // View Invoice Button -- Display Invoice in modal
-    $('.view-invoice-btn').on('click', function (e) {
+    // View Invoice Button -- Display Invoice in modal.
+    // Use event delegation on document so it survives DataTables pagination,
+    // sort, search, and responsive row redraws (each of which detaches the
+    // original <tr> nodes and re-mounts them).
+    $(document).on('click', '.view-invoice-btn', function (e) {
         e.preventDefault();
-
         var invoiceId = $(this).data('invoice-id');
-        var $modal = $('#invoiceModal');
-        var $iframe = $('#invoiceFrame');
-
-        // Load PDF into iframe
-        $iframe.attr('src', 'data:application/pdf;base64,' + invoiceId);
-        $modal.show();
+        $('#invoiceFrame').attr('src', 'data:application/pdf;base64,' + invoiceId);
+        $('#invoiceModal').show();
     });
 
     // Close Modal Function

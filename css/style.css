@@ -977,3 +977,243 @@ a.view-invoice-btn , .email-btn , .gen-invoice-btn , .upgrade-btn{
     z-index: 999;
     font-size: 14px;
 }
+
+/* ============================================================
+   Modern dashboard refresh (subscription card + orders table)
+   Added at the bottom of the file so it overrides the older
+   rules above without touching any other page's styling.
+   ============================================================ */
+
+/* Subscription card --------------------------------------- */
+.package-card {
+    background: #fff;
+    border: 1px solid #e3e3e3;
+    border-radius: 12px;
+    padding: 24px 28px;
+    box-shadow: 0 1px 2px rgba(15, 23, 42, 0.04);
+    margin-bottom: 24px;
+}
+.package-card h3 {
+    font-size: 14px;
+    font-weight: 600;
+    color: #4b5563;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    margin-bottom: 18px;
+}
+.package-card .package-name {
+    font-size: 22px;
+    font-weight: 700;
+    color: #111827;
+    line-height: 1.2;
+}
+.package-card .package-price {
+    font-size: 15px;
+    color: #6b7280;
+    margin-top: 2px;
+}
+.package-card .package-stat span {
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    color: #6b7280;
+}
+.package-card .package-stat strong {
+    font-size: 16px;
+    font-weight: 600;
+    color: #111827;
+}
+.package-card .usage-bar {
+    height: 8px;
+    background-color: #f1f5f9;
+    border-radius: 999px;
+}
+.package-card .usage-progress {
+    background-color: #1f8a4c;
+    border-radius: 999px;
+    transition: width 0.3s ease;
+}
+.package-card .usage-info {
+    font-size: 12px;
+    color: #4b5563;
+    margin-bottom: 6px;
+}
+
+.package-card .upgrade-btn {
+    background: #111827;
+    color: #fff;
+    text-decoration: none;
+    padding: 8px 16px;
+    border-radius: 8px;
+    font-size: 13px;
+    font-weight: 500;
+    display: inline-block;
+    margin-top: 10px;
+    transition: background 0.15s ease;
+}
+.package-card .upgrade-btn:hover { background: #1f2937; }
+
+/* Orders card --------------------------------------------- */
+.orders-card {
+    background: #fff;
+    border: 1px solid #e3e3e3;
+    border-radius: 12px;
+    padding: 24px 28px;
+    box-shadow: 0 1px 2px rgba(15, 23, 42, 0.04);
+}
+.orders-card h3 {
+    font-size: 14px;
+    font-weight: 600;
+    color: #4b5563;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    margin-bottom: 16px;
+}
+
+.orders-card table#ordersTable {
+    width: 100% !important;
+    border-collapse: separate;
+    border-spacing: 0;
+}
+.orders-card table#ordersTable thead th {
+    background: #f9fafb;
+    color: #4b5563;
+    font-size: 11px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.6px;
+    padding: 12px 14px;
+    border-bottom: 1px solid #e5e7eb;
+    text-align: left;
+}
+.orders-card table#ordersTable tbody td {
+    padding: 14px;
+    font-size: 13px;
+    color: #1f2937;
+    border-bottom: 1px solid #f1f5f9;
+    vertical-align: middle;
+}
+.orders-card table#ordersTable tbody tr:hover {
+    background: #fafbfc;
+}
+
+/* Action buttons inside the table */
+.orders-card a.view-invoice-btn,
+.orders-card a.email-btn,
+.orders-card a.gen-invoice-btn,
+.orders-card .email-btn,
+.orders-card .gen-invoice-btn {
+    background: #111827;
+    color: #fff;
+    text-decoration: none;
+    padding: 6px 12px;
+    border-radius: 6px;
+    font-size: 12px;
+    font-weight: 500;
+    display: inline-block;
+    margin: 2px 4px 2px 0;
+    transition: background 0.15s ease, transform 0.05s ease;
+    border: none;
+}
+.orders-card a.view-invoice-btn:hover,
+.orders-card a.email-btn:hover,
+.orders-card a.gen-invoice-btn:hover { background: #1f2937; }
+.orders-card a.email-btn.owner {
+    background: #fff;
+    color: #111827;
+    border: 1px solid #d1d5db;
+}
+.orders-card a.email-btn.owner:hover {
+    background: #f3f4f6;
+}
+
+/* Status badges — fix the duplicate-rule bug where pending and
+   completed both used the same yellow background. */
+.orders-card .status {
+    display: inline-block;
+    padding: 4px 10px;
+    border-radius: 999px;
+    font-size: 11px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.4px;
+    line-height: 1.4;
+}
+.orders-card .status.pending {
+    background: #fef3c7;
+    color: #92400e;
+}
+.orders-card .status.completed,
+.orders-card .status.generated,
+.orders-card .status.sent,
+.orders-card .status.paid {
+    background: #d1fae5;
+    color: #065f46;
+}
+
+/* DataTables controls -------------------------------------- */
+.orders-card .dataTables_wrapper .dataTables_length,
+.orders-card .dataTables_wrapper .dataTables_filter {
+    font-size: 13px;
+    color: #4b5563;
+    margin-bottom: 14px;
+}
+.orders-card .dataTables_wrapper .dataTables_length select,
+.orders-card .dataTables_wrapper .dataTables_filter input {
+    padding: 6px 10px;
+    border: 1px solid #d1d5db;
+    border-radius: 6px;
+    font-size: 13px;
+    margin: 0 6px;
+}
+.orders-card .dataTables_wrapper .dataTables_filter input:focus,
+.orders-card .dataTables_wrapper .dataTables_length select:focus {
+    outline: none;
+    border-color: #111827;
+    box-shadow: 0 0 0 3px rgba(17, 24, 39, 0.08);
+}
+.orders-card .dataTables_wrapper .dataTables_info {
+    font-size: 12px;
+    color: #6b7280;
+    padding-top: 14px;
+}
+.orders-card .dataTables_wrapper .dataTables_paginate {
+    padding-top: 14px;
+}
+.orders-card .dataTables_wrapper .dataTables_paginate .paginate_button {
+    padding: 6px 12px !important;
+    margin-left: 4px !important;
+    border: 1px solid #e5e7eb !important;
+    border-radius: 6px !important;
+    background: #fff !important;
+    color: #374151 !important;
+    font-size: 12px;
+    cursor: pointer;
+    transition: background 0.15s ease, border-color 0.15s ease;
+}
+.orders-card .dataTables_wrapper .dataTables_paginate .paginate_button:hover {
+    background: #f9fafb !important;
+    border-color: #d1d5db !important;
+    color: #111827 !important;
+}
+.orders-card .dataTables_wrapper .dataTables_paginate .paginate_button.current,
+.orders-card .dataTables_wrapper .dataTables_paginate .paginate_button.current:hover {
+    background: #111827 !important;
+    border-color: #111827 !important;
+    color: #fff !important;
+}
+.orders-card .dataTables_wrapper .dataTables_paginate .paginate_button.disabled,
+.orders-card .dataTables_wrapper .dataTables_paginate .paginate_button.disabled:hover {
+    background: #fff !important;
+    color: #9ca3af !important;
+    border-color: #e5e7eb !important;
+    cursor: default;
+}
+
+/* Sort indicator polish */
+.orders-card table#ordersTable thead th.sorting,
+.orders-card table#ordersTable thead th.sorting_asc,
+.orders-card table#ordersTable thead th.sorting_desc {
+    cursor: pointer;
+    position: relative;
+}
