@@ -1,24 +1,34 @@
 $(document).ready(function() {
-    // Initialize DataTables
+    var dtLanguage = {
+        "search": "Search:",
+        "lengthMenu": "Show _MENU_ entries",
+        "info": "Showing _START_ to _END_ of _TOTAL_ entries",
+        "infoEmpty": "Showing 0 to 0 of 0 entries",
+        "infoFiltered": "(filtered from _MAX_ total entries)",
+        "paginate": { "first": "First", "last": "Last", "next": "Next", "previous": "Previous" }
+    };
+
+    // Dashboard + orders tables
     $('#ordersTable, .billing-table').DataTable({
         "order": [[1, 'desc']],
         "pageLength": 25,
         "lengthMenu": [10, 25, 50, 100],
-        "language": {
-            "search": "Search:",
-            "lengthMenu": "Show _MENU_ entries",
-            "info": "Showing _START_ to _END_ of _TOTAL_ entries",
-            "infoEmpty": "Showing 0 to 0 of 0 entries",
-            "infoFiltered": "(filtered from _MAX_ total entries)",
-            "paginate": {
-                "first": "First",
-                "last": "Last",
-                "next": "Next",
-                "previous": "Previous"
-            }
-        },
+        "language": dtLanguage,
         "responsive": true
     });
+
+    // Bulk download table — first column is the checkbox, not sortable.
+    if ($('#bulkInvoicesTable').length) {
+        $('#bulkInvoicesTable').DataTable({
+            "order": [[2, 'desc']],   // sort by Date column by default
+            "pageLength": 25,
+            "lengthMenu": [10, 25, 50, 100],
+            "language": dtLanguage,
+            "columnDefs": [
+                { "orderable": false, "searchable": false, "targets": 0 }
+            ]
+        });
+    }
 
     //Generate Invoice Function
     window.generateInvoice = function (shopId, orderId, invoiceStatus) {
@@ -91,6 +101,47 @@ $(document).ready(function() {
         $('#invoiceModal').hide();
         $('#invoiceFrame').attr('src', '');
     };
+
+    // -------- Bulk Download page --------
+    // Delegated so DataTables pagination/search/sort doesn't break it.
+    function updateBulkSelectionState() {
+        var $boxes  = $('.bulk-row-check');
+        var $checked = $boxes.filter(':checked');
+        $('#bulk-selected-count').text($checked.length + ' selected');
+        // Master checkbox state — only flip the box, don't recurse.
+        var $master = $('#bulk-select-all');
+        if ($boxes.length === 0) {
+            $master.prop('checked', false).prop('indeterminate', false);
+        } else if ($checked.length === 0) {
+            $master.prop('checked', false).prop('indeterminate', false);
+        } else if ($checked.length === $boxes.length) {
+            $master.prop('checked', true).prop('indeterminate', false);
+        } else {
+            $master.prop('checked', false).prop('indeterminate', true);
+        }
+        // Enable Download button only when at least one row is selected.
+        $('#bulk-download-btn').prop('disabled', $checked.length === 0);
+    }
+
+    $(document).on('change', '#bulk-select-all', function () {
+        // Select/deselect every row checkbox currently in the DOM
+        // (DataTables keeps all rows in DOM even when paginating).
+        var checked = $(this).prop('checked');
+        $('.bulk-row-check:not(:disabled)').prop('checked', checked);
+        updateBulkSelectionState();
+    });
+
+    $(document).on('change', '.bulk-row-check', function () {
+        updateBulkSelectionState();
+    });
+
+    // Friendly guard when the form is submitted with nothing selected.
+    $(document).on('submit', '#bulk-download-form', function (e) {
+        if ($('.bulk-row-check:checked').length === 0) {
+            e.preventDefault();
+            showMessage('Please select at least one invoice.', 'error');
+        }
+    });
 
     // Mobile Menu Toggle
     $('.menu-toggle').on('click', function() {
