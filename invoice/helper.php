@@ -93,15 +93,14 @@ function generatepdf($shop_id,$order_id){
                 }
                 $description = !empty($description_parts) ? implode(' | ', $description_parts) : '';
 
-                $cell_base = 'text-align: left; vertical-align: top; padding: 8px; font-size: 13px; border-bottom: 1px solid #ddd; word-wrap: break-word; overflow-wrap: break-word; white-space: normal;';
-                $items_html .= '<tr>';
                 $row_tax_text = $item_tax_rate !== null ? round($item_tax_rate * 100, 2) . '%' : '';
-                $items_html .= '<td style="'.$cell_base.'">'.htmlspecialchars($item['name']).'</td>';
-                $items_html .= '<td style="'.$cell_base.'">'.htmlspecialchars($description).'</td>';
-                $items_html .= '<td style="'.$cell_base.'">'.$invoice['currency'].' '.number_format($unit_price_ex_tax, 2).'</td>';
-                $items_html .= '<td style="'.$cell_base.'">'.number_format($quantity, 0).'</td>';
-                $items_html .= '<td style="'.$cell_base.'">'.htmlspecialchars($row_tax_text).'</td>';
-                $items_html .= '<td style="'.$cell_base.'">'.$invoice['currency'].' '.number_format($line_total_ex_tax, 2).'</td>';
+                $items_html .= '<tr>';
+                $items_html .= '<td>'.htmlspecialchars($item['name']).'</td>';
+                $items_html .= '<td>'.htmlspecialchars($description).'</td>';
+                $items_html .= '<td class="num">'.$invoice['currency'].' '.number_format($unit_price_ex_tax, 2).'</td>';
+                $items_html .= '<td class="qty">'.number_format($quantity, 0).'</td>';
+                $items_html .= '<td>'.htmlspecialchars($row_tax_text).'</td>';
+                $items_html .= '<td class="num">'.$invoice['currency'].' '.number_format($line_total_ex_tax, 2).'</td>';
                 $items_html .= '</tr>';
                 $counter++;
             }
@@ -133,12 +132,13 @@ function generatepdf($shop_id,$order_id){
 
             $discount_row = '';
             if (floatval($invoice['discount_amount']) != 0) {
-                $discount_row = '<tr><td style="font-weight: bold; border: 1px solid #ddd; text-align: right; background-color: #f2f2f2">Discount</td><td style="font-weight: bold; border: 1px solid #ddd; text-align: right">' . $invoice['currency'] . ' ' . number_format(floatval($invoice['discount_amount']), 2) . '</td></tr>';
+                $discount_amount = abs(floatval($invoice['discount_amount']));
+                $discount_row = '<tr><td class="label">Discount</td><td class="value">-' . $invoice['currency'] . ' ' . number_format($discount_amount, 2) . '</td></tr>';
             }
 
             $shipping_tax_block = '';
             if ($shipping_tax_amount > 0) {
-                $shipping_tax_block = '<tr><td style="font-weight: bold; border: 1px solid #ddd; text-align: right; background-color: #f2f2f2">' . htmlspecialchars($shipping_tax_label) . '</td><td style="font-weight: bold; border: 1px solid #ddd; text-align: right">' . $invoice['currency'] . ' ' . number_format($shipping_tax_amount, 2) . '</td></tr>';
+                $shipping_tax_block = '<tr><td class="label">' . htmlspecialchars($shipping_tax_label) . '</td><td class="value">' . $invoice['currency'] . ' ' . number_format($shipping_tax_amount, 2) . '</td></tr>';
             }
     
             // Prepare replacements array

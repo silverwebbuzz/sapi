@@ -2,136 +2,210 @@
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Invoice1</title>
+    <title>Invoice 1</title>
     <style>
+      @page { margin: 30px 36px; }
       body {
-        font-size: 14px;
+        font-family: 'DejaVu Sans', Arial, Helvetica, sans-serif;
+        font-size: 13px;
         line-height: 1.45;
+        color: #222;
+        margin: 0;
       }
-      .invoice-table table {
+      .header { width: 100%; border-collapse: collapse; margin-bottom: 24px; }
+      .header td { vertical-align: top; }
+      .header .title {
+        font-size: 32px;
+        font-weight: bold;
+        letter-spacing: 2px;
+        text-align: right;
+        color: #222;
+      }
+      .meta { font-size: 12px; text-align: right; margin-top: 6px; }
+      .meta strong { display: inline-block; min-width: 70px; }
+      .parties { width: 100%; border-collapse: collapse; margin-bottom: 18px; }
+      .parties td {
+        width: 33%;
+        vertical-align: top;
+        padding: 10px 12px;
+        font-size: 12px;
+      }
+      .parties .label {
+        font-weight: bold;
+        font-size: 12px;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        color: #555;
+        margin-bottom: 4px;
+        display: block;
+      }
+      .items {
         width: 100%;
         border-collapse: collapse;
+        margin-bottom: 20px;
+        table-layout: fixed;
       }
-      table, td, th {
-        font-size: 13px;
+      .items th {
+        background-color: #f2f2f2;
+        font-size: 12px;
+        font-weight: bold;
+        text-align: left;
+        padding: 8px 8px;
+        border-bottom: 2px solid #ccc;
+        text-transform: uppercase;
+        letter-spacing: 0.3px;
+      }
+      .items th.num, .items td.num { text-align: right; }
+      .items th.qty, .items td.qty { text-align: center; }
+      .items td {
+        font-size: 12px;
+        padding: 8px;
+        border-bottom: 1px solid #eee;
+        vertical-align: top;
         word-wrap: break-word;
         overflow-wrap: break-word;
       }
+      .footer-row { width: 100%; border-collapse: collapse; }
+      .footer-row td { vertical-align: top; }
+      .payment { font-size: 12px; }
+      .payment .label {
+        font-weight: bold;
+        font-size: 12px;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        color: #555;
+        display: block;
+        margin-bottom: 4px;
+      }
+      .totals {
+        width: 100%;
+        border-collapse: collapse;
+        font-size: 12px;
+      }
+      .totals td {
+        padding: 6px 10px;
+      }
+      .totals td.label { text-align: right; color: #555; }
+      .totals td.value { text-align: right; width: 110px; }
+      .totals tr.grand td {
+        border-top: 2px solid #222;
+        font-size: 14px;
+        font-weight: bold;
+        padding-top: 10px;
+        color: #000;
+      }
+      .note {
+        font-size: 11px;
+        color: #666;
+        margin-top: 30px;
+        border-top: 1px solid #eee;
+        padding-top: 10px;
+      }
     </style>
   </head>
-  <body style="font-family: 'DejaVu Sans', Arial, Helvetica, sans-serif; font-size: 14px; line-height: 1.45; margin: 0">
-    <table class="invoice-table" width="100%">
+  <body>
+    <table class="header">
       <tr>
-        <td>
-          <img src="{{ Company_Logo }}" style="width: 200px" alt="{{ Company_Name }}" />
+        <td style="width: 55%;">
+          <img src="{{ Company_Logo }}" style="max-width: 180px; max-height: 70px;" alt="{{ Company_Name }}" />
         </td>
-        <td></td>
-        <td style="text-align: right">
-          <span style="font-size: 40px; display: block">INVOICE</span>
-          <br />
-          <span style="display: block">Invoice No.: {{ Order_Number }}</span>
-          <span style="display: block">Date: {{ Invoice_Date }}</span>
-        </td>
-      </tr>
-      <tr>
-        <td style="height: 30px"></td>
-        <td colspan="2" style="height: 30px"></td>
-      </tr>
-      <tr>
-        <td style="width: 50%">
-          <span style="display: block; font-weight: bold">MERCHANT:</span>
-          <span style="display: block; font-size: 13px">
-            {{ Company_Name }}<br />
-            {{ Company_Address }}<br />
-            {{ Company_Phone }}<br />
-            {{ Company_Email }}</span
-          >
-        </td>
-        <td colspan="2" style="text-align: right; width: 50%;">
-          <span style="display: block; font-weight: bold">BILL TO:</span>
-          <span style="display: block; font-size: 13px">
-            {{ Billing_Name }}<br />
-            {{ Billing_Address1 }}<br />
-            {{ Billing_Address2 }}<br />
-            {{ Billing_City }}, {{ Billing_State }} {{ Billing_Zip }}<br />
-            {{ Billing_Country }}<br />
-            {{ Billing_Email }}</span
-          >
-          <span style="display: block; margin-top: 10px; font-weight: bold">SHIP TO:</span>
-          <span style="display: block; font-size: 13px">
-            {{ Shipping_Name }}<br />
-            {{ Shipping_Address1 }}<br />
-            {{ Shipping_Address2 }}<br />
-            {{ Shipping_City }}, {{ Shipping_State }} {{ Shipping_Zip }}<br />
-            {{ Shipping_Country }}</span
-          >
-        </td>
-      </tr>
-      <tr>
-        <td style="height: 20px"></td>
-        <td colspan="2" style="height: 20px"></td>
-      </tr>
-      <tr>
-        <td colspan="3">
-          <table style="border: 1px solid #ddd; table-layout: fixed;" width="100%" cellpadding="10">
-            <tr style="font-size: 12px">
-              <th style="width: 15%; background-color: #f2f2f2; font-weight: bold; border: 1px solid #ddd; text-align: left">ITEM</th>
-              <th style="width: 38%; background-color: #f2f2f2; font-weight: bold; border: 1px solid #ddd; text-align: left">DESCRIPTION</th>
-              <th style="width: 12%; background-color: #f2f2f2; font-weight: bold; border: 1px solid #ddd; text-align: left">PRICE</th>
-              <th style="width: 8%; background-color: #f2f2f2; font-weight: bold; border: 1px solid #ddd; text-align: left">QTY</th>
-              <th style="width: 13%; background-color: #f2f2f2; font-weight: bold; border: 1px solid #ddd; text-align: left">{{ Tax_Column_Label }}</th>
-              <th style="width: 14%; background-color: #f2f2f2; font-weight: bold; border: 1px solid #ddd; text-align: left">TOTAL</th>
-            </tr>
-            {{ Order_Items }}
-          </table>
-        </td>
-      </tr>
-      <tr>
-        <td>
-          <span style="display: block; font-weight: bold">PAYMENT INFO:</span>
-          <br />
-          <span style="display: block; font-size: 13px">
-            {{ Payment_Method }} <br />
-            {{ Payment_Status }}</span
-          >
-        </td>
-        <td colspan="2" style="font-size: 13px">
-          <table cellpadding="10" style="margin-left:auto; width: 42%; border-collapse: collapse;">
-            <tr>
-              <td style="font-weight: bold; border: 1px solid #ddd; text-align: right; background-color: #f2f2f2">Subtotal</td>
-              <td style="font-weight: bold; border: 1px solid #ddd; text-align: right">{{ Subtotal }}</td>
-            </tr>
-            {{ Discount_Block }}
-            <tr>
-              <td style="font-weight: bold; border: 1px solid #ddd; text-align: right; background-color: #f2f2f2">{{ Tax_Label }}</td>
-              <td style="font-weight: bold; border: 1px solid #ddd; text-align: right">{{ Tax_Amount }}</td>
-            </tr>
-            <tr>
-              <td style="font-weight: bold; border: 1px solid #ddd; text-align: right; background-color: #f2f2f2">Shipping</td>
-              <td style="font-weight: bold; border: 1px solid #ddd; text-align: right">{{ Shipping_Cost }}</td>
-            </tr>
-            {{ Shipping_Tax_Block }}
-            <tr>
-              <td style="font-weight: bold; border: 1px solid #ddd; text-align: right; background-color: #f2f2f2">Grand Total</td>
-              <td style="font-weight: bold; border: 1px solid #ddd; text-align: right; background-color: #f2f2f2">{{ Total_Amount }}</td>
-            </tr>
-          </table>
-        </td>
-      </tr>
-      <tr>
-        <td style="height: 50px"></td>
-        <td colspan="2" style="height: 50px"></td>
-      </tr>
-      <tr>
-        <td colspan="3">
-          <span style="display: block; font-weight: bold">Note:</span>
-          <br />
-          <ul style="font-size: 13px">
-            <li>This is a computer-generated invoice and does not require a physical signature or stamp. All prices are in [Currency]. Please retain this invoice for your records.</li>
-          </ul>
+        <td style="width: 45%;">
+          <div class="title">INVOICE</div>
+          <div class="meta">
+            <div><strong>Invoice No:</strong> {{ Order_Number }}</div>
+            <div><strong>Date:</strong> {{ Invoice_Date }}</div>
+          </div>
         </td>
       </tr>
     </table>
+
+    <table class="parties">
+      <tr>
+        <td>
+          <span class="label">Merchant</span>
+          <strong>{{ Company_Name }}</strong><br />
+          {{ Company_Address }}<br />
+          {{ Company_Phone }}<br />
+          {{ Company_Email }}
+        </td>
+        <td>
+          <span class="label">Bill To</span>
+          <strong>{{ Billing_Name }}</strong><br />
+          {{ Billing_Address1 }}<br />
+          {{ Billing_Address2 }}<br />
+          {{ Billing_City }}, {{ Billing_State }} {{ Billing_Zip }}<br />
+          {{ Billing_Country }}<br />
+          {{ Billing_Email }}
+        </td>
+        <td>
+          <span class="label">Ship To</span>
+          <strong>{{ Shipping_Name }}</strong><br />
+          {{ Shipping_Address1 }}<br />
+          {{ Shipping_Address2 }}<br />
+          {{ Shipping_City }}, {{ Shipping_State }} {{ Shipping_Zip }}<br />
+          {{ Shipping_Country }}
+        </td>
+      </tr>
+    </table>
+
+    <table class="items">
+      <colgroup>
+        <col style="width: 22%;" />
+        <col style="width: 32%;" />
+        <col style="width: 12%;" />
+        <col style="width: 7%;" />
+        <col style="width: 13%;" />
+        <col style="width: 14%;" />
+      </colgroup>
+      <thead>
+        <tr>
+          <th>Item</th>
+          <th>Description</th>
+          <th class="num">Price</th>
+          <th class="qty">Qty</th>
+          <th>{{ Tax_Column_Label }}</th>
+          <th class="num">Total</th>
+        </tr>
+      </thead>
+      <tbody>
+        {{ Order_Items }}
+      </tbody>
+    </table>
+
+    <table class="footer-row">
+      <tr>
+        <td style="width: 55%;" class="payment">
+          <span class="label">Payment Info</span>
+          {{ Payment_Method }}<br />
+          {{ Payment_Status }}
+        </td>
+        <td style="width: 45%;">
+          <table class="totals">
+            <tr>
+              <td class="label">Subtotal</td>
+              <td class="value">{{ Subtotal }}</td>
+            </tr>
+            {{ Discount_Block }}
+            <tr>
+              <td class="label">{{ Tax_Label }}</td>
+              <td class="value">{{ Tax_Amount }}</td>
+            </tr>
+            <tr>
+              <td class="label">Shipping</td>
+              <td class="value">{{ Shipping_Cost }}</td>
+            </tr>
+            {{ Shipping_Tax_Block }}
+            <tr class="grand">
+              <td class="label">Grand Total</td>
+              <td class="value">{{ Total_Amount }}</td>
+            </tr>
+          </table>
+        </td>
+      </tr>
+    </table>
+
+    <div class="note">
+      This is a computer-generated invoice and does not require a physical signature or stamp. Please retain this invoice for your records.
+    </div>
   </body>
 </html>
