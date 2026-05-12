@@ -6,21 +6,42 @@ use Firebase\JWT\Key;
 
 header('Content-Type: application/json');
 
-$authHeader = '';
-
-if (function_exists('getallheaders')) {
-    $headers = getallheaders();
-    if (isset($headers['Authorization'])) {
-        $authHeader = $headers['Authorization'];
-    } elseif (isset($headers['authorization'])) {
-        $authHeader = $headers['authorization'];
+/**
+ * Read the Authorization header in a way that survives every Apache/cPanel
+ * quirk: cGI/FastCGI commonly strips it, mod_rewrite stashes it as
+ * REDIRECT_HTTP_AUTHORIZATION, and case-folding varies by SAPI.
+ */
+function read_authorization_header(): string {
+    // 1) Stock CGI variable
+    if (!empty($_SERVER['HTTP_AUTHORIZATION'])) {
+        return $_SERVER['HTTP_AUTHORIZATION'];
     }
+    // 2) After mod_rewrite forwards it via [E=HTTP_AUTHORIZATION:%1]
+    if (!empty($_SERVER['REDIRECT_HTTP_AUTHORIZATION'])) {
+        return $_SERVER['REDIRECT_HTTP_AUTHORIZATION'];
+    }
+    // 3) Apache module
+    if (function_exists('apache_request_headers')) {
+        $h = apache_request_headers();
+        foreach ($h as $name => $value) {
+            if (strcasecmp($name, 'Authorization') === 0) {
+                return $value;
+            }
+        }
+    }
+    // 4) getallheaders fallback (already case-insensitive in PHP 8+)
+    if (function_exists('getallheaders')) {
+        $h = getallheaders();
+        foreach ($h as $name => $value) {
+            if (strcasecmp($name, 'Authorization') === 0) {
+                return $value;
+            }
+        }
+    }
+    return '';
 }
 
-// Fallback for environments that strip the Authorization header
-if (!$authHeader && isset($_SERVER['HTTP_AUTHORIZATION'])) {
-    $authHeader = $_SERVER['HTTP_AUTHORIZATION'];
-}
+$authHeader = read_authorization_header();
 
 $token = str_replace('Bearer ', '', $authHeader);
 

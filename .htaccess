@@ -1,6 +1,13 @@
 <IfModule mod_rewrite.c>
     RewriteEngine On
-    
+
+    # Forward the Authorization header to PHP. Many Apache/cPanel setups
+    # strip it by default before it reaches PHP-FPM/CGI, which makes
+    # session-token validation in verify_token.php return 401 with
+    # "Missing token" even though the client sent a valid Bearer token.
+    RewriteCond %{HTTP:Authorization} ^(.+)$
+    RewriteRule ^ - [E=HTTP_AUTHORIZATION:%1]
+
     # Base URL redirects
     RewriteBase /
 

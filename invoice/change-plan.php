@@ -24,9 +24,9 @@ $api_key = 'YOUR_SHOPIFY_API_KEY'; // From your app setup
 <html>
 <head>
   <title>Redirecting...</title>
-  <!-- Load App Bridge -->
+  <!-- Load App Bridge v3 only. Loading the cloud auto-bootstrap alongside
+       triggers a deprecated-parameters warning on init. -->
   <meta name="shopify-api-key" content="<?= htmlspecialchars(SHOPIFY_API_KEY) ?>" />
-  <script src="https://cdn.shopify.com/shopifycloud/app-bridge.js"></script>
   <script src="https://unpkg.com/@shopify/app-bridge@3"></script>
 </head>
 <body>

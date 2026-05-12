@@ -41,7 +41,9 @@ if (!isset($currentPlan) || empty($currentPlan)) {
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>SWB Auto PDF Invoices</title>
     <meta name="shopify-api-key" content="<?= htmlspecialchars(SHOPIFY_API_KEY) ?>" />
-    <script src="https://cdn.shopify.com/shopifycloud/app-bridge.js"></script>
+    <!-- App Bridge v3 (manual init). Do NOT also load the auto-bootstrap
+         shopifycloud/app-bridge.js — having both causes the v3 lib to log
+         "using deprecated parameters" warnings on every page load. -->
     <script src="https://unpkg.com/@shopify/app-bridge@3"></script>
     <script src="https://unpkg.com/@shopify/app-bridge-utils@3"></script>
 
