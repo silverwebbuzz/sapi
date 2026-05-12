@@ -6,6 +6,10 @@ ini_set('log_errors', 1);
 ini_set('error_log', __DIR__ . '/callback_debug.log');
 error_reporting(E_ALL);
 
+// Disable output buffering so partial output reaches the browser on crash
+while (ob_get_level() > 0) { ob_end_flush(); }
+@ob_implicit_flush(true);
+
 function dbg($label, $data = null) {
     $line = '[' . date('Y-m-d H:i:s') . '] ' . $label;
     if ($data !== null) {
@@ -26,6 +30,11 @@ register_shutdown_function(function () {
     $err = error_get_last();
     if ($err && in_array($err['type'], [E_ERROR, E_PARSE, E_CORE_ERROR, E_COMPILE_ERROR, E_USER_ERROR], true)) {
         dbg('FATAL_SHUTDOWN', $err);
+        // Also surface to the browser so a blank-page failure is never silent
+        if (!headers_sent()) {
+            header('Content-Type: text/plain', true, 500);
+        }
+        echo "FATAL: " . $err['message'] . "\nFile: " . $err['file'] . "\nLine: " . $err['line'] . "\n";
     }
     dbg('END');
 });
