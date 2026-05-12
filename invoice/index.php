@@ -119,23 +119,36 @@ $invoices_query = DBHelper::select("SELECT * FROM `$invoice_table` ORDER BY crea
                     <td><span class="status <?= htmlspecialchars($invoice['invoice_status']) ?>"><?= ucfirst($invoice['invoice_status']) ?></span></td>
                     <td><span class="status <?= htmlspecialchars($invoice['email_status']) ?>"><?= ucfirst($invoice['email_status']) ?></span></td>
                     <td>
-                        <?php if ($invoice['pdf_invoice']!=''){ ?>
-                            <a href="#" class="view-invoice-btn" data-invoice-id="<?= $invoice['pdf_invoice']; ?>">View Invoice</a>
-                            <?php if($send_email_upgrade_plan_button!='') echo $send_email_upgrade_plan_button; else { ?>
-                            <a href="#" class="email-btn" onclick="sendEmail(<?= $shop_id ?>, <?= $invoice['order_id'] ?>, '<?= $invoice['email_status'] ?>'); return false;">
-                            <?= ($invoice['email_status'] == 'pending') ? 'Send Email' : 'Resend Email'; ?>
-                            </a>
-                            <a href="#" class="email-btn owner" onclick="sendEmailToOwner(<?= $shop_id ?>, <?= $invoice['order_id'] ?>); return false;">
-                            Send to Store Owner
-                            </a>
-                            <?php } ?>
-                        <?php } else { 
-                            if($gen_invoice_upgrade_plan_button!='') echo $gen_invoice_upgrade_plan_button; else {
-                            ?>
-                            <a href="#" class="gen-invoice-btn" onclick="generateInvoice(<?= $shop_id ?>, <?= $invoice['order_id'] ?>, '<?= $invoice['invoice_status'] ?>'); return false;" class="view-invoice">
-                            <?= ($invoice['invoice_status'] == 'pending') ? 'Generate Invoice' : 'View Invoice'; ?>
-                            </a>
-                        <?php } } ?>
+                        <?php if ($invoice['pdf_invoice'] != ''): ?>
+                            <a href="#" class="view-invoice-btn"
+                               data-invoice-id="<?= htmlspecialchars($invoice['pdf_invoice']) ?>">View Invoice</a>
+                            <?php if ($send_email_upgrade_plan_button != ''): ?>
+                                <?= $send_email_upgrade_plan_button ?>
+                            <?php else: ?>
+                                <a href="#" class="email-btn js-send-email"
+                                   data-shop-id="<?= htmlspecialchars($shop_id) ?>"
+                                   data-order-id="<?= htmlspecialchars($invoice['order_id']) ?>"
+                                   data-email-status="<?= htmlspecialchars($invoice['email_status']) ?>">
+                                    <?= ($invoice['email_status'] == 'pending') ? 'Send Email' : 'Resend Email' ?>
+                                </a>
+                                <a href="#" class="email-btn owner js-send-email-owner"
+                                   data-shop-id="<?= htmlspecialchars($shop_id) ?>"
+                                   data-order-id="<?= htmlspecialchars($invoice['order_id']) ?>">
+                                    Send to Store Owner
+                                </a>
+                            <?php endif; ?>
+                        <?php else: ?>
+                            <?php if ($gen_invoice_upgrade_plan_button != ''): ?>
+                                <?= $gen_invoice_upgrade_plan_button ?>
+                            <?php else: ?>
+                                <a href="#" class="gen-invoice-btn js-generate-invoice"
+                                   data-shop-id="<?= htmlspecialchars($shop_id) ?>"
+                                   data-order-id="<?= htmlspecialchars($invoice['order_id']) ?>"
+                                   data-invoice-status="<?= htmlspecialchars($invoice['invoice_status']) ?>">
+                                    <?= ($invoice['invoice_status'] == 'pending') ? 'Generate Invoice' : 'View Invoice' ?>
+                                </a>
+                            <?php endif; ?>
+                        <?php endif; ?>
                     </td>
                 </tr>
             <?php endforeach; ?>

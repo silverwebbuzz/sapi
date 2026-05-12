@@ -45,15 +45,45 @@ $(document).ready(function() {
         }, 3000); // ⏱️ 3 seconds
     };
 
-    // View Invoice Button -- Display Invoice in modal.
-    // Use event delegation on document so it survives DataTables pagination,
-    // sort, search, and responsive row redraws (each of which detaches the
-    // original <tr> nodes and re-mounts them).
+    // ALL action buttons use event delegation on document so they survive
+    // DataTables pagination, sort, and search (which detach/re-attach rows).
+    console.log('[script.js] binding delegated click handlers');
+
+    // View Invoice — open modal
     $(document).on('click', '.view-invoice-btn', function (e) {
         e.preventDefault();
         var invoiceId = $(this).data('invoice-id');
         $('#invoiceFrame').attr('src', 'data:application/pdf;base64,' + invoiceId);
         $('#invoiceModal').show();
+    });
+
+    // Generate Invoice
+    $(document).on('click', '.js-generate-invoice', function (e) {
+        e.preventDefault();
+        window.generateInvoice(
+            $(this).data('shop-id'),
+            $(this).data('order-id'),
+            $(this).data('invoice-status')
+        );
+    });
+
+    // Send Email to customer
+    $(document).on('click', '.js-send-email', function (e) {
+        e.preventDefault();
+        window.sendEmail(
+            $(this).data('shop-id'),
+            $(this).data('order-id'),
+            $(this).data('email-status')
+        );
+    });
+
+    // Send Email to store owner
+    $(document).on('click', '.js-send-email-owner', function (e) {
+        e.preventDefault();
+        window.sendEmailToOwner(
+            $(this).data('shop-id'),
+            $(this).data('order-id')
+        );
     });
 
     // Close Modal Function
