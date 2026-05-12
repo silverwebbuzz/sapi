@@ -6,18 +6,21 @@
     <title>Invoice1</title>
     <style>
       body {
-        font-size: 13px;
+        font-size: 14px;
+        line-height: 1.45;
       }
       .invoice-table table {
         width: 100%;
         border-collapse: collapse;
       }
       table, td, th {
-        font-size: 12px;
+        font-size: 13px;
+        word-wrap: break-word;
+        overflow-wrap: break-word;
       }
     </style>
   </head>
-  <body style="font-family: 'DejaVu Sans', Arial, Helvetica, sans-serif; font-size: 13px; margin: 0">
+  <body style="font-family: 'DejaVu Sans', Arial, Helvetica, sans-serif; font-size: 14px; line-height: 1.45; margin: 0">
     <table class="invoice-table" width="100%">
       <tr>
         <td>
@@ -38,7 +41,7 @@
       <tr>
         <td style="width: 50%">
           <span style="display: block; font-weight: bold">MERCHANT:</span>
-          <span style="display: block; font-size: 11px">
+          <span style="display: block; font-size: 13px">
             {{ Company_Name }}<br />
             {{ Company_Address }}<br />
             {{ Company_Phone }}<br />
@@ -47,7 +50,7 @@
         </td>
         <td colspan="2" style="text-align: right; width: 50%;">
           <span style="display: block; font-weight: bold">BILL TO:</span>
-          <span style="display: block; font-size: 11px">
+          <span style="display: block; font-size: 13px">
             {{ Billing_Name }}<br />
             {{ Billing_Address1 }}<br />
             {{ Billing_Address2 }}<br />
@@ -56,7 +59,7 @@
             {{ Billing_Email }}</span
           >
           <span style="display: block; margin-top: 10px; font-weight: bold">SHIP TO:</span>
-          <span style="display: block; font-size: 11px">
+          <span style="display: block; font-size: 13px">
             {{ Shipping_Name }}<br />
             {{ Shipping_Address1 }}<br />
             {{ Shipping_Address2 }}<br />
@@ -72,7 +75,7 @@
       <tr>
         <td colspan="3">
           <table style="border: 1px solid #ddd; table-layout: fixed;" width="100%" cellpadding="10">
-            <tr style="font-size: 10px">
+            <tr style="font-size: 12px">
               <th style="width: 15%; background-color: #f2f2f2; font-weight: bold; border: 1px solid #ddd; text-align: left">ITEM</th>
               <th style="width: 38%; background-color: #f2f2f2; font-weight: bold; border: 1px solid #ddd; text-align: left">DESCRIPTION</th>
               <th style="width: 12%; background-color: #f2f2f2; font-weight: bold; border: 1px solid #ddd; text-align: left">PRICE</th>
@@ -88,12 +91,12 @@
         <td>
           <span style="display: block; font-weight: bold">PAYMENT INFO:</span>
           <br />
-          <span style="display: block; font-size: 11px">
+          <span style="display: block; font-size: 13px">
             {{ Payment_Method }} <br />
             {{ Payment_Status }}</span
           >
         </td>
-        <td colspan="2" style="font-size: 11px">
+        <td colspan="2" style="font-size: 13px">
           <table cellpadding="10" style="margin-left:auto; width: 42%; border-collapse: collapse;">
             <tr>
               <td style="font-weight: bold; border: 1px solid #ddd; text-align: right; background-color: #f2f2f2">Subtotal</td>
@@ -124,7 +127,7 @@
         <td colspan="3">
           <span style="display: block; font-weight: bold">Note:</span>
           <br />
-          <ul style="font-size: 11px">
+          <ul style="font-size: 13px">
             <li>This is a computer-generated invoice and does not require a physical signature or stamp. All prices are in [Currency]. Please retain this invoice for your records.</li>
           </ul>
         </td>

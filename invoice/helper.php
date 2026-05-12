@@ -63,18 +63,19 @@ function generatepdf($shop_id,$order_id){
                 $unit_price = isset($item['price_set']['shop_money']['amount']) ? floatval($item['price_set']['shop_money']['amount']) : floatval($item['price']);
                 $quantity = isset($item['quantity']) ? floatval($item['quantity']) : 1.0;
                 $line_total_gross = $unit_price * $quantity;
-                $unit_price_ex_tax = $line_total_gross;
-                if ($tax_amount > 0) {
+                // Shopify's `price` is tax-inclusive; derive ex-tax from the rate so that
+                // line-level discounts (which Shopify applies to tax_lines.price) don't
+                // contaminate the unit ex-tax figure.
+                if ($item_tax_rate !== null && $item_tax_rate > 0) {
+                    $unit_price_ex_tax = $unit_price / (1 + floatval($item_tax_rate));
+                } elseif ($tax_amount > 0) {
                     $unit_price_ex_tax = max(0, ($line_total_gross - $tax_amount) / max(1.0, $quantity));
+                } else {
+                    $unit_price_ex_tax = $unit_price;
                 }
                 $line_total_ex_tax = $unit_price_ex_tax * $quantity;
                 $subtotal_ex_tax += $line_total_ex_tax;
                 $item_tax_total += $tax_amount;
-
-                if ($tax_label === '' && !empty($item_tax_title)) {
-                    $tax_label = $item_tax_title;
-                    $tax_rate = $item_tax_rate;
-                }
 
                 // Build description from variant title and properties
                 $description_parts = [];
@@ -83,21 +84,24 @@ function generatepdf($shop_id,$order_id){
                 }
                 if (!empty($item['properties']) && is_array($item['properties'])) {
                     foreach ($item['properties'] as $property) {
-                        if (!in_array($property['name'], ['_itemKey', '_optionSetId'], true)) {
-                            $description_parts[] = $property['name'] . ': ' . $property['value'];
+                        $prop_name = $property['name'] ?? '';
+                        if ($prop_name === '' || $prop_name[0] === '_') {
+                            continue;
                         }
+                        $description_parts[] = $prop_name . ': ' . ($property['value'] ?? '');
                     }
                 }
                 $description = !empty($description_parts) ? implode(' | ', $description_parts) : '';
 
-                $items_html .= '<tr style="font-size: 11px; border-bottom: 1px solid #ddd">';
+                $cell_base = 'text-align: left; vertical-align: top; padding: 8px; font-size: 13px; border-bottom: 1px solid #ddd; word-wrap: break-word; overflow-wrap: break-word; white-space: normal;';
+                $items_html .= '<tr>';
                 $row_tax_text = $item_tax_rate !== null ? round($item_tax_rate * 100, 2) . '%' : '';
-                $items_html .= '<td style="text-align: left; word-wrap: break-word; white-space: normal">'.htmlspecialchars($item['name']).'</td>';
-                $items_html .= '<td style="text-align: left; word-wrap: break-word; white-space: normal">'.htmlspecialchars($description).'</td>';
-                $items_html .= '<td style="text-align: left">'.$invoice['currency'].' '.number_format($unit_price_ex_tax, 2).'</td>';
-                $items_html .= '<td style="text-align: left">'.number_format($quantity, 0).'</td>';
-                $items_html .= '<td style="text-align: left">'.htmlspecialchars($row_tax_text).'</td>';
-                $items_html .= '<td style="text-align: left">'.$invoice['currency'].' '.number_format($line_total_ex_tax, 2).'</td>';
+                $items_html .= '<td style="'.$cell_base.'">'.htmlspecialchars($item['name']).'</td>';
+                $items_html .= '<td style="'.$cell_base.'">'.htmlspecialchars($description).'</td>';
+                $items_html .= '<td style="'.$cell_base.'">'.$invoice['currency'].' '.number_format($unit_price_ex_tax, 2).'</td>';
+                $items_html .= '<td style="'.$cell_base.'">'.number_format($quantity, 0).'</td>';
+                $items_html .= '<td style="'.$cell_base.'">'.htmlspecialchars($row_tax_text).'</td>';
+                $items_html .= '<td style="'.$cell_base.'">'.$invoice['currency'].' '.number_format($line_total_ex_tax, 2).'</td>';
                 $items_html .= '</tr>';
                 $counter++;
             }
