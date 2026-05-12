@@ -16,6 +16,9 @@ function dbg($label, $data = null) {
         $line .= ' :: ' . (is_scalar($data) ? var_export($data, true) : json_encode($data, JSON_UNESCAPED_SLASHES));
     }
     error_log($line . "\n", 3, __DIR__ . '/callback_debug.log');
+    // TEMP: also echo to browser so we can debug without log file access
+    echo htmlspecialchars($line) . "<br>\n";
+    @flush();
 }
 
 // Catch every fatal so we always see the cause
@@ -336,6 +339,7 @@ if (isset($access_token)) {
     $shopify_webhook = registerShopifyWebhooks($shop, $access_token);
     dbg('webhook result', $shopify_webhook);
 
+    dbg('about to redirect or fail', ['webhook' => $shopify_webhook]);
     if ($shopify_webhook==1) {
         $redirect_url = "https://{$shop}/admin/apps/" . SHOPIFY_API_KEY;
         header("Location: " . $redirect_url);
