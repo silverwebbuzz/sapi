@@ -428,6 +428,73 @@ function extractIdFromGql($gqlId) {
     return end($parts);
 }
 
+/**
+ * Fetch just the billing dates (current_period_end, trial_ends_on) for a
+ * specific AppSubscription by its charge id. The app_subscriptions/update
+ * webhook payload omits these fields, so we look them up here.
+ *
+ * Returns ['current_period_end' => ?string, 'trial_ends_on' => ?string]
+ * (ISO-8601 strings) or null on failure.
+ */
+function fetchSubscriptionBillingDates($shop, $accessToken, $chargeId) {
+    $graphqlEndpoint = "https://{$shop}/admin/api/" . SHOPIFY_API_VERSION . "/graphql.json";
+    $query = 'query($id: ID!) {
+        node(id: $id) {
+            ... on AppSubscription {
+                currentPeriodEnd
+                trialDays
+                createdAt
+            }
+        }
+    }';
+    $variables = ['id' => "gid://shopify/AppSubscription/$chargeId"];
+
+    $payload = json_encode(['query' => $query, 'variables' => $variables]);
+
+    $ch = curl_init();
+    curl_setopt($ch, CURLOPT_URL, $graphqlEndpoint);
+    curl_setopt($ch, CURLOPT_HTTPHEADER, [
+        'Content-Type: application/json',
+        'X-Shopify-Access-Token: ' . $accessToken,
+    ]);
+    curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+    curl_setopt($ch, CURLOPT_POST, true);
+    curl_setopt($ch, CURLOPT_POSTFIELDS, $payload);
+    curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, true);
+
+    $response = curl_exec($ch);
+    $error    = curl_error($ch);
+    curl_close($ch);
+
+    if ($error) {
+        error_log("[fetchSubscriptionBillingDates] cURL: $error");
+        return null;
+    }
+
+    $data = json_decode($response, true);
+    if (!empty($data['errors'])) {
+        error_log("[fetchSubscriptionBillingDates] GraphQL: " . json_encode($data['errors']));
+        return null;
+    }
+
+    $node = $data['data']['node'] ?? null;
+    if (!$node) {
+        return null;
+    }
+
+    // Derive trial_ends_on from createdAt + trialDays if trialDays > 0.
+    $trialEndsOn = null;
+    $trialDays   = (int)($node['trialDays'] ?? 0);
+    if ($trialDays > 0 && !empty($node['createdAt'])) {
+        $trialEndsOn = date('c', strtotime("+{$trialDays} days", strtotime($node['createdAt'])));
+    }
+
+    return [
+        'current_period_end' => $node['currentPeriodEnd'] ?? null,
+        'trial_ends_on'      => $trialEndsOn,
+    ];
+}
+
 function fetchSubscriptionWithGraphQL($shop, $accessToken, $chargeId) {
     $graphqlEndpoint = "https://{$shop}/admin/api/" . SHOPIFY_API_VERSION . "/graphql.json";
     $query = '{

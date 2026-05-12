@@ -38,7 +38,7 @@ $invoices_query = DBHelper::select("SELECT * FROM `$invoice_table` ORDER BY crea
                 </div>
                 <div class="package-stat">
                     <span>Next Billing Date</span>
-                    <strong><?= date('M d, Y', strtotime($currentPlan['current_period_end'] ?? '')) ?></strong>
+                    <strong><?= !empty($currentPlan['current_period_end']) ? date('M d, Y', strtotime($currentPlan['current_period_end'])) : 'N/A' ?></strong>
                 </div>
                 <div class="package-stat">
                     <span>PDF Invoice Limit</span>

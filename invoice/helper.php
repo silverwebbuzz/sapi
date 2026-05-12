@@ -439,7 +439,7 @@ function store_app_subscriptions($shopId, array $subscription)
 
     // shopify_id is bigint — bind as string to avoid 32-bit int truncation
     $store = DBHelper::selectOne(
-        "SELECT id FROM stores WHERE shopify_id = ? LIMIT 1",
+        "SELECT id, shop, access_token FROM stores WHERE shopify_id = ? LIMIT 1",
         "s",
         [(string)$shopId]
     );
@@ -467,21 +467,41 @@ function store_app_subscriptions($shopId, array $subscription)
         ? date('Y-m-d H:i:s', strtotime($subscription['created_at']))
         : date('Y-m-d H:i:s');
 
+    // Shopify is the source of truth for billing dates. The webhook payload
+    // omits current_period_end and trial_ends_on, so look them up via GraphQL
+    // on the active subscription only. Skip the API hit on cancelled/expired.
+    $currentPeriodEnd = null;
+    $trialEndsOn      = null;
+    if ($status === 'active' && !empty($store['shop']) && !empty($store['access_token'])) {
+        $billing = fetchSubscriptionBillingDates($store['shop'], $store['access_token'], $chargeId);
+        subscription_log('billing dates from shopify', $billing);
+        if ($billing) {
+            $currentPeriodEnd = !empty($billing['current_period_end'])
+                ? date('Y-m-d H:i:s', strtotime($billing['current_period_end']))
+                : null;
+            $trialEndsOn = !empty($billing['trial_ends_on'])
+                ? date('Y-m-d H:i:s', strtotime($billing['trial_ends_on']))
+                : null;
+        }
+    }
+
     $limits = calculatePlanLimits($planName, (float)$price, $isAnnual ? 'annual' : 'monthly');
 
     $row = [
-        'store_id'         => (int)$store['id'],
-        'shopify_id'       => (string)$shopId,
-        'charge_id'        => (string)$chargeId,
-        'plan_name'        => $planName,
-        'status'           => $status,
-        'price'            => $price,
-        'currency'         => $currency,
-        'billing_interval' => $billingInterval,
-        'activated_on'     => $activatedOn,
-        'order_limit'      => (int)$limits['order_limit'],
-        'email_limit'      => (int)$limits['email_limit'],
-        'is_test'          => $isTest,
+        'store_id'           => (int)$store['id'],
+        'shopify_id'         => (string)$shopId,
+        'charge_id'          => (string)$chargeId,
+        'plan_name'          => $planName,
+        'status'             => $status,
+        'price'              => $price,
+        'currency'           => $currency,
+        'billing_interval'   => $billingInterval,
+        'activated_on'       => $activatedOn,
+        'current_period_end' => $currentPeriodEnd,
+        'trial_ends_on'      => $trialEndsOn,
+        'order_limit'        => (int)$limits['order_limit'],
+        'email_limit'        => (int)$limits['email_limit'],
+        'is_test'            => $isTest,
     ];
     subscription_log('upserting', $row);
 
@@ -491,24 +511,27 @@ function store_app_subscriptions($shopId, array $subscription)
     $sql = "
         INSERT INTO store_subscriptions
             (store_id, shopify_id, charge_id, plan_name, status, price, currency,
-             billing_interval, interval_count, activated_on,
+             billing_interval, interval_count, activated_on, current_period_end, trial_ends_on,
              order_limit, email_limit, is_test)
-        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
         ON DUPLICATE KEY UPDATE
-            plan_name        = VALUES(plan_name),
-            status           = VALUES(status),
-            price            = VALUES(price),
-            currency         = VALUES(currency),
-            billing_interval = VALUES(billing_interval),
-            order_limit      = VALUES(order_limit),
-            email_limit      = VALUES(email_limit),
-            is_test          = VALUES(is_test),
-            updated_at       = NOW()
+            plan_name          = VALUES(plan_name),
+            status             = VALUES(status),
+            price              = VALUES(price),
+            currency           = VALUES(currency),
+            billing_interval   = VALUES(billing_interval),
+            activated_on       = VALUES(activated_on),
+            current_period_end = VALUES(current_period_end),
+            trial_ends_on      = VALUES(trial_ends_on),
+            order_limit        = VALUES(order_limit),
+            email_limit        = VALUES(email_limit),
+            is_test            = VALUES(is_test),
+            updated_at         = NOW()
     ";
 
     DBHelper::insert(
         $sql,
-        "isssssssisiii",
+        "isssssssisssiii",
         [
             $row['store_id'],
             $row['shopify_id'],
@@ -520,6 +543,8 @@ function store_app_subscriptions($shopId, array $subscription)
             $row['billing_interval'],
             1,                        // interval_count
             $row['activated_on'],
+            $row['current_period_end'],
+            $row['trial_ends_on'],
             $row['order_limit'],
             $row['email_limit'],
             $row['is_test'],
