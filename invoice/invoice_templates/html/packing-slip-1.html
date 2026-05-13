@@ -84,29 +84,21 @@
         word-wrap: break-word;
         overflow-wrap: break-word;
       }
-      .items .col-check { width: 32px; text-align: center; }
-      .items .col-sku   { width: 16%; }
-      .items .col-qty,
-      .items .col-shipped { width: 70px; text-align: center; }
-      .items .check-box {
-        display: inline-block;
-        width: 14px;
-        height: 14px;
-        border: 1.5px solid #555;
-        border-radius: 3px;
-      }
+      .items .col-qty { width: 70px; text-align: center; }
       .items .qty-num { font-weight: 600; font-size: 13px; }
-      .items .shipped-blank {
-        display: inline-block;
-        min-width: 40px;
-        border-bottom: 1px solid #999;
-        height: 16px;
-      }
       .item-variant {
         display: block;
         color: #555;
         font-size: 11px;
         margin-top: 2px;
+      }
+      .item-sku {
+        display: block;
+        color: #888;
+        font-size: 10px;
+        margin-top: 4px;
+        text-transform: uppercase;
+        letter-spacing: 0.3px;
       }
 
       .totals-row {
@@ -199,19 +191,13 @@
 
     <table class="items">
       <colgroup>
-        <col class="col-check" />
-        <col class="col-sku" />
         <col />
         <col class="col-qty" />
-        <col class="col-shipped" />
       </colgroup>
       <thead>
         <tr>
-          <th>&nbsp;</th>
-          <th>SKU</th>
           <th>Item</th>
-          <th style="text-align: center;">Qty Ordered</th>
-          <th style="text-align: center;">Qty Shipped</th>
+          <th style="text-align: center;">Qty</th>
         </tr>
       </thead>
       <tbody>

@@ -303,19 +303,19 @@ function generatePackingSlip($shop_id, $order_id) {
         }
 
         $items_html .= '<tr>';
-        $items_html .= '<td style="text-align: center;"><span class="check-box"></span></td>';
-        $items_html .= '<td>' . htmlspecialchars($sku !== '' ? $sku : '—') . '</td>';
         $items_html .= '<td>' . htmlspecialchars($name);
         if ($variant !== '') {
             $items_html .= '<span class="item-variant">' . htmlspecialchars($variant) . '</span>';
         }
+        if ($sku !== '') {
+            $items_html .= '<span class="item-sku">SKU: ' . htmlspecialchars($sku) . '</span>';
+        }
         $items_html .= '</td>';
         $items_html .= '<td style="text-align: center;"><span class="qty-num">' . $qty . '</span></td>';
-        $items_html .= '<td style="text-align: center;"><span class="shipped-blank">&nbsp;</span></td>';
         $items_html .= '</tr>';
     }
     if ($items_html === '') {
-        $items_html = '<tr><td colspan="5" style="text-align: center; color: #777;">No items.</td></tr>';
+        $items_html = '<tr><td colspan="2" style="text-align: center; color: #777;">No items.</td></tr>';
     }
 
     $replacements = [
