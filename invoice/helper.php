@@ -42,40 +42,53 @@ function generatepdf($shop_id,$order_id){
             $counter = 1;
             $subtotal_ex_tax = 0.0;
             $item_tax_total = 0.0;
-            $tax_label = '';
-            $tax_rate = null;
+
+            // Aggregate tax by title across all line items. Indian GST split
+            // (CGST + SGST) lands as two separate entries; UK VAT lands as one.
+            // Each entry tracks the rate and the running total of tax_amount.
+            $tax_aggregates = [];   // key = "TITLE|RATE" => ['title','rate','amount']
 
             foreach ($products as $item) {
-                $tax_amount = 0.0;
-                $item_tax_rate = null;
-                $item_tax_title = '';
+                $line_tax_rate_combined = 0.0;   // sum of all tax_lines.rate on this item
+                $line_tax_amount_total  = 0.0;   // sum of all tax_lines.price on this item
 
-                if (isset($item['tax_lines']) && !empty($item['tax_lines'])) {
-                    $item_tax_rate = $item['tax_lines'][0]['rate'];
-                    $tax_amount = floatval($item['tax_lines'][0]['price']);
-                    $item_tax_title = $item['tax_lines'][0]['title'] ?? '';
-                    if ($tax_label === '' && !empty($item_tax_title)) {
-                        $tax_label = $item_tax_title;
-                        $tax_rate = $item_tax_rate;
+                if (isset($item['tax_lines']) && is_array($item['tax_lines'])) {
+                    foreach ($item['tax_lines'] as $tl) {
+                        $r = isset($tl['rate'])  ? floatval($tl['rate'])  : 0.0;
+                        $p = isset($tl['price']) ? floatval($tl['price']) : 0.0;
+                        $t = isset($tl['title']) ? (string)$tl['title']   : 'Tax';
+
+                        $line_tax_rate_combined += $r;
+                        $line_tax_amount_total  += $p;
+
+                        // Round rate to 4dp for the aggregate key so 0.09000000001 and 0.09
+                        // bucket together.
+                        $rateKey = number_format($r, 4, '.', '');
+                        $key = $t . '|' . $rateKey;
+                        if (!isset($tax_aggregates[$key])) {
+                            $tax_aggregates[$key] = ['title' => $t, 'rate' => $r, 'amount' => 0.0];
+                        }
+                        $tax_aggregates[$key]['amount'] += $p;
                     }
                 }
 
                 $unit_price = isset($item['price_set']['shop_money']['amount']) ? floatval($item['price_set']['shop_money']['amount']) : floatval($item['price']);
                 $quantity = isset($item['quantity']) ? floatval($item['quantity']) : 1.0;
                 $line_total_gross = $unit_price * $quantity;
-                // Shopify's `price` is tax-inclusive; derive ex-tax from the rate so that
-                // line-level discounts (which Shopify applies to tax_lines.price) don't
-                // contaminate the unit ex-tax figure.
-                if ($item_tax_rate !== null && $item_tax_rate > 0) {
-                    $unit_price_ex_tax = $unit_price / (1 + floatval($item_tax_rate));
-                } elseif ($tax_amount > 0) {
-                    $unit_price_ex_tax = max(0, ($line_total_gross - $tax_amount) / max(1.0, $quantity));
+
+                // Shopify's `price` is tax-inclusive. Use the COMBINED tax rate
+                // across all tax_lines so Indian GST (9% + 9% = 18%) is handled
+                // correctly. For UK VAT this is just the single 20%.
+                if ($line_tax_rate_combined > 0) {
+                    $unit_price_ex_tax = $unit_price / (1 + $line_tax_rate_combined);
+                } elseif ($line_tax_amount_total > 0) {
+                    $unit_price_ex_tax = max(0, ($line_total_gross - $line_tax_amount_total) / max(1.0, $quantity));
                 } else {
                     $unit_price_ex_tax = $unit_price;
                 }
                 $line_total_ex_tax = $unit_price_ex_tax * $quantity;
                 $subtotal_ex_tax += $line_total_ex_tax;
-                $item_tax_total += $tax_amount;
+                $item_tax_total  += $line_tax_amount_total;
 
                 // Build description from variant title and properties
                 $description_parts = [];
@@ -93,7 +106,12 @@ function generatepdf($shop_id,$order_id){
                 }
                 $description = !empty($description_parts) ? implode(' | ', $description_parts) : '';
 
-                $row_tax_text = $item_tax_rate !== null ? round($item_tax_rate * 100, 2) . '%' : '';
+                // Per-row tax column shows the COMBINED effective rate.
+                // (e.g. India intra-state: 18% rather than just the 9% CGST.)
+                $row_tax_text = $line_tax_rate_combined > 0
+                    ? rtrim(rtrim(number_format($line_tax_rate_combined * 100, 2, '.', ''), '0'), '.') . '%'
+                    : '';
+
                 $items_html .= '<tr>';
                 $items_html .= '<td>'.htmlspecialchars($item['name']).'</td>';
                 $items_html .= '<td>'.htmlspecialchars($description).'</td>';
@@ -111,24 +129,51 @@ function generatepdf($shop_id,$order_id){
             }
 
             $has_tax = floatval($invoice['tax_amount']) > 0;
-            if ($tax_label === '') {
-                $tax_label = 'Tax';
+
+            // Build the tax block: one <tr> per tax title (CGST, SGST, VAT, etc.).
+            // Empty for tax-free orders.
+            $tax_block = '';
+            foreach ($tax_aggregates as $agg) {
+                $ratePct = rtrim(rtrim(number_format($agg['rate'] * 100, 2, '.', ''), '0'), '.');
+                $label = $agg['title'] . ' (' . $ratePct . '%)';
+                $tax_block .= '<tr><td class="label">' . htmlspecialchars($label) . '</td>'
+                            . '<td class="value">' . $invoice['currency'] . ' ' . number_format($agg['amount'], 2) . '</td></tr>';
             }
-            $tax_rate_text = $tax_rate !== null ? ' (' . round($tax_rate * 100, 2) . '%)' : '';
-            $tax_label_full = $has_tax ? $tax_label . $tax_rate_text : '';
+
+            // Column-header label & shipping-tax label use the FIRST tax title
+            // we saw (UK: "VAT"; India: "CGST" — close enough for the column
+            // header; the per-row column shows the combined % anyway).
+            $first_agg = !empty($tax_aggregates) ? reset($tax_aggregates) : null;
+            $primary_tax_title = $first_agg ? $first_agg['title'] : 'Tax';
+            $primary_tax_rate  = $first_agg ? $first_agg['rate']  : null;
+            $primary_rate_text = $primary_tax_rate !== null
+                ? ' (' . rtrim(rtrim(number_format($primary_tax_rate * 100, 2, '.', ''), '0'), '.') . '%)'
+                : '';
+            $tax_column_label = $has_tax ? $primary_tax_title . $primary_rate_text : '';
+
+            // Backward-compat single-line placeholders (older custom templates
+            // may still reference these). Empty when we have a multi-tax block.
+            $tax_label_full     = $has_tax ? $primary_tax_title . $primary_rate_text : '';
+            $tax_amount_display = $has_tax ? $invoice['currency'].' '.number_format($invoice['tax_amount'], 2) : '';
+
+            // Shipping-tax label uses the combined GST rate when the country
+            // splits the tax, otherwise the primary single rate.
+            $combined_shipping_rate = 0.0;
+            foreach ($tax_aggregates as $agg) { $combined_shipping_rate += $agg['rate']; }
             if ($has_tax) {
-                $lc_tax_label = strtolower($tax_label);
-                if (strpos($lc_tax_label, 'vat') !== false) {
-                    $shipping_tax_label = 'Shipping VAT' . $tax_rate_text;
-                } elseif (strpos($lc_tax_label, 'gst') !== false) {
-                    $shipping_tax_label = 'Shipping GST' . $tax_rate_text;
+                $lc_tax_label = strtolower($primary_tax_title);
+                if (strpos($lc_tax_label, 'gst') !== false) {
+                    // For Indian GST, label the shipping tax with the combined rate (18%).
+                    $shipRatePct = rtrim(rtrim(number_format($combined_shipping_rate * 100, 2, '.', ''), '0'), '.');
+                    $shipping_tax_label = 'Shipping GST (' . $shipRatePct . '%)';
+                } elseif (strpos($lc_tax_label, 'vat') !== false) {
+                    $shipping_tax_label = 'Shipping VAT' . $primary_rate_text;
                 } else {
-                    $shipping_tax_label = 'Shipping ' . $tax_label . $tax_rate_text;
+                    $shipping_tax_label = 'Shipping ' . $primary_tax_title . $primary_rate_text;
                 }
             } else {
                 $shipping_tax_label = '';
             }
-            $tax_amount_display = $has_tax ? $invoice['currency'].' '.number_format($invoice['tax_amount'], 2) : '';
 
             $discount_row = '';
             if (floatval($invoice['discount_amount']) != 0) {
@@ -173,7 +218,10 @@ function generatepdf($shop_id,$order_id){
                 '{{ Shipping_Country }}' => isset($shipping_address['country']) ? $shipping_address['country'] : ($billing_address['country'] ?? ''),
                 '{{ Order_Items }}' => $items_html,
                 '{{ Subtotal }}' => $invoice['currency'].' '.number_format($subtotal_ex_tax, 2),
-                '{{ Tax_Column_Label }}' => htmlspecialchars($tax_label_full),
+                '{{ Tax_Column_Label }}' => htmlspecialchars($tax_column_label),
+                '{{ Tax_Block }}' => $tax_block,
+                // Back-compat placeholders for older templates that still
+                // reference a single Tax_Label / Tax_Amount pair.
                 '{{ Tax_Label }}' => htmlspecialchars($tax_label_full),
                 '{{ Tax_Amount }}' => $tax_amount_display,
                 '{{ Shipping_Cost }}' => $invoice['currency'].' '.number_format($invoice['shipping_cost'], 2),
