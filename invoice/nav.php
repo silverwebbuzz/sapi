@@ -99,16 +99,16 @@ if (isset($currentPlan['order_limit'], $currentPlan['order_used']) && $currentPl
         ? $message 
         : "Please upgrade your plan to send more invoices.";
     
-    $gen_invoice_upgrade_plan_button = '<a href="change-plan" class="gen-invoice-btn">Upgrade To Generate Invoice</a>';
+    $gen_invoice_upgrade_plan_button = '<a href="change-plan?shop=' . htmlspecialchars($shop) . '" class="gen-invoice-btn">Upgrade To Generate Invoice</a>';
 }
 
 // Check Email Limit
 if (isset($currentPlan['email_limit'], $currentPlan['email_used']) && $currentPlan['email_used'] >= $currentPlan['email_limit']) {
-    $message = $isFreePlan 
-        ? $message 
+    $message = $isFreePlan
+        ? $message
         : "Please upgrade your plan to send more emails.";
-    
-    $send_email_upgrade_plan_button = '<a href="change-plan" class="gen-invoice-btn">Upgrade To Send Email</a>';
+
+    $send_email_upgrade_plan_button = '<a href="change-plan?shop=' . htmlspecialchars($shop) . '" class="gen-invoice-btn">Upgrade To Send Email</a>';
 }
 
 // SMTP settings check for paid plans

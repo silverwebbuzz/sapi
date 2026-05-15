@@ -1,24 +1,34 @@
 <?php
- error_reporting(E_ALL);
- ini_set('display_errors', 1);
- ini_set('display_startup_errors', 1);
- 
+error_reporting(E_ALL);
+ini_set('display_errors', 0);
+ini_set('display_startup_errors', 0);
+
 require_once '../config/config.php';
 require_once '../config/db.php';
 require_once 'shopify_functions.php';
 require_once 'helper.php';
 
-$shop = $_GET['shop'];
+// Shop param can come from $_GET (normal nav) or from $_SESSION (if the user
+// landed here via an upgrade button that lost the param). Fall back to session
+// before failing so users don't see PHP warnings.
+$shop = $_GET['shop'] ?? ($_SESSION['shop'] ?? '');
+if (!$shop) {
+    http_response_code(400);
+    die('Missing shop parameter. Please re-open the app from your Shopify admin.');
+}
+
 $store_name = explode('.', $shop)[0];
 
 $store = DBHelper::selectOne(
-  "SELECT * FROM stores WHERE `shop` = ? AND `status` = ?",
-  "ss", 
-  [$shop, "installed"]
+    "SELECT * FROM stores WHERE `shop` = ? AND `status` = ?",
+    "ss",
+    [$shop, "installed"]
 );
-$host = $store['host'];
-
-$api_key = 'YOUR_SHOPIFY_API_KEY'; // From your app setup
+if (!$store) {
+    http_response_code(404);
+    die('Store not found or not installed.');
+}
+$host = $store['host'] ?? '';
 ?>
 <!DOCTYPE html>
 <html>
