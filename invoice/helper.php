@@ -291,6 +291,46 @@ function generatepdf($shop_id,$order_id){
     }
 }
 
+function getInvoicePdfContent($shop_id, $order_id) {
+    $shop_data = DBHelper::selectOne(
+        "SELECT * FROM stores WHERE `id` = ?",
+        "s",
+        [$shop_id]
+    );
+
+    if (!$shop_data) {
+        return null;
+    }
+
+    $shop_name = preg_replace('/[^a-zA-Z0-9_]/', '_', strtolower($shop_data['shop']));
+    $invoice_table = "invoices_" . $shop_name;
+
+    $invoice = DBHelper::selectOne(
+        "SELECT pdf_invoice FROM `$invoice_table` WHERE order_id = ?",
+        "s",
+        [$order_id]
+    );
+
+    if ($invoice && !empty($invoice['pdf_invoice'])) {
+        return base64_decode($invoice['pdf_invoice']);
+    }
+
+    if ($invoice) {
+        generatepdf($shop_id, $order_id);
+        $invoice = DBHelper::selectOne(
+            "SELECT pdf_invoice FROM `$invoice_table` WHERE order_id = ?",
+            "s",
+            [$order_id]
+        );
+
+        if ($invoice && !empty($invoice['pdf_invoice'])) {
+            return base64_decode($invoice['pdf_invoice']);
+        }
+    }
+
+    return null;
+}
+
 /**
  * Generate a packing-slip PDF for one order and store it in the
  * packing_slip_pdf column of invoices_<shop>.

@@ -1,0 +1,10 @@
+name = "Print Invoice - SWB Auto PDF Invoices"
+type = "ui_extension"
+extension_points = ["Admin::Action::Order", "Admin::Action::Orders::Index"]
+
+[development]
+	entry_point = "src/index.jsx"
+
+[build]
+	command = "npm run build"
+	path = "build/index.js"

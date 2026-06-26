@@ -1,0 +1,16 @@
+{
+  "name": "swb-auto-pdf-invoices-admin-action",
+  "private": true,
+  "version": "1.0.0",
+  "scripts": {
+    "build": "esbuild src/index.jsx --bundle --minify --outfile=build/index.js --loader:.jsx=jsx",
+    "dev": "shopify extension serve --path .",
+    "lint": "echo \"No lint configured\""
+  },
+  "dependencies": {
+    "@shopify/admin-ui-extensions-react": "^1.0.0"
+  },
+  "devDependencies": {
+    "esbuild": "^0.18.0"
+  }
+}
