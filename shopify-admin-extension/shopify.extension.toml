@@ -1,9 +1,10 @@
-api_version = "2025-04"
+api_version = "2025-07"
 
 [[extensions]]
-type = "admin_action"
+type = "ui_extension"
 name = "Print Invoice - SWB Auto PDF Invoices"
 handle = "print-invoice"
+uid = "5182661c-3325-781a-d0b8-cff9b4a389ee829869bc"
 
 [[extensions.targeting]]
 target = "admin.order-details.action.render"
