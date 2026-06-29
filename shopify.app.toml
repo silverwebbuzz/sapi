@@ -1,0 +1,29 @@
+# Learn more about configuring your app at https://shopify.dev/docs/apps/tools/cli/configuration
+
+name = "SWB Auto PDF Invoices"
+handle = "swb-auto-pdf-invoices"
+client_id = "376ce2c1e19ffa08ea8ad26e038ff4f5"
+organization_id = ""
+application_url = "https://sapi.silverwebbuzz.com/"
+embedded = true
+
+[build]
+  command = "php -S 0.0.0.0:8080 -t ."
+
+[pos]
+  embedded = false
+
+[app_proxy]
+  url = "https://sapi.silverwebbuzz.com"
+  subpath = "sapi"
+  prefix = "apps"
+
+[auth]
+  redirect_urls = [ "https://sapi.silverwebbuzz.com/invoice/callback" ]
+
+[webhooks]
+api_version = "2025-01"
+
+  [[webhooks.subscriptions]]
+  uri = "/invoice/webhook"
+  compliance_topics = [ "customers/data_request", "customers/redact", "shop/redact" ]

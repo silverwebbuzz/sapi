@@ -1,10 +1,10 @@
+api_version = "2025-04"
+
+[[extensions]]
+type = "admin_action"
 name = "Print Invoice - SWB Auto PDF Invoices"
-type = "ui_extension"
-extension_points = ["Admin::Action::Order", "Admin::Action::Orders::Index"]
+handle = "print-invoice"
 
-[development]
-	entry_point = "src/index.jsx"
-
-[build]
-	command = "npm run build"
-	path = "build/index.js"
+[[extensions.targeting]]
+target = "admin.order-details.action.render"
+module = "./src/index.jsx"
