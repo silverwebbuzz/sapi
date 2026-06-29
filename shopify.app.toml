@@ -6,6 +6,7 @@ client_id = "376ce2c1e19ffa08ea8ad26e038ff4f5"
 organization_id = ""
 application_url = "https://sapi.silverwebbuzz.com/"
 embedded = true
+extension_directories = [ "shopify-admin-extension" ]
 
 [build]
   command = "php -S 0.0.0.0:8080 -t ."

@@ -1,107 +1,103 @@
-import React from 'react';
-import {extend, render, Button, BlockStack, InlineStack, Text, Spinner, useSessionToken} from '@shopify/admin-ui-extensions-react';
-import {useEffect, useState} from 'react';
+import React, {useEffect, useState} from 'react';
+import {
+  reactExtension,
+  useApi,
+  AdminAction,
+  Button,
+  Link,
+  BlockStack,
+  Text,
+  Banner,
+  ProgressIndicator,
+} from '@shopify/ui-extensions-react/admin';
 
-const BACKEND_BASE_URL = 'https://sapi.silverwebbuzz.com'; // Replace with your actual app backend domain if needed.
+const TARGET = 'admin.order-details.action.render';
 
-function getQueryParam(name) {
-  const params = new URLSearchParams(window.location.search);
-  return params.get(name) || '';
-}
+// Your app backend that generates / serves the PDF invoice.
+const BACKEND_BASE_URL = 'https://sapi.silverwebbuzz.com';
 
-function useOrderContext() {
-  const [orderId, setOrderId] = useState('');
-  const [shopDomain, setShopDomain] = useState('');
+export default reactExtension(TARGET, () => <PrintInvoiceAction />);
 
-  useEffect(() => {
-    const orderFromQuery = getQueryParam('order_id') || getQueryParam('resource_id') || getQueryParam('id');
-    const shopFromQuery = getQueryParam('shop') || getQueryParam('shop_origin') || getQueryParam('domain');
-    setOrderId(orderFromQuery);
-    setShopDomain(shopFromQuery);
-  }, []);
-
-  return {orderId, shopDomain};
+// gid://shopify/Order/123456789 -> "123456789"
+function numericId(gid) {
+  if (!gid) return '';
+  const parts = String(gid).split('/');
+  return parts[parts.length - 1] || '';
 }
 
 function PrintInvoiceAction() {
-  const sessionToken = useSessionToken();
-  const {orderId, shopDomain} = useOrderContext();
-  const [loading, setLoading] = useState(false);
-  const [feedback, setFeedback] = useState('');
+  const {close, data, query} = useApi(TARGET);
 
-  async function handlePrint() {
-    setFeedback('');
+  const [shopDomain, setShopDomain] = useState('');
+  const [error, setError] = useState('');
+  const [loading, setLoading] = useState(true);
 
-    if (!orderId || !shopDomain) {
-      setFeedback('Unable to detect the order ID or shop domain. Open this action from a Shopify order page.');
-      return;
-    }
+  const orderId = numericId(data?.selected?.[0]?.id);
 
-    setLoading(true);
-    const printWindow = window.open('', '_blank');
-    if (!printWindow) {
-      setFeedback('Popup blocked. Please allow popups for this app.');
-      setLoading(false);
-      return;
-    }
-
-    try {
-      const headers = {
-        Accept: 'application/pdf'
-      };
-
+  useEffect(() => {
+    let active = true;
+    (async () => {
       try {
-        const token = await sessionToken.getSessionToken();
-        if (token) {
-          headers.Authorization = `Bearer ${token}`;
-        }
-      } catch (tokenError) {
-        console.warn('Unable to get session token from extension API:', tokenError);
+        const res = await query(`{ shop { myshopifyDomain } }`);
+        const domain = res?.data?.shop?.myshopifyDomain || '';
+        if (active) setShopDomain(domain);
+      } catch (e) {
+        if (active) setError('Unable to detect the shop domain.');
+      } finally {
+        if (active) setLoading(false);
       }
+    })();
+    return () => {
+      active = false;
+    };
+  }, [query]);
 
-      const url = `${BACKEND_BASE_URL}/invoice/admin-print-invoice.php?order_id=${encodeURIComponent(orderId)}&shop=${encodeURIComponent(shopDomain)}`;
-      const response = await fetch(url, {
-        method: 'GET',
-        headers
-      });
-
-      if (!response.ok) {
-        const text = await response.text();
-        throw new Error(text || `Server returned ${response.status}`);
-      }
-
-      const blob = await response.blob();
-      const pdfUrl = URL.createObjectURL(blob);
-      printWindow.location.href = pdfUrl;
-      printWindow.focus();
-    } catch (error) {
-      setFeedback(`Unable to generate invoice: ${error.message}`);
-      printWindow.close();
-    } finally {
-      setLoading(false);
-    }
-  }
+  const ready = Boolean(orderId && shopDomain);
+  const invoiceUrl = ready
+    ? `${BACKEND_BASE_URL}/invoice/admin-print-invoice.php?order_id=${encodeURIComponent(
+        orderId,
+      )}&shop=${encodeURIComponent(shopDomain)}`
+    : '';
 
   return (
-    <BlockStack spacing="loose">
-      <InlineStack alignment="space-between">
-        <Button onPress={handlePrint} loading={loading} primary>
-          Print Invoice - SWB Auto PDF Invoices
-        </Button>
-      </InlineStack>
-      {loading && (
-        <InlineStack alignment="center" spacing="tight">
-          <Spinner size="small" accessibilityLabel="Generating invoice" />
-          <Text>Generating your invoice...</Text>
-        </InlineStack>
-      )}
-      {feedback && <Text tone="critical">{feedback}</Text>}
-      <Text tone="secondary">
-        This button sends the Shopify order ID and shop domain to your existing PHP backend, which generates or retrieves the PDF invoice and opens it for view/print.
-      </Text>
-    </BlockStack>
+    <AdminAction
+      primaryAction={
+        ready ? (
+          <Button href={invoiceUrl} target="_blank" variant="primary">
+            Open / Print Invoice
+          </Button>
+        ) : undefined
+      }
+      secondaryAction={<Button onPress={close}>Close</Button>}
+    >
+      <BlockStack gap="base">
+        {loading && (
+          <BlockStack inlineAlignment="center">
+            <ProgressIndicator size="small-200" variant="spinner" />
+            <Text>Preparing your invoice…</Text>
+          </BlockStack>
+        )}
+
+        {error && <Banner tone="critical">{error}</Banner>}
+
+        {!loading && !error && !orderId && (
+          <Banner tone="critical">
+            Could not detect the order. Open this action from an order details page.
+          </Banner>
+        )}
+
+        {ready && (
+          <BlockStack gap="base">
+            <Text>
+              Click the button below to open the PDF invoice for this order in a
+              new tab, ready to view or print.
+            </Text>
+            <Link href={invoiceUrl} target="_blank">
+              Open invoice PDF
+            </Link>
+          </BlockStack>
+        )}
+      </BlockStack>
+    </AdminAction>
   );
 }
-
-extend('Admin::Action::Order', render(() => <PrintInvoiceAction />));
-extend('Admin::Action::Orders::Index', render(() => <PrintInvoiceAction />));
