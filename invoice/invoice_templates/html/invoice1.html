@@ -21,8 +21,10 @@
         text-align: right;
         color: #222;
       }
-      .meta { font-size: 12px; text-align: right; margin-top: 6px; }
-      .meta strong { display: inline-block; min-width: 70px; }
+      .meta { font-size: 12px; margin-top: 6px; float: right; border-collapse: collapse; }
+      .meta td { padding: 1px 0; white-space: nowrap; }
+      .meta td.meta-label { text-align: right; font-weight: bold; padding-right: 6px; }
+      .meta td.meta-val { text-align: left; }
       .parties { width: 100%; border-collapse: collapse; margin-bottom: 18px; }
       .parties td {
         width: 33%;
@@ -111,10 +113,16 @@
         </td>
         <td style="width: 45%;">
           <div class="title">INVOICE</div>
-          <div class="meta">
-            <div><strong>Invoice No:</strong> {{ Order_Number }}</div>
-            <div><strong>Date:</strong> {{ Invoice_Date }}</div>
-          </div>
+          <table class="meta">
+            <tr>
+              <td class="meta-label">Invoice No:</td>
+              <td class="meta-val">{{ Order_Number }}</td>
+            </tr>
+            <tr>
+              <td class="meta-label">Date:</td>
+              <td class="meta-val">{{ Invoice_Date }}</td>
+            </tr>
+          </table>
         </td>
       </tr>
     </table>
