@@ -110,20 +110,32 @@ if ($topic === 'app/uninstalled') {
     $sql_currentPlan = "SELECT * FROM store_subscriptions ss WHERE ss.store_id = ? AND ss.status = 'active'  ORDER BY ss.activated_on DESC LIMIT 1 ";
     $currentPlan = DBHelper::selectOne($sql_currentPlan, "i", [$shop_id]);
 
-    if ($currentPlan['price']!='0.00') {
-        // Generate PDF if within limits
-        if ($currentPlan['order_used'] <= $currentPlan['order_limit']) {
-            $generatepdf = generatepdf($shop_id,$order_id);
-            
+    // Free and paid plans run the same automatic flow — the plan's own limits
+    // are the only gate (Lifetime Free = 20 invoices / 20 emails). Once a limit
+    // is hit the owner is emailed once, and the admin shows the same warning.
+    if ($currentPlan) {
+        $autoEnabled = ($shop_data['auto_invoice_customer'] == 'Yes' || $shop_data['auto_invoice_personal'] == 'Yes');
+
+        if ($currentPlan['order_used'] < $currentPlan['order_limit']) {
+            $generatepdf = generatepdf($shop_id, $order_id);
+
+            $emailQuotaLeft = ($currentPlan['email_used'] < $currentPlan['email_limit']);
+
+            if ($autoEnabled && !$emailQuotaLeft) {
+                notifyPlanLimitReached($shop_id, 'email');
+            }
+
             // Send email to customer if enabled
-            if ($shop_data['auto_invoice_customer']=='Yes' && $currentPlan['email_used'] <= $currentPlan['email_limit']) {
-                $sendemail = sendemail($shop_id,$order_id);
+            if ($shop_data['auto_invoice_customer'] == 'Yes' && $emailQuotaLeft) {
+                $sendemail = sendemail($shop_id, $order_id);
             }
-            
+
             // Send personal copy if enabled (independent of customer email setting)
-            if ($shop_data['auto_invoice_personal']=='Yes' && $currentPlan['email_used'] <= $currentPlan['email_limit']) {
-                $sendemail = sendemail($shop_id,$order_id, true);
+            if ($shop_data['auto_invoice_personal'] == 'Yes' && $emailQuotaLeft) {
+                $sendemail = sendemail($shop_id, $order_id, true);
             }
+        } elseif ($autoEnabled) {
+            notifyPlanLimitReached($shop_id, 'order');
         }
     }
 

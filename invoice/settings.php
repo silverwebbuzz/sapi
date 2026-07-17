@@ -212,12 +212,17 @@ if ($row) {
                         <p class="description">Receive a copy of every invoice at your store email address, regardless of customer email settings</p>
                         <input type="email" name="email_invoice" value="<?= htmlspecialchars($settings['email_invoice']) ?>"  placeholder="your-email@example.com" class="form-input">
                     </div>
-                    <?php 
-                    if($currentPlan['price']>'0'){ ?>
+                    <?php if ($currentPlan['price'] == 0.00): ?>
+                    <p class="description">
+                        Your <?= htmlspecialchars($currentPlan['plan_name']) ?> plan includes
+                        <?= (int)$currentPlan['order_limit'] ?> automatic invoices and
+                        <?= (int)$currentPlan['email_limit'] ?> emails per billing cycle
+                        (<?= (int)$currentPlan['order_used'] ?> invoices used so far).
+                        Automatic sending pauses once the limit is reached —
+                        <a href="change-plan?shop=<?= htmlspecialchars($shop) ?>">upgrade your plan</a> to continue.
+                    </p>
+                    <?php endif; ?>
                     <button type="submit" class="btn-save">Save General Settings</button>
-             <?php  }else {?>
-                    <p>Please activate any paid plan to get using this services.</p>
-            <?php   } ?>
                 </form>
             </section>
             

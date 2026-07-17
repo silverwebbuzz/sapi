@@ -468,6 +468,88 @@ function generatePackingSlip($shop_id, $order_id) {
     return ['status' => 'success', 'message' => 'Packing slip generated.'];
 }
 
+/**
+ * Resolve the SMTP settings for a store: its own configuration when it has
+ * saved one, otherwise the shared Sapi mailbox (free plans never configure
+ * SMTP, so they always land on the fallback).
+ */
+function getStoreSmtpSettings($shop_data) {
+    if (!empty($shop_data['smtp_settings'])) {
+        return json_decode($shop_data['smtp_settings'], true);
+    }
+
+    return [
+        'host' => 'mail.silverwebbuzz.com',
+        'port' => '587',
+        'displayname' => $shop_data['store_name'].' - Sapi',
+        'username' => 'support.sapi@silverwebbuzz.com',
+        'password' => 'Bhavik@1109',
+        'subject' => DEFAULT_EMAIL_SUBJECT,
+        'body' => DEFAULT_EMAIL_BODY
+    ];
+}
+
+/**
+ * Tell the store owner their plan quota is exhausted and automatic invoices
+ * have stopped.
+ *
+ * $type is 'order' (PDF quota) or 'email' (send quota). Sent at most once per
+ * subscription row — usage counters are never reset, so a new row (upgrade or
+ * renewal) is what re-arms the notice.
+ */
+function notifyPlanLimitReached($shop_id, $type = 'order') {
+    $column = ($type === 'email') ? 'email_limit_notice_sent_at' : 'order_limit_notice_sent_at';
+
+    $plan = DBHelper::selectOne(
+        "SELECT id, plan_name, price, order_limit, email_limit, `$column` AS notice_sent_at
+           FROM store_subscriptions
+          WHERE store_id = ? AND status = 'active'
+          ORDER BY activated_on DESC LIMIT 1",
+        "i",
+        [$shop_id]
+    );
+
+    if (!$plan || !empty($plan['notice_sent_at'])) {
+        return false;
+    }
+
+    $shop_data = DBHelper::selectOne("SELECT * FROM stores WHERE `id` = ?", "s", [$shop_id]);
+    if (!$shop_data) {
+        return false;
+    }
+
+    $to_email = !empty($shop_data['email_invoice']) ? $shop_data['email_invoice'] : $shop_data['email'];
+    if (empty($to_email)) {
+        return false;
+    }
+
+    $limit = ($type === 'email') ? (int)$plan['email_limit'] : (int)$plan['order_limit'];
+    $what  = ($type === 'email') ? 'invoice emails' : 'invoices';
+    $upgrade_url = BASE_SHOPIFY_AF_URL . 'change-plan?shop=' . urlencode($shop_data['shop']);
+
+    $subject = 'Action needed: your ' . $plan['plan_name'] . ' plan limit is reached';
+    $body = '<p>Hi ' . htmlspecialchars($shop_data['shop_owner']) . ',</p>'
+        . '<p>Your <strong>' . htmlspecialchars($plan['plan_name']) . '</strong> plan allows '
+        . $limit . ' ' . $what . ' per billing cycle, and that limit has now been reached.</p>'
+        . '<p>Automatic invoices to your customers have been paused. Upgrade your plan to '
+        . 'resume sending invoices right away.</p>'
+        . '<p><a href="' . htmlspecialchars($upgrade_url) . '">Upgrade your plan</a></p>'
+        . '<p>— SWB Auto PDF Invoices</p>';
+
+    $smtp_settings = getStoreSmtpSettings($shop_data);
+    $sent = sendPlainEmail($smtp_settings, $to_email, $shop_data['shop_owner'], $subject, $body);
+
+    // Mark it sent regardless of the SMTP outcome: a failing mailbox must not
+    // turn this into one notice attempt per incoming order.
+    DBHelper::execute(
+        "UPDATE store_subscriptions SET `$column` = NOW() WHERE id = ?",
+        "i",
+        [$plan['id']]
+    );
+
+    return $sent;
+}
+
 function sendemail($shop_id,$order_id, $personal_copy = false){
         
     $shop_data = DBHelper::selectOne(
@@ -504,23 +586,8 @@ function sendemail($shop_id,$order_id, $personal_copy = false){
             $decoded_pdf = base64_decode($invoice['pdf_invoice']);
             $billing_address = json_decode($invoice['billing_address'], true);
 
-            // SMTP settings 
-            if($shop_data['smtp_settings']!=''){
-                $smtp_settings = json_decode($shop_data['smtp_settings'], true);
-            }else{
-                $default_subject = DEFAULT_EMAIL_SUBJECT;
-                $default_body = DEFAULT_EMAIL_BODY;
-                $smtp_settings = [
-                    'host' => 'mail.silverwebbuzz.com',
-                    'port' => '587',
-                    'displayname' => $shop_data['store_name'].' - Sapi',
-                    'username' => 'support.sapi@silverwebbuzz.com',
-                    'password' => 'Bhavik@1109',
-                    'subject' => $default_subject,
-                    'body' => $default_body
-                ];
-            }
-            
+            $smtp_settings = getStoreSmtpSettings($shop_data);
+
             if ($personal_copy) {
                 $to_email = $shop_data['email_invoice'] ?? $shop_data['email'];
                 $to_name = $shop_data['shop_owner'];
@@ -578,6 +645,35 @@ function sendemail($shop_id,$order_id, $personal_copy = false){
             'status' => 'error',
             'message' => 'No shop found with the specified ID.'
         ]);
+    }
+}
+
+// Notification email without an invoice attached (plan limit notices, etc).
+function sendPlainEmail($smtp_settings, $to_email, $to_name, $subject, $html_body) {
+    $mail = new PHPMailer(true);
+
+    try {
+        $mail->isSMTP();
+        $mail->Host       = $smtp_settings['host'];
+        $mail->SMTPAuth   = true;
+        $mail->Username   = $smtp_settings['username'];
+        $mail->Password   = $smtp_settings['password'];
+        $mail->SMTPSecure = PHPMailer::ENCRYPTION_STARTTLS;
+        $mail->Port       = $smtp_settings['port'];
+
+        $from_email = !empty($smtp_settings['from_email']) ? $smtp_settings['from_email'] : $smtp_settings['username'];
+        $mail->setFrom($from_email, $smtp_settings['displayname'], true);
+        $mail->addAddress($to_email, $to_name);
+
+        $mail->isHTML(true);
+        $mail->Subject = $subject;
+        $mail->Body    = $html_body;
+        $mail->AltBody = strip_tags($html_body);
+
+        return $mail->send();
+    } catch (Exception $e) {
+        error_log("Mail Error (plain): " . $e->getMessage());
+        return false;
     }
 }
 
