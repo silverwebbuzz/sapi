@@ -100,23 +100,30 @@ $orderLimitReached = isset($currentPlan['order_limit'], $currentPlan['order_used
 $emailLimitReached = isset($currentPlan['email_limit'], $currentPlan['email_used'])
     && $currentPlan['email_used'] >= $currentPlan['email_limit'];
 
-if ($orderLimitReached) {
+$planName = htmlspecialchars($currentPlan['plan_name']);
+
+if ($orderLimitReached && $emailLimitReached) {
+    // Both limits reached: show a single combined message instead of two
+    // near-identical sentences.
+    $message = "You have used all " . (int)$currentPlan['order_limit'] . " invoices and "
+        . (int)$currentPlan['email_limit'] . " invoice emails included in your " . $planName . " plan."
+        . ($autoInvoiceOn ? " Automatic invoices and invoice emails to customers are paused." : "")
+        . " Please upgrade your plan to continue.";
+
+    $gen_invoice_upgrade_plan_button = '<a href="change-plan?shop=' . htmlspecialchars($shop) . '" class="gen-invoice-btn">Upgrade To Generate Invoice</a>';
+    $send_email_upgrade_plan_button = '<a href="change-plan?shop=' . htmlspecialchars($shop) . '" class="gen-invoice-btn">Upgrade To Send Email</a>';
+} elseif ($orderLimitReached) {
     $message = "You have used all " . (int)$currentPlan['order_limit'] . " invoices included in your "
-        . htmlspecialchars($currentPlan['plan_name']) . " plan."
+        . $planName . " plan."
         . ($autoInvoiceOn ? " Automatic invoices to customers are paused." : "")
         . " Please upgrade your plan to continue.";
 
     $gen_invoice_upgrade_plan_button = '<a href="change-plan?shop=' . htmlspecialchars($shop) . '" class="gen-invoice-btn">Upgrade To Generate Invoice</a>';
-}
-
-// Check Email Limit
-if ($emailLimitReached) {
-    $emailMessage = "You have used all " . (int)$currentPlan['email_limit'] . " invoice emails included in your "
-        . htmlspecialchars($currentPlan['plan_name']) . " plan."
+} elseif ($emailLimitReached) {
+    $message = "You have used all " . (int)$currentPlan['email_limit'] . " invoice emails included in your "
+        . $planName . " plan."
         . ($autoInvoiceOn ? " Automatic invoice emails to customers are paused." : "")
         . " Please upgrade your plan to continue.";
-
-    $message = $orderLimitReached ? $message . " " . $emailMessage : $emailMessage;
 
     $send_email_upgrade_plan_button = '<a href="change-plan?shop=' . htmlspecialchars($shop) . '" class="gen-invoice-btn">Upgrade To Send Email</a>';
 }
