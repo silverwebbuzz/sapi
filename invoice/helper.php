@@ -490,12 +490,86 @@ function getStoreSmtpSettings($shop_data) {
 }
 
 /**
+ * Reset a subscription's usage counters when its billing period has rolled
+ * over, so plan quotas (e.g. Lifetime Free = 20 invoices / 20 emails) are
+ * enforced per month rather than accumulating for the life of the row.
+ *
+ * This is a lazy, read-time reset: it does NOT rely on Shopify renewal webhooks
+ * (which reuse the same row without zeroing usage) and works for the free plan
+ * too. The period is anchored on `usage_period_start`, falling back to
+ * `activated_on`, then now. The anchor is advanced in whole periods so a gap in
+ * traffic still lands the store back on its original billing day. Clearing the
+ * notice timestamps re-arms the "limit reached" email for the new period.
+ *
+ * Returns the (possibly updated) plan row so callers can use fresh values.
+ */
+function applyMonthlyUsageReset($plan) {
+    if (empty($plan) || empty($plan['id'])) {
+        return $plan;
+    }
+
+    // Annual plans already carry the whole year's quota (limits are ×12), so
+    // their window is the year; everything else resets every 30 days.
+    $intervalDays = (isset($plan['billing_interval']) && $plan['billing_interval'] === 'annual') ? 365 : 30;
+    $periodSeconds = $intervalDays * 86400;
+
+    $anchorStr = !empty($plan['usage_period_start'])
+        ? $plan['usage_period_start']
+        : (!empty($plan['activated_on']) ? $plan['activated_on'] : null);
+
+    // No anchor yet (e.g. a freshly created free row with no activated_on):
+    // stamp the period start now and count from here. No reset on this pass.
+    if ($anchorStr === null) {
+        DBHelper::execute(
+            "UPDATE store_subscriptions SET usage_period_start = NOW() WHERE id = ?",
+            "i",
+            [$plan['id']]
+        );
+        $plan['usage_period_start'] = date('Y-m-d H:i:s');
+        return $plan;
+    }
+
+    $anchor = strtotime($anchorStr);
+    $now = time();
+
+    // Still inside the current period — nothing to do.
+    if ($anchor === false || $now < $anchor + $periodSeconds) {
+        return $plan;
+    }
+
+    // Advance the anchor by whole periods so it stays aligned to the original
+    // billing day even if the app saw no traffic for several periods.
+    $periodsElapsed = (int) floor(($now - $anchor) / $periodSeconds);
+    $newAnchor = date('Y-m-d H:i:s', $anchor + $periodsElapsed * $periodSeconds);
+
+    DBHelper::execute(
+        "UPDATE store_subscriptions
+            SET order_used = 0,
+                email_used = 0,
+                order_limit_notice_sent_at = NULL,
+                email_limit_notice_sent_at = NULL,
+                usage_period_start = ?
+          WHERE id = ?",
+        "si",
+        [$newAnchor, $plan['id']]
+    );
+
+    $plan['order_used'] = 0;
+    $plan['email_used'] = 0;
+    $plan['order_limit_notice_sent_at'] = null;
+    $plan['email_limit_notice_sent_at'] = null;
+    $plan['usage_period_start'] = $newAnchor;
+
+    return $plan;
+}
+
+/**
  * Tell the store owner their plan quota is exhausted and automatic invoices
  * have stopped.
  *
  * $type is 'order' (PDF quota) or 'email' (send quota). Sent at most once per
- * subscription row — usage counters are never reset, so a new row (upgrade or
- * renewal) is what re-arms the notice.
+ * usage period — applyMonthlyUsageReset() clears the notice timestamp when the
+ * period rolls over, which re-arms the notice for the new period.
  */
 function notifyPlanLimitReached($shop_id, $type = 'order') {
     $column = ($type === 'email') ? 'email_limit_notice_sent_at' : 'order_limit_notice_sent_at';

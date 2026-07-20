@@ -110,6 +110,9 @@ if ($topic === 'app/uninstalled') {
     $sql_currentPlan = "SELECT * FROM store_subscriptions ss WHERE ss.store_id = ? AND ss.status = 'active'  ORDER BY ss.activated_on DESC LIMIT 1 ";
     $currentPlan = DBHelper::selectOne($sql_currentPlan, "i", [$shop_id]);
 
+    // Reset usage counters if the billing period has rolled over (monthly quota).
+    $currentPlan = applyMonthlyUsageReset($currentPlan);
+
     // Free and paid plans run the same automatic flow — the plan's own limits
     // are the only gate (Lifetime Free = 20 invoices / 20 emails). Once a limit
     // is hit the owner is emailed once, and the admin shows the same warning.

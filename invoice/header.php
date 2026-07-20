@@ -33,6 +33,8 @@ if (!isset($currentPlan) || empty($currentPlan)) {
   header("Location: change-plan.php?shop=".$shop);
   exit();
 }
+// Reset usage counters if the billing period has rolled over (monthly quota).
+$currentPlan = applyMonthlyUsageReset($currentPlan);
 ?>
 <!DOCTYPE html>
 <html lang="en">
