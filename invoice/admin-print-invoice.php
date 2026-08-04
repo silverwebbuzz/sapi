@@ -3,6 +3,9 @@ require_once '../vendor/autoload.php';
 require_once '../config/db.php';
 require_once 'shopify_functions.php';
 require_once 'helper.php';
+require_once 'i18n.php';
+
+i18n_boot();
 
 use Firebase\JWT\JWT;
 use Firebase\JWT\Key;
@@ -68,7 +71,7 @@ $order_id = $_GET['order_id'] ?? '';
 $shop = $_GET['shop'] ?? '';
 
 if (!$order_id) {
-    respondJson(400, 'Missing order_id.');
+    respondJson(400, t('errors.missing_order_id'));
 }
 
 $token = getBearerToken();
@@ -80,7 +83,7 @@ if ($token) {
 }
 
 if (!$shop || !validateShopDomain($shop)) {
-    respondJson(401, 'Invalid or missing shop domain.');
+    respondJson(401, t('errors.invalid_shop_domain'));
 }
 
 $store = DBHelper::selectOne(
@@ -90,12 +93,12 @@ $store = DBHelper::selectOne(
 );
 
 if (!$store) {
-    respondJson(404, 'Shop not found or not installed.');
+    respondJson(404, t('errors.shop_not_installed'));
 }
 
 $pdfBytes = getInvoicePdfContent($store['id'], $order_id);
 if (!$pdfBytes) {
-    respondJson(404, 'Invoice PDF not found for the requested order.');
+    respondJson(404, t('errors.invoice_pdf_not_found'));
 }
 
 header('Content-Type: application/pdf');

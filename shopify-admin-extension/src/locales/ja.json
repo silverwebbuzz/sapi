@@ -1,0 +1,9 @@
+{
+  "extension.open_print_invoice": "請求書を開く／印刷",
+  "extension.close": "閉じる",
+  "extension.preparing": "請求書を準備しています…",
+  "extension.open_invoice_pdf": "請求書PDFを開く",
+  "extension.instructions": "下のボタンをクリックすると、この注文のPDF請求書が新しいタブで開き、そのまま表示・印刷できます。",
+  "extension.error_shop_domain": "ストアのドメインを検出できませんでした。",
+  "extension.error_no_order": "注文を検出できませんでした。注文詳細ページからこの操作を開いてください。"
+}

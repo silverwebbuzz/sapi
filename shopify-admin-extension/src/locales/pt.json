@@ -1,0 +1,9 @@
+{
+  "extension.open_print_invoice": "Abrir / Imprimir fatura",
+  "extension.close": "Fechar",
+  "extension.preparing": "A preparar a sua fatura…",
+  "extension.open_invoice_pdf": "Abrir fatura em PDF",
+  "extension.instructions": "Clique no botão abaixo para abrir a fatura PDF desta encomenda num novo separador, pronta para ver ou imprimir.",
+  "extension.error_shop_domain": "Não foi possível detetar o domínio da loja.",
+  "extension.error_no_order": "Não foi possível detetar a encomenda. Abra esta ação a partir de uma página de detalhes da encomenda."
+}

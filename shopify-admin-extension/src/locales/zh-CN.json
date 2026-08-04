@@ -1,0 +1,9 @@
+{
+  "extension.open_print_invoice": "打开 / 打印发票",
+  "extension.close": "关闭",
+  "extension.preparing": "正在准备您的发票…",
+  "extension.open_invoice_pdf": "打开发票 PDF",
+  "extension.instructions": "点击下方按钮，在新标签页中打开该订单的 PDF 发票，可直接查看或打印。",
+  "extension.error_shop_domain": "无法识别店铺域名。",
+  "extension.error_no_order": "无法识别订单。请从订单详情页面打开此操作。"
+}

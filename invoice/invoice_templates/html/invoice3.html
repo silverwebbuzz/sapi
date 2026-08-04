@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="{{ Html_Lang }}" dir="{{ Html_Dir }}">
   <head>
     <meta charset="UTF-8" />
     <title>Invoice 3</title>
@@ -110,10 +110,10 @@
           <img src="{{ Company_Logo }}" style="max-width: 180px; max-height: 70px;" alt="{{ Company_Name }}" />
         </td>
         <td style="width: 45%;" class="title-cell">
-          <div class="title">INVOICE</div>
+          <div class="title">{{ L_Invoice_Title }}</div>
           <div class="meta">
-            <strong>Invoice No:</strong> {{ Order_Number }}<br />
-            <strong>Date:</strong> {{ Invoice_Date }}
+            <strong>{{ L_Invoice_No }}</strong> {{ Order_Number }}<br />
+            <strong>{{ L_Date }}</strong> {{ Invoice_Date }}
           </div>
         </td>
       </tr>
@@ -123,14 +123,14 @@
     <table class="parties">
       <tr>
         <td>
-          <span class="label">Merchant</span>
+          <span class="label">{{ L_Merchant }}</span>
           <strong>{{ Company_Name }}</strong><br />
           {{ Company_Address }}<br />
           {{ Company_Phone }}<br />
           {{ Company_Email }}
         </td>
         <td>
-          <span class="label">Bill To</span>
+          <span class="label">{{ L_Bill_To }}</span>
           <strong>{{ Billing_Name }}</strong><br />
           {{ Billing_Address1 }}<br />
           {{ Billing_Address2 }}<br />
@@ -139,7 +139,7 @@
           {{ Billing_Email }}
         </td>
         <td>
-          <span class="label">Ship To</span>
+          <span class="label">{{ L_Ship_To }}</span>
           <strong>{{ Shipping_Name }}</strong><br />
           {{ Shipping_Address1 }}<br />
           {{ Shipping_Address2 }}<br />
@@ -160,12 +160,12 @@
       </colgroup>
       <thead>
         <tr>
-          <th>Item</th>
-          <th>Description</th>
-          <th class="num">Price</th>
-          <th class="qty">Qty</th>
+          <th>{{ L_Item }}</th>
+          <th>{{ L_Description }}</th>
+          <th class="num">{{ L_Price }}</th>
+          <th class="qty">{{ L_Qty }}</th>
           <th>{{ Tax_Column_Label }}</th>
-          <th class="num">Total</th>
+          <th class="num">{{ L_Total }}</th>
         </tr>
       </thead>
       <tbody>
@@ -176,25 +176,25 @@
     <table class="footer-row">
       <tr>
         <td style="width: 55%;" class="payment">
-          <span class="label">Payment Info</span>
+          <span class="label">{{ L_Payment_Info }}</span>
           {{ Payment_Method }}<br />
           {{ Payment_Status }}
         </td>
         <td style="width: 45%;">
           <table class="totals">
             <tr>
-              <td class="label">Subtotal</td>
+              <td class="label">{{ L_Subtotal }}</td>
               <td class="value">{{ Subtotal }}</td>
             </tr>
             {{ Discount_Block }}
             {{ Tax_Block }}
             <tr>
-              <td class="label">Shipping</td>
+              <td class="label">{{ L_Shipping }}</td>
               <td class="value">{{ Shipping_Cost }}</td>
             </tr>
             {{ Shipping_Tax_Block }}
             <tr class="grand">
-              <td class="label">Grand Total</td>
+              <td class="label">{{ L_Grand_Total }}</td>
               <td class="value">{{ Total_Amount }}</td>
             </tr>
           </table>
@@ -203,7 +203,7 @@
     </table>
 
     <div class="note">
-      This is a computer-generated invoice and does not require a physical signature or stamp. Please retain this invoice for your records.
+      {{ L_Note }}
     </div>
   </body>
 </html>

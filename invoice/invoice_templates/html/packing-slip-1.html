@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="{{ Html_Lang }}" dir="{{ Html_Dir }}">
   <head>
     <meta charset="UTF-8" />
     <title>Packing Slip {{ Order_Number }}</title>
@@ -158,11 +158,11 @@
           </span>
         </td>
         <td style="width: 45%;">
-          <div class="title">PACKING SLIP</div>
+          <div class="title">{{ L_Packing_Title }}</div>
           <div class="meta">
-            <div><strong>Order No:</strong> {{ Order_Number }}</div>
-            <div><strong>Order Date:</strong> {{ Invoice_Date }}</div>
-            <div><strong>Ship Date:</strong> {{ Ship_Date }}</div>
+            <div><strong>{{ L_Order_No }}</strong> {{ Order_Number }}</div>
+            <div><strong>{{ L_Order_Date }}</strong> {{ Invoice_Date }}</div>
+            <div><strong>{{ L_Ship_Date }}</strong> {{ Ship_Date }}</div>
           </div>
         </td>
       </tr>
@@ -171,7 +171,7 @@
     <table class="addresses">
       <tr>
         <td class="ship-to">
-          <span class="label">Ship To</span>
+          <span class="label">{{ L_Ship_To }}</span>
           <div class="ship-to-name">{{ Shipping_Name }}</div>
           <div>
             {{ Shipping_Address1 }}<br/>
@@ -181,7 +181,7 @@
           </div>
         </td>
         <td class="bill-to">
-          <span class="label">Bill To</span>
+          <span class="label">{{ L_Bill_To }}</span>
           {{ Billing_Name }}<br/>
           {{ Billing_City }}, {{ Billing_State }} {{ Billing_Zip }}<br/>
           {{ Billing_Country }}
@@ -196,8 +196,8 @@
       </colgroup>
       <thead>
         <tr>
-          <th>Item</th>
-          <th style="text-align: center;">Qty</th>
+          <th>{{ L_Item }}</th>
+          <th style="text-align: center;">{{ L_Qty }}</th>
         </tr>
       </thead>
       <tbody>
@@ -206,22 +206,22 @@
     </table>
 
     <div class="totals-row">
-      Total items in this shipment: {{ Total_Items }}
+      {{ L_Total_Items }}
     </div>
 
     <table class="signature">
       <tr>
         <td style="width: 60%;">
-          Picked &amp; packed by: <span class="sig-line"></span>
+          {{ L_Picked_By }} <span class="sig-line"></span>
         </td>
         <td style="width: 40%; text-align: right;">
-          Date: <span class="date-line"></span>
+          {{ L_Date }} <span class="date-line"></span>
         </td>
       </tr>
     </table>
 
     <div class="note">
-      This is a packing slip — not an invoice. No payment is required.
+      {{ L_Note }}
     </div>
   </body>
 </html>

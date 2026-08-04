@@ -36,17 +36,22 @@ require_once '../config/config.php';
 require_once '../config/db.php';
 require_once 'shopify_functions.php';
 require_once 'helper.php';
+require_once 'i18n.php';
+
+// No store row exists yet during install, so this resolves from the
+// browser's Accept-Language.
+i18n_boot();
 
 $params = $_GET;
 if (!verifyHmac($params, SHOPIFY_API_SECRET)) {
     callback_log('HMAC_FAILED', $_GET);
-    die('Invalid HMAC');
+    die(t('install.invalid_hmac'));
 }
 
 // Validate nonce
 if (!isset($_SESSION['nonce']) || $_SESSION['nonce'] !== $_GET['state']) {
     callback_log('NONCE_FAILED', ['session_nonce' => $_SESSION['nonce'] ?? null, 'state' => $_GET['state'] ?? null]);
-    die('Invalid nonce');
+    die(t('install.invalid_nonce'));
 }
 
 $shop = $_GET['shop'];
@@ -57,7 +62,7 @@ $access_token = getAccessToken($shop, $code);
 
 if (!isset($access_token)) {
     callback_log('ACCESS_TOKEN_EMPTY', ['shop' => $shop]);
-    die('Installation failed');
+    die(t('install.failed'));
 }
 
 $_SESSION['shop'] = $shop;
@@ -68,7 +73,7 @@ $shopDetailsResponse_json = getShopDetailsRestAPI($shop, $access_token);
 $shopDetailsResponse = json_decode($shopDetailsResponse_json, true);
 if (!isset($shopDetailsResponse['shop'])) {
     callback_log('SHOP_DETAILS_MISSING', ['shop' => $shop, 'raw' => substr((string)$shopDetailsResponse_json, 0, 500)]);
-    die("Error: Failed to retrieve shop details.");
+    die(t('install.shop_details_failed'));
 }
 
 $shop   = $shopDetailsResponse['shop']['myshopify_domain'];
@@ -302,5 +307,5 @@ if ($shopify_webhook == 1) {
     exit;
 } else {
     callback_log('WEBHOOK_REGISTRATION_FAILED', ['shop' => $shop]);
-    die('Installation failed');
+    die(t('install.failed'));
 }

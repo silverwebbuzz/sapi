@@ -1,0 +1,9 @@
+{
+  "extension.open_print_invoice": "開啟／列印發票",
+  "extension.close": "關閉",
+  "extension.preparing": "正在準備您的發票…",
+  "extension.open_invoice_pdf": "開啟發票 PDF",
+  "extension.instructions": "點選下方按鈕，即可在新分頁開啟此訂單的 PDF 發票，直接檢視或列印。",
+  "extension.error_shop_domain": "無法偵測商店網域。",
+  "extension.error_no_order": "無法偵測訂單。請從訂單詳細頁面開啟此操作。"
+}

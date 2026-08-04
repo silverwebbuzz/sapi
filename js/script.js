@@ -1,11 +1,52 @@
+// -------- i18n bridge --------
+// footer.php injects window.SAPI_I18N = { locale, dir, intl, rtl, strings }.
+// The defaults below only matter if that block failed to render, so the UI
+// degrades to English instead of showing raw keys.
+var I18N = window.SAPI_I18N || { locale: 'en', dir: 'ltr', intl: 'en-US', rtl: false, strings: {} };
+
+/**
+ * Translate a key, interpolating {{name}} placeholders.
+ * Falls back to the key itself so a missing string is obvious and greppable.
+ */
+function t(key, params) {
+    var s = I18N.strings[key];
+    if (s === undefined) {
+        if (window.console && console.warn) {
+            console.warn('[i18n] missing JS key:', key);
+        }
+        return key;
+    }
+    if (params) {
+        Object.keys(params).forEach(function (name) {
+            s = s.replace(new RegExp('\\{\\{\\s*' + name + '\\s*\\}\\}', 'g'), params[name]);
+        });
+    }
+    return s;
+}
+
+/** Locale-aware integer formatting for the counters. */
+function fmtNum(n) {
+    try {
+        return new Intl.NumberFormat(I18N.intl).format(n);
+    } catch (e) {
+        return String(n);
+    }
+}
+
 $(document).ready(function() {
     var dtLanguage = {
-        "search": "Search:",
-        "lengthMenu": "Show _MENU_ entries",
-        "info": "Showing _START_ to _END_ of _TOTAL_ entries",
-        "infoEmpty": "Showing 0 to 0 of 0 entries",
-        "infoFiltered": "(filtered from _MAX_ total entries)",
-        "paginate": { "first": "First", "last": "Last", "next": "Next", "previous": "Previous" }
+        "search": t('datatable.search'),
+        "lengthMenu": t('datatable.length_menu'),
+        "info": t('datatable.info'),
+        "infoEmpty": t('datatable.info_empty'),
+        "infoFiltered": t('datatable.info_filtered'),
+        "emptyTable": t('datatable.empty'),
+        "paginate": {
+            "first": t('datatable.first'),
+            "last": t('datatable.last'),
+            "next": t('datatable.next'),
+            "previous": t('datatable.previous')
+        }
     };
 
     // Dashboard + orders tables.
@@ -74,11 +115,11 @@ $(document).ready(function() {
         fetch(`${BASE_URL}/invoice/generatepdf.php?shop_id=${shopId}&order_id=${orderId}&invoicestatus=${invoiceStatus}`)
             .then(response => response.text())
             .then(data => {
-                showMessage('Invoice processed successfully.', 'success');
+                showMessage(t('toast.invoice_processed'), 'success');
                 setTimeout(() => location.reload(), 2000);
             })
             .catch(error => {
-                showMessage('Failed to process invoice.', 'error');
+                showMessage(t('toast.invoice_failed'), 'error');
             });
     };
 
@@ -146,7 +187,7 @@ $(document).ready(function() {
     function updateBulkSelectionState() {
         var $boxes  = $('.bulk-row-check');
         var $checked = $boxes.filter(':checked');
-        $('#bulk-selected-count').text($checked.length + ' selected');
+        $('#bulk-selected-count').text(t('common.selected_count', { count: fmtNum($checked.length) }));
         // Master checkbox state — only flip the box, don't recurse.
         var $master = $('#bulk-select-all');
         if ($boxes.length === 0) {
@@ -178,7 +219,7 @@ $(document).ready(function() {
     $(document).on('submit', '#bulk-download-form', function (e) {
         if ($('.bulk-row-check:checked').length === 0) {
             e.preventDefault();
-            showMessage('Please select at least one invoice.', 'error');
+            showMessage(t('toast.select_one_invoice'), 'error');
         }
     });
 
@@ -186,7 +227,7 @@ $(document).ready(function() {
     function updateOrdersBulkState() {
         var $boxes = $('.orders-row-check');
         var $checked = $boxes.filter(':checked');
-        $('#orders-selected-count').text($checked.length + ' selected');
+        $('#orders-selected-count').text(t('common.selected_count', { count: fmtNum($checked.length) }));
 
         var $master = $('#orders-select-all');
         if ($boxes.length === 0 || $checked.length === 0) {
@@ -212,15 +253,28 @@ $(document).ready(function() {
     // invoice generate) and Packing Slips (bulk packing slip generate).
     // We hit the per-item endpoint one at a time so any single timeout only
     // affects one item, not the whole batch. User must keep the tab open.
-    var bulkState = { cancelled: false, inFlight: null, noun: 'invoice' };
+    // `kind` is 'invoice' or 'packing_slip' — a key fragment, not a display
+    // word, so the noun is looked up per language instead of pluralised by
+    // bolting an "s" onto an English string.
+    var bulkState = { cancelled: false, inFlight: null, kind: 'invoice' };
 
-    function showBulkModal(total, noun) {
+    function bulkNoun(count) {
+        var suffix = (count === 1) ? '' : '_plural';
+        return t('bulk.noun_' + bulkState.kind + suffix);
+    }
+
+    function showBulkModal(total, kind) {
         bulkState.cancelled = false;
-        bulkState.noun = noun || 'invoice';
-        $('#bulkProgressTitle').text('Generating ' + bulkState.noun + 's…');
-        $('#bulkProgressStatus').text('Starting…');
+        bulkState.kind = kind || 'invoice';
+        $('#bulkProgressTitle').text(
+            bulkState.kind === 'packing_slip' ? t('bulk.generating_slips_title') : t('bulk.generating_title')
+        );
+        $('#bulkProgressStatus').text(t('bulk.starting'));
         $('#bulkProgressFill').css('width', '0%');
-        $('#bulkProgressMeta').text('Please keep this tab open while we process your ' + total + ' ' + bulkState.noun + (total === 1 ? '' : 's') + '.');
+        $('#bulkProgressMeta').text(t('bulk.keep_tab_open_count', {
+            count: fmtNum(total),
+            noun: bulkNoun(total)
+        }));
         $('#bulkProgressCancel').prop('disabled', false).show();
         $('#bulkProgressClose').hide();
         $('#bulkProgressModal').show();
@@ -229,31 +283,33 @@ $(document).ready(function() {
     function updateBulkProgress(done, total, label, ok) {
         var pct = Math.round((done / total) * 100);
         $('#bulkProgressFill').css('width', pct + '%');
-        var prefix = ok === false ? 'Skipped' : 'Processed';
-        $('#bulkProgressStatus').text(prefix + ' ' + done + ' of ' + total + ' — ' + (label || ''));
+        $('#bulkProgressStatus').text(t(ok === false ? 'bulk.skipped' : 'bulk.processed', {
+            done: fmtNum(done),
+            total: fmtNum(total),
+            label: label || ''
+        }));
     }
 
     function finishBulk(done, total, failures) {
         $('#bulkProgressCancel').hide();
         $('#bulkProgressClose').show();
         var msg;
-        var noun = bulkState.noun;
         if (bulkState.cancelled) {
-            msg = 'Stopped at ' + done + ' of ' + total + '.';
-            $('#bulkProgressTitle').text('Stopped');
+            msg = t('bulk.stopped_at', { done: fmtNum(done), total: fmtNum(total) });
+            $('#bulkProgressTitle').text(t('bulk.stopped_title'));
         } else if (failures === 0) {
-            msg = 'All ' + done + ' ' + noun + (done === 1 ? '' : 's') + ' generated successfully.';
-            $('#bulkProgressTitle').text('Done');
+            msg = t('bulk.all_generated', { count: fmtNum(done), noun: bulkNoun(done) });
+            $('#bulkProgressTitle').text(t('bulk.done_title'));
         } else {
-            msg = done + ' completed, ' + failures + ' failed. Try again for the failed ones.';
-            $('#bulkProgressTitle').text('Finished with errors');
+            msg = t('bulk.completed_failed', { done: fmtNum(done), failed: fmtNum(failures) });
+            $('#bulkProgressTitle').text(t('bulk.finished_with_errors_title'));
         }
-        $('#bulkProgressMeta').text(msg + ' The page will refresh when you close this.');
+        $('#bulkProgressMeta').text(msg + ' ' + t('bulk.will_refresh'));
     }
 
     $(document).on('click', '#bulkProgressCancel', function () {
         bulkState.cancelled = true;
-        $('#bulkProgressStatus').text('Stopping after current invoice…');
+        $('#bulkProgressStatus').text(t('bulk.stopping'));
         $(this).prop('disabled', true);
     });
 
@@ -274,7 +330,7 @@ $(document).ready(function() {
         }).get();
 
         if (selections.length === 0) {
-            showMessage('Please select at least one invoice.', 'error');
+            showMessage(t('toast.select_one_invoice'), 'error');
             return;
         }
 
@@ -282,16 +338,16 @@ $(document).ready(function() {
         var limit = Math.min(cap, remaining > 0 ? remaining : cap);
         if (selections.length > limit) {
             var reason = (remaining > 0 && remaining < cap)
-                ? 'You have ' + remaining + ' invoice' + (remaining === 1 ? '' : 's') + ' left in your plan this period.'
-                : 'You can process up to ' + cap + ' invoices at a time.';
-            if (!confirm(reason + '\n\nProcess the first ' + limit + ' selected and skip the rest?')) {
+                ? t('bulk.quota_reason', { remaining: fmtNum(remaining) })
+                : t('bulk.cap_reason', { cap: fmtNum(cap) });
+            if (!confirm(reason + '\n\n' + t('bulk.confirm_truncate', { limit: fmtNum(limit) }))) {
                 return;
             }
             selections = selections.slice(0, limit);
         }
 
         if (remaining === 0) {
-            showMessage('Your plan has no remaining invoice quota this period.', 'error');
+            showMessage(t('toast.no_quota_remaining'), 'error');
             return;
         }
 
@@ -311,7 +367,11 @@ $(document).ready(function() {
                 return;
             }
             var item = selections[i++];
-            $('#bulkProgressStatus').text('Processing ' + (i) + ' of ' + total + ' — ' + item.label);
+            $('#bulkProgressStatus').text(t('bulk.processing', {
+                current: fmtNum(i),
+                total: fmtNum(total),
+                label: item.label
+            }));
 
             bulkState.inFlight = $.ajax({
                 url: endpointUrl,
@@ -336,7 +396,7 @@ $(document).ready(function() {
     function updatePackingSlipBulkState() {
         var $boxes = $('.ps-row-check');
         var $checked = $boxes.filter(':checked');
-        $('#ps-selected-count').text($checked.length + ' selected');
+        $('#ps-selected-count').text(t('common.selected_count', { count: fmtNum($checked.length) }));
 
         var $master = $('#ps-select-all');
         if ($boxes.length === 0 || $checked.length === 0) {
@@ -376,7 +436,7 @@ $(document).ready(function() {
     $(document).on('submit', '#ps-bulk-zip-form', function (e) {
         if ($(this).find('input[name="order_ids[]"]').length === 0) {
             e.preventDefault();
-            showMessage('Select at least one already-generated packing slip to download.', 'error');
+            showMessage(t('toast.select_one_generated_slip'), 'error');
         }
     });
 
@@ -387,7 +447,7 @@ $(document).ready(function() {
         var shopId  = $a.data('shop-id');
         var orderId = $a.data('order-id');
         var originalText = $a.text();
-        $a.text('Generating…').css('pointer-events', 'none');
+        $a.text(t('generic.generating')).css('pointer-events', 'none');
 
         $.ajax({
             url: BASE_URL + '/invoice/generate-packing-slip.php',
@@ -397,14 +457,14 @@ $(document).ready(function() {
             timeout: 60000
         }).done(function (resp) {
             if (resp && resp.status === 'success') {
-                showMessage('Packing slip generated.', 'success');
+                showMessage(t('toast.packing_slip_generated'), 'success');
                 setTimeout(function () { location.reload(); }, 1200);
             } else {
-                showMessage((resp && resp.message) || 'Failed to generate packing slip.', 'error');
+                showMessage((resp && resp.message) || t('toast.packing_slip_failed'), 'error');
                 $a.text(originalText).css('pointer-events', '');
             }
         }).fail(function () {
-            showMessage('Failed to generate packing slip.', 'error');
+            showMessage(t('toast.packing_slip_failed'), 'error');
             $a.text(originalText).css('pointer-events', '');
         });
     });
@@ -423,7 +483,7 @@ $(document).ready(function() {
         // Show modal immediately with a loading state.
         $('#invoiceFrame').attr('src', '');
         $('#invoiceModal').show();
-        showMessage('Loading packing slip…', 'success');
+        showMessage(t('toast.packing_slip_loading'), 'success');
 
         $.ajax({
             url: BASE_URL + '/invoice/generate-packing-slip.php',
@@ -436,11 +496,11 @@ $(document).ready(function() {
                 $('#invoiceFrame').attr('src', 'data:application/pdf;base64,' + resp.pdf_base64);
             } else {
                 $('#invoiceModal').hide();
-                showMessage((resp && resp.message) || 'Could not load packing slip.', 'error');
+                showMessage((resp && resp.message) || t('toast.packing_slip_load_failed'), 'error');
             }
         }).fail(function () {
             $('#invoiceModal').hide();
-            showMessage('Could not load packing slip.', 'error');
+            showMessage(t('toast.packing_slip_load_failed'), 'error');
         });
     });
 
@@ -455,17 +515,17 @@ $(document).ready(function() {
         }).get();
 
         if (selections.length === 0) {
-            showMessage('Please select at least one order.', 'error');
+            showMessage(t('toast.select_one_order'), 'error');
             return;
         }
         if (selections.length > cap) {
-            if (!confirm('You can process up to ' + cap + ' at a time.\n\nProcess the first ' + cap + ' and skip the rest?')) {
+            if (!confirm(t('bulk.confirm_cap', { cap: fmtNum(cap) }))) {
                 return;
             }
             selections = selections.slice(0, cap);
         }
 
-        showBulkModal(selections.length, 'packing slip');
+        showBulkModal(selections.length, 'packing_slip');
         runBulkSequentially(BASE_URL + '/invoice/generate-packing-slip.php', shopId, selections);
     });
 
@@ -504,7 +564,7 @@ $(document).ready(function() {
     $('.btn-upgrade').on('click', function() {
         if (!$(this).hasClass('current')) {
             const planName = $(this).closest('.plan-card').find('h4').text();
-            if (confirm(`Are you sure you want to upgrade to ${planName} plan?`)) {
+            if (confirm(t('confirm.upgrade_plan', { plan: planName }))) {
                 // Here you would typically redirect to payment page or make an AJAX call
                 //alert(`Upgraded to ${planName} plan!`);
             }
@@ -513,7 +573,7 @@ $(document).ready(function() {
 
     // Cancel Subscription Button
     $('.btn-cancel').on('click', function() {
-        if (confirm('Are you sure you want to cancel your subscription?')) {
+        if (confirm(t('confirm.cancel_subscription'))) {
             // Here you would typically make an AJAX call to cancel subscription
            // alert('Subscription cancelled!');
         }
@@ -589,7 +649,7 @@ window.sendEmail = function (shopId, orderId, emailStatus) {
                 showMessage(data.message, 'error');
                 if (data.message.includes('upgrade your plan')) {
                     setTimeout(() => {
-                        if (confirm('Would you like to upgrade your plan now?')) {
+                        if (confirm(t('confirm.upgrade_now'))) {
                             window.location.href = `${BASE_URL}/invoice/change-plan?shop=${shopId}`;
                         }
                     }, 1000);
@@ -597,7 +657,7 @@ window.sendEmail = function (shopId, orderId, emailStatus) {
             }
         })
         .catch(error => {
-            showMessage('Failed to send email.', 'error');
+            showMessage(t('toast.email_failed'), 'error');
         });
 };
 
@@ -614,6 +674,6 @@ window.sendEmailToOwner = function (shopId, orderId) {
             }
         })
         .catch(error => {
-            showMessage('Failed to send email to store owner.', 'error');
+            showMessage(t('toast.email_owner_failed'), 'error');
         });
 };

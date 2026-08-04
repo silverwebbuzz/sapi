@@ -1,0 +1,9 @@
+{
+  "extension.open_print_invoice": "Otwórz / wydrukuj fakturę",
+  "extension.close": "Zamknij",
+  "extension.preparing": "Przygotowywanie faktury…",
+  "extension.open_invoice_pdf": "Otwórz fakturę PDF",
+  "extension.instructions": "Kliknij przycisk poniżej, aby otworzyć fakturę PDF dla tego zamówienia w nowej karcie — gotową do podglądu lub wydruku.",
+  "extension.error_shop_domain": "Nie udało się wykryć domeny sklepu.",
+  "extension.error_no_order": "Nie udało się wykryć zamówienia. Otwórz tę akcję ze strony szczegółów zamówienia."
+}

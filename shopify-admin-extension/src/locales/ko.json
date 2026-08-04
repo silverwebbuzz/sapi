@@ -1,0 +1,9 @@
+{
+  "extension.open_print_invoice": "인보이스 열기 / 인쇄",
+  "extension.close": "닫기",
+  "extension.preparing": "인보이스를 준비하는 중…",
+  "extension.open_invoice_pdf": "인보이스 PDF 열기",
+  "extension.instructions": "아래 버튼을 클릭하면 이 주문의 PDF 인보이스가 새 탭에서 열려 바로 확인하거나 인쇄할 수 있습니다.",
+  "extension.error_shop_domain": "스토어 도메인을 확인할 수 없습니다.",
+  "extension.error_no_order": "주문을 확인할 수 없습니다. 주문 상세 페이지에서 이 작업을 실행하세요."
+}

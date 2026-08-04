@@ -32,26 +32,26 @@ $BULK_BATCH_CAP = 50;
 
 <main class="main-content">
     <div class="page-header">
-        <h2>Packing Slips</h2>
-        <h3>Generate, print and bulk-download packing slips for orders being shipped.</h3>
+        <h2><?= e('packing.title') ?></h2>
+        <h3><?= e('packing.subtitle') ?></h3>
     </div>
 
     <?php if (!$migrated): ?>
         <div class="bulk-upgrade-banner" style="background:#fef2f2; border-color:#fca5a5;">
             <div>
-                <strong style="color:#991b1b;">One-time setup required.</strong>
+                <strong style="color:#991b1b;"><?= e('packing.setup_required_title') ?></strong>
                 <p style="color:#7f1d1d;">
-                    The packing slip feature needs a one-time database update for your store before it can be used. Please contact support and we'll enable it for you within minutes.
+                    <?= e('packing.setup_required_body') ?>
                 </p>
             </div>
         </div>
     <?php elseif ($isFreePlan): ?>
         <div class="bulk-upgrade-banner">
             <div>
-                <strong>Packing slips are a paid feature.</strong>
-                <p>You can preview your generated packing slips below, but creating new ones requires a paid plan.</p>
+                <strong><?= e('packing.paid_feature_title') ?></strong>
+                <p><?= e('packing.paid_feature_body') ?></p>
             </div>
-            <a href="change-plan?shop=<?= htmlspecialchars($shop) ?>" class="upgrade-btn">Upgrade Plan</a>
+            <a href="change-plan?shop=<?= htmlspecialchars($shop) ?>" class="upgrade-btn"><?= e('common.upgrade_plan') ?></a>
         </div>
     <?php endif; ?>
 
@@ -60,33 +60,33 @@ $BULK_BATCH_CAP = 50;
         <div class="bulk-toolbar">
             <label class="bulk-select-all">
                 <input type="checkbox" id="ps-select-all" <?= $isFreePlan ? 'disabled' : '' ?>>
-                <span>Select all on this page</span>
+                <span><?= e('common.select_all_page') ?></span>
             </label>
-            <span class="bulk-selected-count" id="ps-selected-count">0 selected</span>
+            <span class="bulk-selected-count" id="ps-selected-count"><?= e('common.selected_count', ['count' => fmt_number(0)]) ?></span>
 
             <?php if ($isFreePlan): ?>
                 <button type="button" class="bulk-download-btn locked" disabled>
-                    <span class="lock-icon">&#128274;</span> Bulk Generate
+                    <span class="lock-icon">&#128274;</span> <?= e('packing.bulk_generate') ?>
                 </button>
                 <button type="button" class="bulk-download-btn locked" disabled>
-                    <span class="lock-icon">&#128274;</span> Download ZIP
+                    <span class="lock-icon">&#128274;</span> <?= e('common.download_zip') ?>
                 </button>
-                <a href="change-plan?shop=<?= htmlspecialchars($shop) ?>" class="upgrade-btn">Upgrade to unlock</a>
+                <a href="change-plan?shop=<?= htmlspecialchars($shop) ?>" class="upgrade-btn"><?= e('common.upgrade_to_unlock') ?></a>
             <?php else: ?>
                 <button type="button" class="bulk-download-btn" id="ps-bulk-generate-btn"
                         data-shop-id="<?= htmlspecialchars($shop_id) ?>"
                         data-batch-cap="<?= (int)$BULK_BATCH_CAP ?>"
                         disabled>
-                    Bulk Generate / Regenerate
+                    <?= e('orders.bulk_generate') ?>
                 </button>
                 <form id="ps-bulk-zip-form" method="post" action="bulk-download-zip" target="_blank" style="display: inline;">
                     <input type="hidden" name="shop_id" value="<?= htmlspecialchars($shop_id) ?>">
                     <input type="hidden" name="type" value="packing_slip">
                     <button type="submit" class="bulk-download-btn" id="ps-bulk-zip-btn" disabled>
-                        Download ZIP
+                        <?= e('common.download_zip') ?>
                     </button>
                 </form>
-                <span class="bulk-hint">Packing slips don't count against your invoice quota</span>
+                <span class="bulk-hint"><?= e('packing.quota_hint') ?></span>
             <?php endif; ?>
         </div>
 
@@ -94,12 +94,12 @@ $BULK_BATCH_CAP = 50;
             <thead>
                 <tr>
                     <th style="width: 40px;">&nbsp;</th>
-                    <th>ORDER ID</th>
-                    <th>DATE</th>
-                    <th>CUSTOMER</th>
-                    <th>AMOUNT</th>
-                    <th>STATUS</th>
-                    <th>ACTION</th>
+                    <th><?= e('table.order_id') ?></th>
+                    <th><?= e('table.date') ?></th>
+                    <th><?= e('table.customer') ?></th>
+                    <th><?= e('table.amount') ?></th>
+                    <th><?= e('table.status') ?></th>
+                    <th><?= e('table.action') ?></th>
                 </tr>
             </thead>
             <tbody>
@@ -121,27 +121,27 @@ $BULK_BATCH_CAP = 50;
                         >
                     </td>
                     <td><?= htmlspecialchars($o['order_name'] ?? ('#' . $o['order_number'])) ?></td>
-                    <td><?= htmlspecialchars($o['created_at']) ?></td>
+                    <td data-order="<?= htmlspecialchars($o['created_at']) ?>"><?= htmlspecialchars(fmt_date($o['created_at'])) ?></td>
                     <td><?= htmlspecialchars($o['customer_name']) ?></td>
-                    <td><?= htmlspecialchars($o['currency']) ?> <?= number_format((float)$o['total_price'], 2) ?></td>
-                    <td><span class="status <?= $status ?>"><?= ucfirst($status) ?></span></td>
+                    <td><?= htmlspecialchars(fmt_currency($o['total_price'], $o['currency'])) ?></td>
+                    <td><span class="status <?= $status ?>"><?= htmlspecialchars(t_status($status)) ?></span></td>
                     <td>
                         <?php if ($hasSlip): ?>
                             <a href="#" class="view-invoice-btn js-view-packing-slip"
                                data-shop-id="<?= htmlspecialchars($shop_id) ?>"
-                               data-order-id="<?= htmlspecialchars($o['order_id']) ?>">View Slip</a>
+                               data-order-id="<?= htmlspecialchars($o['order_id']) ?>"><?= e('actions.view_slip') ?></a>
                             <?php if (!$isFreePlan): ?>
                                 <a href="#" class="gen-invoice-btn js-generate-packing-slip"
                                    data-shop-id="<?= htmlspecialchars($shop_id) ?>"
-                                   data-order-id="<?= htmlspecialchars($o['order_id']) ?>">Re-Generate</a>
+                                   data-order-id="<?= htmlspecialchars($o['order_id']) ?>"><?= e('actions.regenerate') ?></a>
                             <?php endif; ?>
                         <?php else: ?>
                             <?php if ($isFreePlan): ?>
-                                <a href="change-plan?shop=<?= htmlspecialchars($shop) ?>" class="gen-invoice-btn">Upgrade to Generate</a>
+                                <a href="change-plan?shop=<?= htmlspecialchars($shop) ?>" class="gen-invoice-btn"><?= e('actions.upgrade_to_generate') ?></a>
                             <?php else: ?>
                                 <a href="#" class="gen-invoice-btn js-generate-packing-slip"
                                    data-shop-id="<?= htmlspecialchars($shop_id) ?>"
-                                   data-order-id="<?= htmlspecialchars($o['order_id']) ?>">Generate Packing Slip</a>
+                                   data-order-id="<?= htmlspecialchars($o['order_id']) ?>"><?= e('actions.generate_packing_slip') ?></a>
                             <?php endif; ?>
                         <?php endif; ?>
                     </td>
@@ -167,15 +167,15 @@ $BULK_BATCH_CAP = 50;
 <!-- Bulk progress modal (shared) -->
 <div id="bulkProgressModal" class="bulk-progress-modal" style="display:none;" role="dialog" aria-modal="true">
     <div class="bulk-progress-card">
-        <h3 id="bulkProgressTitle">Generating packing slips…</h3>
-        <p class="bulk-progress-status" id="bulkProgressStatus">Preparing…</p>
+        <h3 id="bulkProgressTitle"><?= e('bulk.generating_slips_title') ?></h3>
+        <p class="bulk-progress-status" id="bulkProgressStatus"><?= e('bulk.preparing') ?></p>
         <div class="bulk-progress-bar">
             <div class="bulk-progress-bar-fill" id="bulkProgressFill" style="width: 0%"></div>
         </div>
-        <p class="bulk-progress-meta" id="bulkProgressMeta">Please keep this tab open while we process your packing slips.</p>
+        <p class="bulk-progress-meta" id="bulkProgressMeta"><?= e('bulk.keep_tab_open_slips') ?></p>
         <div class="bulk-progress-actions">
-            <button type="button" class="bulk-progress-cancel" id="bulkProgressCancel">Stop after current</button>
-            <button type="button" class="bulk-progress-close" id="bulkProgressClose" style="display:none;">Close</button>
+            <button type="button" class="bulk-progress-cancel" id="bulkProgressCancel"><?= e('bulk.stop_after_current') ?></button>
+            <button type="button" class="bulk-progress-close" id="bulkProgressClose" style="display:none;"><?= e('common.close') ?></button>
         </div>
     </div>
 </div>

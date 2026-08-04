@@ -1,0 +1,190 @@
+/*
+ * Right-to-left overrides for Arabic and Hebrew.
+ *
+ * Loaded by header.php ONLY when the active locale is RTL, so LTR merchants
+ * download nothing extra. It layers on top of style.css and flips the
+ * directional properties that sheet sets — everything symmetric (padding on
+ * both sides, widths, colours) is left alone.
+ *
+ * The base layout is flexbox and tables, both of which mirror themselves off
+ * `dir="rtl"` on <html>; what needs help is the handful of one-sided margins,
+ * absolute offsets and text-align:left declarations.
+ *
+ * Adding a new RTL language: add it to i18n_locales() with 'dir' => 'rtl'.
+ * This file needs no change.
+ */
+
+/* ---------------------------------------------------------------------------
+ * Base direction
+ * ------------------------------------------------------------------------ */
+
+[dir="rtl"] body {
+    direction: rtl;
+    text-align: right;
+}
+
+/* ---------------------------------------------------------------------------
+ * Header / navigation
+ * ------------------------------------------------------------------------ */
+
+[dir="rtl"] .menu-toggle {
+    margin-right: 0;
+    margin-left: 10px;
+}
+
+[dir="rtl"] .horizontal-menu li a i,
+[dir="rtl"] .settings-tab i,
+[dir="rtl"] .settings-section h3 i,
+[dir="rtl"] .bulk-download-btn .lock-icon {
+    margin-right: 0;
+    margin-left: 8px;
+}
+
+[dir="rtl"] .icon-chevron {
+    margin-left: 0;
+    margin-right: 8px;
+}
+
+[dir="rtl"] .dropdown-menu {
+    left: auto;
+    right: 0;
+}
+
+[dir="rtl"] .settings-tab {
+    margin-right: 0;
+    margin-left: 5px;
+}
+
+/* ---------------------------------------------------------------------------
+ * Tables
+ *
+ * Header cells and the numeric columns both flip: a right-aligned amount in
+ * LTR is a left-aligned amount in RTL.
+ * ------------------------------------------------------------------------ */
+
+[dir="rtl"] th,
+[dir="rtl"] .billing-table th,
+[dir="rtl"] .orders-card table.dataTable thead th,
+[dir="rtl"] .orders-card table.dataTable tbody td {
+    text-align: right;
+}
+
+[dir="rtl"] .orders-card table.dataTable thead .sorting_desc_disabled {
+    padding-right: 0 !important;
+    padding-left: 28px !important;
+}
+
+[dir="rtl"] .dataTables_wrapper .dataTables_filter input {
+    margin-left: 0;
+    margin-right: 10px;
+}
+
+[dir="rtl"] .dataTables_wrapper .dataTables_paginate .paginate_button,
+[dir="rtl"] .orders-card .dataTables_wrapper .dataTables_paginate .paginate_button {
+    margin-left: 0 !important;
+    margin-right: 5px;
+}
+
+[dir="rtl"] .orders-card .dataTables_wrapper .dataTables_paginate .paginate_button {
+    margin-right: 4px !important;
+}
+
+/* ---------------------------------------------------------------------------
+ * Buttons and actions
+ * ------------------------------------------------------------------------ */
+
+[dir="rtl"] .btn-action {
+    margin-right: 0;
+    margin-left: 5px;
+}
+
+/* ---------------------------------------------------------------------------
+ * Plans / billing
+ * ------------------------------------------------------------------------ */
+
+[dir="rtl"] .recommended-badge {
+    right: auto;
+    left: 20px;
+}
+
+[dir="rtl"] .plan-features li {
+    padding-left: 0;
+    padding-right: 20px;
+}
+
+[dir="rtl"] .plan-features li:before {
+    left: auto;
+    right: 0;
+}
+
+/* ---------------------------------------------------------------------------
+ * Forms
+ *
+ * Inputs holding LTR-by-nature data (email, URL, SMTP host, port, numbers)
+ * stay left-to-right: an address reads "user@example.com" in every language,
+ * and forcing it RTL moves the punctuation to the wrong end. The FIELD is
+ * right-aligned to match the form; only its CONTENT direction is pinned.
+ * ------------------------------------------------------------------------ */
+
+[dir="rtl"] .form-input,
+[dir="rtl"] input[type="text"],
+[dir="rtl"] input[type="password"],
+[dir="rtl"] textarea,
+[dir="rtl"] select {
+    text-align: right;
+}
+
+[dir="rtl"] input[type="email"],
+[dir="rtl"] input[type="url"],
+[dir="rtl"] input[type="number"],
+[dir="rtl"] input[type="tel"] {
+    direction: ltr;
+    text-align: right;
+}
+
+/* The SMTP host/username fields are type="text" but always hold ASCII. */
+[dir="rtl"] input[name="smtp_host"],
+[dir="rtl"] input[name="smtp_user"],
+[dir="rtl"] input[name="smtp_from_email"],
+[dir="rtl"] input[name="email_invoice"] {
+    direction: ltr;
+    text-align: right;
+}
+
+/* The email body is HTML the merchant authors — keep it LTR-neutral so
+   markup doesn't visually scramble while editing. */
+[dir="rtl"] textarea[name="email_body"] {
+    direction: ltr;
+    text-align: left;
+}
+
+/* ---------------------------------------------------------------------------
+ * Toasts, modals and overlays
+ * ------------------------------------------------------------------------ */
+
+[dir="rtl"] #message-box {
+    right: auto !important;
+    left: 20px;
+}
+
+[dir="rtl"] #invoiceModal > div > span,
+[dir="rtl"] #invoiceModal span[onclick] {
+    right: auto;
+    left: 20px;
+}
+
+[dir="rtl"] .bulk-progress-card,
+[dir="rtl"] .warning-box {
+    text-align: right;
+}
+
+/* ---------------------------------------------------------------------------
+ * Mobile
+ * ------------------------------------------------------------------------ */
+
+@media (max-width: 992px) {
+    [dir="rtl"] .dropdown-menu li a {
+        padding-left: 0;
+        padding-right: 40px;
+    }
+}

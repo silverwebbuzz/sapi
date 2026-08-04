@@ -1,0 +1,9 @@
+{
+  "extension.open_print_invoice": "פתיחה / הדפסה של החשבונית",
+  "extension.close": "סגירה",
+  "extension.preparing": "מכין את החשבונית שלכם…",
+  "extension.open_invoice_pdf": "פתיחת קובץ ה-PDF של החשבונית",
+  "extension.instructions": "לחצו על הכפתור למטה כדי לפתוח את חשבונית ה-PDF של ההזמנה בלשונית חדשה, מוכנה לצפייה או להדפסה.",
+  "extension.error_shop_domain": "לא ניתן לזהות את דומיין החנות.",
+  "extension.error_no_order": "לא ניתן לזהות את ההזמנה. פתחו פעולה זו מדף פרטי ההזמנה."
+}

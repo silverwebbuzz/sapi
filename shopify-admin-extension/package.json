@@ -4,6 +4,10 @@
   "version": "1.0.0",
   "license": "UNLICENSED",
   "scripts": {
+    "sync-locales": "node scripts/sync-locales.js",
+    "prebuild": "npm run sync-locales",
+    "predev": "npm run sync-locales",
+    "predeploy": "npm run sync-locales",
     "build": "shopify app build",
     "dev": "shopify app dev",
     "deploy": "shopify app deploy",

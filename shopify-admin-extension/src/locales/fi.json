@@ -1,0 +1,9 @@
+{
+  "extension.open_print_invoice": "Avaa / tulosta lasku",
+  "extension.close": "Sulje",
+  "extension.preparing": "Valmistellaan laskuasi…",
+  "extension.open_invoice_pdf": "Avaa lasku-PDF",
+  "extension.instructions": "Napsauta alla olevaa painiketta avataksesi tämän tilauksen PDF-laskun uudessa välilehdessä valmiina katseltavaksi tai tulostettavaksi.",
+  "extension.error_shop_domain": "Kaupan verkkotunnusta ei voitu tunnistaa.",
+  "extension.error_no_order": "Tilausta ei voitu tunnistaa. Avaa tämä toiminto tilauksen tietosivulta."
+}

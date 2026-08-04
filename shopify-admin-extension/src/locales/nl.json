@@ -1,0 +1,9 @@
+{
+  "extension.open_print_invoice": "Factuur openen / printen",
+  "extension.close": "Sluiten",
+  "extension.preparing": "Je factuur wordt voorbereid…",
+  "extension.open_invoice_pdf": "Factuur-pdf openen",
+  "extension.instructions": "Klik op de knop hieronder om de pdf-factuur van deze bestelling in een nieuw tabblad te openen, klaar om te bekijken of te printen.",
+  "extension.error_shop_domain": "Kan het winkeldomein niet detecteren.",
+  "extension.error_no_order": "Kan de bestelling niet detecteren. Open deze actie vanaf een bestelpagina."
+}

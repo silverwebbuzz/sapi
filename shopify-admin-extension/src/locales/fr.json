@@ -1,0 +1,9 @@
+{
+  "extension.open_print_invoice": "Ouvrir / Imprimer la facture",
+  "extension.close": "Fermer",
+  "extension.preparing": "Préparation de votre facture…",
+  "extension.open_invoice_pdf": "Ouvrir la facture PDF",
+  "extension.instructions": "Cliquez sur le bouton ci-dessous pour ouvrir la facture PDF de cette commande dans un nouvel onglet, prête à être consultée ou imprimée.",
+  "extension.error_shop_domain": "Impossible de détecter le domaine de la boutique.",
+  "extension.error_no_order": "Impossible de détecter la commande. Ouvrez cette action depuis une page de détail de commande."
+}

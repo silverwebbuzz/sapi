@@ -1,0 +1,9 @@
+{
+  "extension.open_print_invoice": "Öppna / skriv ut faktura",
+  "extension.close": "Stäng",
+  "extension.preparing": "Förbereder din faktura…",
+  "extension.open_invoice_pdf": "Öppna faktura-PDF",
+  "extension.instructions": "Klicka på knappen nedan för att öppna PDF-fakturan för den här ordern i en ny flik, klar att visa eller skriva ut.",
+  "extension.error_shop_domain": "Det gick inte att identifiera butiksdomänen.",
+  "extension.error_no_order": "Det gick inte att identifiera ordern. Öppna den här åtgärden från en ordersida."
+}

@@ -1,25 +1,25 @@
 <nav class="horizontal-menu">
     <ul>
         <li class="<?= basename($_SERVER['PHP_SELF']) == 'index' ? 'active' : '' ?>">
-            <a href="index?shop=<?php echo $shop; ?>">Dashboard</a>
+            <a href="index?shop=<?php echo $shop; ?>"><?= e('nav.dashboard') ?></a>
         </li>
         <li class="<?= basename($_SERVER['PHP_SELF']) == 'order' ? 'active' : '' ?>">
-            <a href="order?shop=<?php echo $shop; ?>">Shopify Orders</a>
+            <a href="order?shop=<?php echo $shop; ?>"><?= e('nav.orders') ?></a>
         </li>
         <li class="<?= basename($_SERVER['PHP_SELF']) == 'bulk-download' ? 'active' : '' ?>">
-            <a href="bulk-download?shop=<?php echo $shop; ?>">Bulk Download</a>
+            <a href="bulk-download?shop=<?php echo $shop; ?>"><?= e('nav.bulk_download') ?></a>
         </li>
         <li class="<?= basename($_SERVER['PHP_SELF']) == 'packing-slip' ? 'active' : '' ?>">
-            <a href="packing-slip?shop=<?php echo $shop; ?>">Packing Slips</a>
+            <a href="packing-slip?shop=<?php echo $shop; ?>"><?= e('nav.packing_slips') ?></a>
         </li>
         <li class="<?= basename($_SERVER['PHP_SELF']) == 'billing' ? 'active' : '' ?>">
-            <a href="change-plan?shop=<?php echo $shop; ?>">Change Plans</a>
+            <a href="change-plan?shop=<?php echo $shop; ?>"><?= e('nav.change_plans') ?></a>
         </li>
         <li class="<?= basename($_SERVER['PHP_SELF']) == 'settings' ? 'active' : '' ?>">
-            <a href="settings?shop=<?php echo $shop; ?>">Settings</a>
+            <a href="settings?shop=<?php echo $shop; ?>"><?= e('nav.settings') ?></a>
         </li>
         <li class="<?= basename($_SERVER['PHP_SELF']) == 'help' ? 'active' : '' ?>">
-            <a href="help?shop=<?php echo $shop; ?>">Help</a>
+            <a href="help?shop=<?php echo $shop; ?>"><?= e('nav.help') ?></a>
         </li>
     </ul>
 </nav>
@@ -91,7 +91,7 @@ $autoInvoiceOn = ($row['auto_invoice_customer'] === 'Yes' || $row['auto_invoice_
 
 // Base message for free plans
 if ($isFreePlan) {
-    $message = "Please upgrade your plan and configure your SMTP settings to send emails from your own email address.";
+    $message = t('errors.upgrade_for_smtp');
 }
 
 // Check Order Limit
@@ -100,38 +100,54 @@ $orderLimitReached = isset($currentPlan['order_limit'], $currentPlan['order_used
 $emailLimitReached = isset($currentPlan['email_limit'], $currentPlan['email_used'])
     && $currentPlan['email_used'] >= $currentPlan['email_limit'];
 
+// $message is echoed raw into the warning box below, so the plan name (store
+// data from Shopify) is escaped here rather than at the echo site.
 $planName = htmlspecialchars($currentPlan['plan_name']);
+
+// Each branch is assembled from whole translated sentences rather than
+// concatenated fragments, so translators get real sentences to work with
+// and word order stays correct in every language.
+$upgradeHref   = 'change-plan?shop=' . htmlspecialchars($shop);
+$genInvoiceCta = '<a href="' . $upgradeHref . '" class="gen-invoice-btn">' . e('actions.upgrade_to_generate_invoice') . '</a>';
+$sendEmailCta  = '<a href="' . $upgradeHref . '" class="gen-invoice-btn">' . e('actions.upgrade_to_send_email') . '</a>';
 
 if ($orderLimitReached && $emailLimitReached) {
     // Both limits reached: show a single combined message instead of two
     // near-identical sentences.
-    $message = "You have used all " . (int)$currentPlan['order_limit'] . " invoices and "
-        . (int)$currentPlan['email_limit'] . " invoice emails included in your " . $planName . " plan."
-        . ($autoInvoiceOn ? " Automatic invoices and invoice emails to customers are paused." : "")
-        . " Please upgrade your plan to continue.";
+    $message = t('limits.both_reached', [
+        'orders' => fmt_number((int)$currentPlan['order_limit']),
+        'emails' => fmt_number((int)$currentPlan['email_limit']),
+        'plan'   => $planName,
+    ])
+        . ($autoInvoiceOn ? ' ' . t('limits.paused_both') : '')
+        . ' ' . t('limits.upgrade_to_continue');
 
-    $gen_invoice_upgrade_plan_button = '<a href="change-plan?shop=' . htmlspecialchars($shop) . '" class="gen-invoice-btn">Upgrade To Generate Invoice</a>';
-    $send_email_upgrade_plan_button = '<a href="change-plan?shop=' . htmlspecialchars($shop) . '" class="gen-invoice-btn">Upgrade To Send Email</a>';
+    $gen_invoice_upgrade_plan_button = $genInvoiceCta;
+    $send_email_upgrade_plan_button  = $sendEmailCta;
 } elseif ($orderLimitReached) {
-    $message = "You have used all " . (int)$currentPlan['order_limit'] . " invoices included in your "
-        . $planName . " plan."
-        . ($autoInvoiceOn ? " Automatic invoices to customers are paused." : "")
-        . " Please upgrade your plan to continue.";
+    $message = t('limits.orders_reached', [
+        'orders' => fmt_number((int)$currentPlan['order_limit']),
+        'plan'   => $planName,
+    ])
+        . ($autoInvoiceOn ? ' ' . t('limits.paused_orders') : '')
+        . ' ' . t('limits.upgrade_to_continue');
 
-    $gen_invoice_upgrade_plan_button = '<a href="change-plan?shop=' . htmlspecialchars($shop) . '" class="gen-invoice-btn">Upgrade To Generate Invoice</a>';
+    $gen_invoice_upgrade_plan_button = $genInvoiceCta;
 } elseif ($emailLimitReached) {
-    $message = "You have used all " . (int)$currentPlan['email_limit'] . " invoice emails included in your "
-        . $planName . " plan."
-        . ($autoInvoiceOn ? " Automatic invoice emails to customers are paused." : "")
-        . " Please upgrade your plan to continue.";
+    $message = t('limits.emails_reached', [
+        'emails' => fmt_number((int)$currentPlan['email_limit']),
+        'plan'   => $planName,
+    ])
+        . ($autoInvoiceOn ? ' ' . t('limits.paused_emails') : '')
+        . ' ' . t('limits.upgrade_to_continue');
 
-    $send_email_upgrade_plan_button = '<a href="change-plan?shop=' . htmlspecialchars($shop) . '" class="gen-invoice-btn">Upgrade To Send Email</a>';
+    $send_email_upgrade_plan_button = $sendEmailCta;
 }
 
 // SMTP settings check for paid plans
 if (!$isFreePlan && empty($row['smtp_settings'])) {
-    $smtpMessage = "Please configure your SMTP settings to send emails from your own email address.";
-    
+    $smtpMessage = t('limits.configure_smtp');
+
     // Append to existing message if already set
     if ($message) {
         $message .= " " . $smtpMessage;

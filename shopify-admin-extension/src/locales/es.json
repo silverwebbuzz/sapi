@@ -1,0 +1,9 @@
+{
+  "extension.open_print_invoice": "Abrir / Imprimir factura",
+  "extension.close": "Cerrar",
+  "extension.preparing": "Preparando tu factura…",
+  "extension.open_invoice_pdf": "Abrir factura PDF",
+  "extension.instructions": "Haz clic en el botón de abajo para abrir la factura PDF de este pedido en una pestaña nueva, lista para ver o imprimir.",
+  "extension.error_shop_domain": "No se ha podido detectar el dominio de la tienda.",
+  "extension.error_no_order": "No se ha podido detectar el pedido. Abre esta acción desde una página de detalles de pedido."
+}

@@ -1,0 +1,9 @@
+{
+  "extension.open_print_invoice": "Open / Print Invoice",
+  "extension.close": "Close",
+  "extension.preparing": "Preparing your invoice…",
+  "extension.open_invoice_pdf": "Open invoice PDF",
+  "extension.instructions": "Click the button below to open the PDF invoice for this order in a new tab, ready to view or print.",
+  "extension.error_shop_domain": "Unable to detect the shop domain.",
+  "extension.error_no_order": "Could not detect the order. Open this action from an order details page."
+}

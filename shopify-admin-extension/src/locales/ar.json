@@ -1,0 +1,9 @@
+{
+  "extension.open_print_invoice": "فتح / طباعة الفاتورة",
+  "extension.close": "إغلاق",
+  "extension.preparing": "جارٍ تحضير فاتورتك…",
+  "extension.open_invoice_pdf": "فتح ملف PDF للفاتورة",
+  "extension.instructions": "انقر على الزر أدناه لفتح فاتورة PDF الخاصة بهذا الطلب في علامة تبويب جديدة، جاهزة للعرض أو الطباعة.",
+  "extension.error_shop_domain": "تعذّر تحديد نطاق المتجر.",
+  "extension.error_no_order": "تعذّر تحديد الطلب. افتح هذا الإجراء من صفحة تفاصيل الطلب."
+}

@@ -1,0 +1,9 @@
+{
+  "extension.open_print_invoice": "Åpne / skriv ut faktura",
+  "extension.close": "Lukk",
+  "extension.preparing": "Forbereder fakturaen din…",
+  "extension.open_invoice_pdf": "Åpne faktura-PDF",
+  "extension.instructions": "Klikk på knappen nedenfor for å åpne PDF-fakturaen for denne ordren i en ny fane, klar til visning eller utskrift.",
+  "extension.error_shop_domain": "Klarte ikke å finne butikkdomenet.",
+  "extension.error_no_order": "Klarte ikke å finne ordren. Åpne denne handlingen fra en ordredetaljside."
+}

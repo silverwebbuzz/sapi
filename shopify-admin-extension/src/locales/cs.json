@@ -1,0 +1,9 @@
+{
+  "extension.open_print_invoice": "Otevřít / vytisknout fakturu",
+  "extension.close": "Zavřít",
+  "extension.preparing": "Připravujeme vaši fakturu…",
+  "extension.open_invoice_pdf": "Otevřít PDF faktury",
+  "extension.instructions": "Kliknutím na tlačítko níže otevřete PDF fakturu k této objednávce na nové kartě, připravenou k zobrazení nebo tisku.",
+  "extension.error_shop_domain": "Doménu obchodu se nepodařilo zjistit.",
+  "extension.error_no_order": "Objednávku se nepodařilo zjistit. Otevřete tuto akci ze stránky s detailem objednávky."
+}

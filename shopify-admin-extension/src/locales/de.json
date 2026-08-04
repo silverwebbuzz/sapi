@@ -1,0 +1,9 @@
+{
+  "extension.open_print_invoice": "Rechnung öffnen / drucken",
+  "extension.close": "Schließen",
+  "extension.preparing": "Ihre Rechnung wird vorbereitet…",
+  "extension.open_invoice_pdf": "Rechnungs-PDF öffnen",
+  "extension.instructions": "Klicken Sie auf die Schaltfläche unten, um die PDF-Rechnung für diese Bestellung in einem neuen Tab zu öffnen – bereit zum Ansehen oder Drucken.",
+  "extension.error_shop_domain": "Die Shop-Domain konnte nicht ermittelt werden.",
+  "extension.error_no_order": "Die Bestellung konnte nicht ermittelt werden. Öffnen Sie diese Aktion über eine Bestelldetailseite."
+}

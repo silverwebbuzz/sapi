@@ -1,4 +1,5 @@
-import React, {useEffect, useState} from 'react';
+import React, {useEffect, useMemo, useState} from 'react';
+import {createTranslator} from './i18n';
 import {
   reactExtension,
   useApi,
@@ -26,10 +27,14 @@ function numericId(gid) {
 }
 
 function PrintInvoiceAction() {
-  const {close, data, query} = useApi(TARGET);
+  const {close, data, query, i18n} = useApi(TARGET);
+
+  // Shopify hands us the admin user's locale; the translator falls back to
+  // English for anything we don't ship.
+  const t = useMemo(() => createTranslator(i18n?.locale), [i18n?.locale]);
 
   const [shopDomain, setShopDomain] = useState('');
-  const [error, setError] = useState('');
+  const [errorKey, setErrorKey] = useState('');
   const [loading, setLoading] = useState(true);
 
   const orderId = numericId(data?.selected?.[0]?.id);
@@ -42,7 +47,9 @@ function PrintInvoiceAction() {
         const domain = res?.data?.shop?.myshopifyDomain || '';
         if (active) setShopDomain(domain);
       } catch (e) {
-        if (active) setError('Unable to detect the shop domain.');
+        // Store the KEY, not the translated text, so the message re-renders
+        // in the right language if the locale changes.
+        if (active) setErrorKey('extension.error_shop_domain');
       } finally {
         if (active) setLoading(false);
       }
@@ -64,36 +71,31 @@ function PrintInvoiceAction() {
       primaryAction={
         ready ? (
           <Button href={invoiceUrl} target="_blank" variant="primary">
-            Open / Print Invoice
+            {t('extension.open_print_invoice')}
           </Button>
         ) : undefined
       }
-      secondaryAction={<Button onPress={close}>Close</Button>}
+      secondaryAction={<Button onPress={close}>{t('extension.close')}</Button>}
     >
       <BlockStack gap="base">
         {loading && (
           <BlockStack inlineAlignment="center">
             <ProgressIndicator size="small-200" variant="spinner" />
-            <Text>Preparing your invoice…</Text>
+            <Text>{t('extension.preparing')}</Text>
           </BlockStack>
         )}
 
-        {error && <Banner tone="critical">{error}</Banner>}
+        {errorKey && <Banner tone="critical">{t(errorKey)}</Banner>}
 
-        {!loading && !error && !orderId && (
-          <Banner tone="critical">
-            Could not detect the order. Open this action from an order details page.
-          </Banner>
+        {!loading && !errorKey && !orderId && (
+          <Banner tone="critical">{t('extension.error_no_order')}</Banner>
         )}
 
         {ready && (
           <BlockStack gap="base">
-            <Text>
-              Click the button below to open the PDF invoice for this order in a
-              new tab, ready to view or print.
-            </Text>
+            <Text>{t('extension.instructions')}</Text>
             <Link href={invoiceUrl} target="_blank">
-              Open invoice PDF
+              {t('extension.open_invoice_pdf')}
             </Link>
           </BlockStack>
         )}

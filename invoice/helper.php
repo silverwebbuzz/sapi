@@ -11,11 +11,15 @@ use PHPMailer\PHPMailer\Exception;
 function generatepdf($shop_id,$order_id){
     $shop_data = DBHelper::selectOne(
         "SELECT * FROM stores WHERE `id` = ? ",
-        "s", 
+        "s",
         [$shop_id]
     );
-    
+
     if ($shop_data) {
+        // The PDF is customer-facing, so it renders in the store's language
+        // regardless of who triggered generation (merchant click, webhook,
+        // or bulk batch).
+        i18n_boot($shop_data);
         $shop_name = preg_replace('/[^a-zA-Z0-9_]/', '_', strtolower($shop_data['shop']));
         $invoice_table = "invoices_" . $shop_name;
     
@@ -115,10 +119,10 @@ function generatepdf($shop_id,$order_id){
                 $items_html .= '<tr>';
                 $items_html .= '<td>'.htmlspecialchars($item['name']).'</td>';
                 $items_html .= '<td>'.htmlspecialchars($description).'</td>';
-                $items_html .= '<td class="num">'.$invoice['currency'].' '.number_format($unit_price_ex_tax, 2).'</td>';
-                $items_html .= '<td class="qty">'.number_format($quantity, 0).'</td>';
+                $items_html .= '<td class="num">'.htmlspecialchars(fmt_currency($unit_price_ex_tax, $invoice['currency'])).'</td>';
+                $items_html .= '<td class="qty">'.htmlspecialchars(fmt_number($quantity, 0)).'</td>';
                 $items_html .= '<td>'.htmlspecialchars($row_tax_text).'</td>';
-                $items_html .= '<td class="num">'.$invoice['currency'].' '.number_format($line_total_ex_tax, 2).'</td>';
+                $items_html .= '<td class="num">'.htmlspecialchars(fmt_currency($line_total_ex_tax, $invoice['currency'])).'</td>';
                 $items_html .= '</tr>';
                 $counter++;
             }
@@ -137,7 +141,7 @@ function generatepdf($shop_id,$order_id){
                 $ratePct = rtrim(rtrim(number_format($agg['rate'] * 100, 2, '.', ''), '0'), '.');
                 $label = $agg['title'] . ' (' . $ratePct . '%)';
                 $tax_block .= '<tr><td class="label">' . htmlspecialchars($label) . '</td>'
-                            . '<td class="value">' . $invoice['currency'] . ' ' . number_format($agg['amount'], 2) . '</td></tr>';
+                            . '<td class="value">' . htmlspecialchars(fmt_currency($agg['amount'], $invoice['currency'])) . '</td></tr>';
             }
 
             // Column-header label & shipping-tax label use the FIRST tax title
@@ -154,7 +158,7 @@ function generatepdf($shop_id,$order_id){
             // Backward-compat single-line placeholders (older custom templates
             // may still reference these). Empty when we have a multi-tax block.
             $tax_label_full     = $has_tax ? $primary_tax_title . $primary_rate_text : '';
-            $tax_amount_display = $has_tax ? $invoice['currency'].' '.number_format($invoice['tax_amount'], 2) : '';
+            $tax_amount_display = $has_tax ? fmt_currency($invoice['tax_amount'], $invoice['currency']) : '';
 
             // Shipping-tax label uses the combined GST rate when the country
             // splits the tax, otherwise the primary single rate.
@@ -162,14 +166,16 @@ function generatepdf($shop_id,$order_id){
             foreach ($tax_aggregates as $agg) { $combined_shipping_rate += $agg['rate']; }
             if ($has_tax) {
                 $lc_tax_label = strtolower($primary_tax_title);
+                // The tax NAME (GST, VAT, …) comes from Shopify and stays as-is;
+                // only the surrounding "Shipping …" wording is translated.
                 if (strpos($lc_tax_label, 'gst') !== false) {
                     // For Indian GST, label the shipping tax with the combined rate (18%).
                     $shipRatePct = rtrim(rtrim(number_format($combined_shipping_rate * 100, 2, '.', ''), '0'), '.');
-                    $shipping_tax_label = 'Shipping GST (' . $shipRatePct . '%)';
+                    $shipping_tax_label = t('invoice.shipping_tax', ['tax' => 'GST (' . $shipRatePct . '%)']);
                 } elseif (strpos($lc_tax_label, 'vat') !== false) {
-                    $shipping_tax_label = 'Shipping VAT' . $primary_rate_text;
+                    $shipping_tax_label = t('invoice.shipping_tax', ['tax' => 'VAT' . $primary_rate_text]);
                 } else {
-                    $shipping_tax_label = 'Shipping ' . $primary_tax_title . $primary_rate_text;
+                    $shipping_tax_label = t('invoice.shipping_tax', ['tax' => $primary_tax_title . $primary_rate_text]);
                 }
             } else {
                 $shipping_tax_label = '';
@@ -178,12 +184,14 @@ function generatepdf($shop_id,$order_id){
             $discount_row = '';
             if (floatval($invoice['discount_amount']) != 0) {
                 $discount_amount = abs(floatval($invoice['discount_amount']));
-                $discount_row = '<tr><td class="label">Discount</td><td class="value">-' . $invoice['currency'] . ' ' . number_format($discount_amount, 2) . '</td></tr>';
+                $discount_row = '<tr><td class="label">' . e('invoice.discount') . '</td><td class="value">-'
+                    . htmlspecialchars(fmt_currency($discount_amount, $invoice['currency'])) . '</td></tr>';
             }
 
             $shipping_tax_block = '';
             if ($shipping_tax_amount > 0) {
-                $shipping_tax_block = '<tr><td class="label">' . htmlspecialchars($shipping_tax_label) . '</td><td class="value">' . $invoice['currency'] . ' ' . number_format($shipping_tax_amount, 2) . '</td></tr>';
+                $shipping_tax_block = '<tr><td class="label">' . htmlspecialchars($shipping_tax_label) . '</td><td class="value">'
+                    . htmlspecialchars(fmt_currency($shipping_tax_amount, $invoice['currency'])) . '</td></tr>';
             }
     
             // Prepare replacements array
@@ -197,8 +205,8 @@ function generatepdf($shop_id,$order_id){
                 '{{ Company_Email }}' => $shop_data['email'],
                 '{{ Company_GSTIN }}' => $shop_data['gstin'] ?? '',
                 '{{ Order_Number }}' => $invoice['order_name'],
-                '{{ Invoice_Date }}' => date('d/m/Y', strtotime($invoice['created_at'])),
-                '{{ Due_Date }}' => date('d/m/Y', strtotime($invoice['created_at'].' +15 days')),
+                '{{ Invoice_Date }}' => fmt_date($invoice['created_at'], 'short'),
+                '{{ Due_Date }}' => fmt_date($invoice['created_at'].' +15 days', 'short'),
                 '{{ Billing_Name }}' => $billing_address['name'] ?? '',
                 '{{ Billing_Address1 }}' => $billing_address['address1'] ?? '',
                 '{{ Billing_Address2 }}' => $billing_address['address2'] ?? '',
@@ -208,7 +216,7 @@ function generatepdf($shop_id,$order_id){
                 '{{ Billing_Country }}' => $billing_address['country'] ?? '',
                 '{{ Billing_GSTIN }}' => '', // Add GSTIN if available
                 '{{ Billing_Email }}' => $invoice['customer_email'] ?? '',
-                '{{ Billing_Phone }}' => $billing_address['phone'] ?? 'No phone number',
+                '{{ Billing_Phone }}' => $billing_address['phone'] ?? t('invoice.no_phone'),
                 '{{ Shipping_Name }}' => isset($shipping_address['name']) ? $shipping_address['name'] : ($billing_address['name'] ?? ''),
                 '{{ Shipping_Address1 }}' => isset($shipping_address['address1']) ? $shipping_address['address1'] : ($billing_address['address1'] ?? ''),
                 '{{ Shipping_Address2 }}' => isset($shipping_address['address2']) ? $shipping_address['address2'] : ($billing_address['address2'] ?? ''),
@@ -217,19 +225,48 @@ function generatepdf($shop_id,$order_id){
                 '{{ Shipping_Zip }}' => isset($shipping_address['zip']) ? $shipping_address['zip'] : ($billing_address['zip'] ?? ''),
                 '{{ Shipping_Country }}' => isset($shipping_address['country']) ? $shipping_address['country'] : ($billing_address['country'] ?? ''),
                 '{{ Order_Items }}' => $items_html,
-                '{{ Subtotal }}' => $invoice['currency'].' '.number_format($subtotal_ex_tax, 2),
+                '{{ Subtotal }}' => fmt_currency($subtotal_ex_tax, $invoice['currency']),
                 '{{ Tax_Column_Label }}' => htmlspecialchars($tax_column_label),
                 '{{ Tax_Block }}' => $tax_block,
                 // Back-compat placeholders for older templates that still
                 // reference a single Tax_Label / Tax_Amount pair.
                 '{{ Tax_Label }}' => htmlspecialchars($tax_label_full),
                 '{{ Tax_Amount }}' => $tax_amount_display,
-                '{{ Shipping_Cost }}' => $invoice['currency'].' '.number_format($invoice['shipping_cost'], 2),
+                '{{ Shipping_Cost }}' => fmt_currency($invoice['shipping_cost'], $invoice['currency']),
                 '{{ Shipping_Tax_Block }}' => $shipping_tax_block,
                 '{{ Discount_Block }}' => $discount_row,
-                '{{ Total_Amount }}' => $invoice['currency'].' '.number_format($invoice['total_price'], 2),
-                '{{ Payment_Method }}' => $invoice['payment_method'] ?? 'Unknown',
-                '{{ Payment_Status }}' => ucfirst($invoice['order_status'])
+                '{{ Total_Amount }}' => fmt_currency($invoice['total_price'], $invoice['currency']),
+                '{{ Payment_Method }}' => $invoice['payment_method'] ?? t('invoice.unknown_payment'),
+                '{{ Payment_Status }}' => t_status($invoice['order_status']),
+
+                // Drives <html lang dir> in the template, so dompdf lays the
+                // PDF out right-to-left for Arabic and Hebrew.
+                '{{ Html_Lang }}' => i18n_locale(),
+                '{{ Html_Dir }}'  => i18n_dir(),
+
+                // Translated chrome. Templates carry {{ L_* }} placeholders
+                // instead of English literals, so one set of HTML files serves
+                // every language and adding a language needs no template edit.
+                '{{ L_Invoice_Title }}' => e('invoice.title_display'),
+                '{{ L_Invoice_No }}'    => e('invoice.invoice_no'),
+                '{{ L_Date }}'          => e('invoice.date'),
+                '{{ L_Due_Date }}'      => e('invoice.due_date'),
+                '{{ L_Merchant }}'      => e('invoice.merchant'),
+                '{{ L_Bill_To }}'       => e('invoice.bill_to'),
+                '{{ L_Ship_To }}'       => e('invoice.ship_to'),
+                '{{ L_Item }}'          => e('invoice.item'),
+                '{{ L_Description }}'   => e('invoice.description'),
+                '{{ L_Price }}'         => e('invoice.price'),
+                '{{ L_Qty }}'           => e('invoice.qty'),
+                '{{ L_Total }}'         => e('invoice.total'),
+                '{{ L_Payment_Info }}'  => e('invoice.payment_info'),
+                '{{ L_Subtotal }}'      => e('invoice.subtotal'),
+                '{{ L_Shipping }}'      => e('invoice.shipping'),
+                '{{ L_Grand_Total }}'   => e('invoice.grand_total'),
+                '{{ L_Notes }}'         => e('invoice.notes'),
+                '{{ L_Terms }}'         => e('invoice.terms'),
+                '{{ L_Thank_You }}'     => e('invoice.thank_you'),
+                '{{ L_Note }}'          => e('invoice.computer_generated'),
             ];
     
             // Load HTML template
@@ -281,13 +318,13 @@ function generatepdf($shop_id,$order_id){
                 "s",
                 [$shop_id]
             );
-            return "PDF Generated Successfully.";
+            return t('errors.pdf_generated');
 
         } else {
-            return "No invoice found with the specified order ID.";
+            return t('errors.invoice_not_found');
         }
     } else {
-        return "No shop found with the specified ID.";
+        return t('errors.shop_not_found');
     }
 }
 
@@ -348,8 +385,11 @@ function generatePackingSlip($shop_id, $order_id) {
         [$shop_id]
     );
     if (!$shop_data) {
-        return ['status' => 'error', 'message' => 'No shop found with the specified ID.'];
+        return ['status' => 'error', 'message' => t('errors.shop_not_found')];
     }
+
+    // Packing slips are customer/warehouse facing — render in the store's language.
+    i18n_boot($shop_data);
 
     $shop_name = preg_replace('/[^a-zA-Z0-9_]/', '_', strtolower($shop_data['shop']));
     $invoice_table = "invoices_" . $shop_name;
@@ -360,7 +400,7 @@ function generatePackingSlip($shop_id, $order_id) {
         [$order_id]
     );
     if (!$invoice) {
-        return ['status' => 'error', 'message' => 'No order found with the specified ID.'];
+        return ['status' => 'error', 'message' => t('errors.order_not_found')];
     }
 
     // Build the items rows (no prices, with SKU + checkbox).
@@ -396,14 +436,14 @@ function generatePackingSlip($shop_id, $order_id) {
             $items_html .= '<span class="item-variant">' . htmlspecialchars($variant) . '</span>';
         }
         if ($sku !== '') {
-            $items_html .= '<span class="item-sku">SKU: ' . htmlspecialchars($sku) . '</span>';
+            $items_html .= '<span class="item-sku">' . e('invoice.sku') . ': ' . htmlspecialchars($sku) . '</span>';
         }
         $items_html .= '</td>';
-        $items_html .= '<td style="text-align: center;"><span class="qty-num">' . $qty . '</span></td>';
+        $items_html .= '<td style="text-align: center;"><span class="qty-num">' . htmlspecialchars(fmt_number($qty, 0)) . '</span></td>';
         $items_html .= '</tr>';
     }
     if ($items_html === '') {
-        $items_html = '<tr><td colspan="2" style="text-align: center; color: #777;">No items.</td></tr>';
+        $items_html = '<tr><td colspan="2" style="text-align: center; color: #777;">' . e('packing_slip.no_items') . '</td></tr>';
     }
 
     $replacements = [
@@ -419,8 +459,8 @@ function generatePackingSlip($shop_id, $order_id) {
         ),
         '{{ Company_Phone }}'   => $shop_data['phone'] ?? '',
         '{{ Order_Number }}'    => $invoice['order_name'] ?? ('#' . ($invoice['order_number'] ?? '')),
-        '{{ Invoice_Date }}'    => date('d/m/Y', strtotime($invoice['created_at'] ?? 'now')),
-        '{{ Ship_Date }}'       => date('d/m/Y'),
+        '{{ Invoice_Date }}'    => fmt_date($invoice['created_at'] ?? 'now', 'short'),
+        '{{ Ship_Date }}'       => fmt_date(time(), 'short'),
         '{{ Shipping_Name }}'    => $shipping_address['name']     ?? ($billing_address['name']     ?? ''),
         '{{ Shipping_Address1 }}'=> $shipping_address['address1'] ?? ($billing_address['address1'] ?? ''),
         '{{ Shipping_Address2 }}'=> $shipping_address['address2'] ?? ($billing_address['address2'] ?? ''),
@@ -434,12 +474,29 @@ function generatePackingSlip($shop_id, $order_id) {
         '{{ Billing_Zip }}'     => $billing_address['zip']      ?? '',
         '{{ Billing_Country }}' => $billing_address['country']  ?? '',
         '{{ Packing_Items }}'   => $items_html,
-        '{{ Total_Items }}'     => $total_items,
+        '{{ Total_Items }}'     => fmt_number($total_items, 0),
+
+        '{{ Html_Lang }}' => i18n_locale(),
+        '{{ Html_Dir }}'  => i18n_dir(),
+
+        // Translated chrome (see the invoice replacements for the rationale).
+        '{{ L_Packing_Title }}' => e('packing_slip.title_display'),
+        '{{ L_Order_No }}'      => e('packing_slip.order_no'),
+        '{{ L_Order_Date }}'    => e('packing_slip.order_date'),
+        '{{ L_Ship_Date }}'     => e('packing_slip.ship_date'),
+        '{{ L_Ship_To }}'       => e('packing_slip.ship_to'),
+        '{{ L_Bill_To }}'       => e('packing_slip.bill_to'),
+        '{{ L_Item }}'          => e('packing_slip.item'),
+        '{{ L_Qty }}'           => e('packing_slip.qty'),
+        '{{ L_Total_Items }}'   => e('packing_slip.total_items', ['count' => fmt_number($total_items, 0)]),
+        '{{ L_Picked_By }}'     => e('packing_slip.picked_by'),
+        '{{ L_Date }}'          => e('packing_slip.date'),
+        '{{ L_Note }}'          => e('packing_slip.note'),
     ];
 
     $template_path = __DIR__ . '/invoice_templates/html/packing-slip-1.html';
     if (!is_readable($template_path)) {
-        return ['status' => 'error', 'message' => 'Packing slip template not found.'];
+        return ['status' => 'error', 'message' => t('errors.packing_slip_template_missing')];
     }
     $template = file_get_contents($template_path);
     $html = str_replace(array_keys($replacements), array_values($replacements), $template);
@@ -465,7 +522,7 @@ function generatePackingSlip($shop_id, $order_id) {
         [$encoded_pdf, $order_id]
     );
 
-    return ['status' => 'success', 'message' => 'Packing slip generated.'];
+    return ['status' => 'success', 'message' => t('toast.packing_slip_generated')];
 }
 
 /**
@@ -484,8 +541,10 @@ function getStoreSmtpSettings($shop_data) {
         'displayname' => $shop_data['store_name'].' - Sapi',
         'username' => 'support.sapi@silverwebbuzz.com',
         'password' => 'Bhavik@1109',
-        'subject' => DEFAULT_EMAIL_SUBJECT,
-        'body' => DEFAULT_EMAIL_BODY
+        // Stores on the shared mailbox have never customised these, so they
+        // get the invoice email in the store's own language.
+        'subject' => i18n_default_email_subject(),
+        'body' => i18n_default_email_body()
     ];
 }
 
@@ -597,18 +656,23 @@ function notifyPlanLimitReached($shop_id, $type = 'order') {
         return false;
     }
 
+    // This one goes to the merchant, so it uses the merchant's app language.
+    i18n_boot($shop_data);
+
     $limit = ($type === 'email') ? (int)$plan['email_limit'] : (int)$plan['order_limit'];
-    $what  = ($type === 'email') ? 'invoice emails' : 'invoices';
+    $what  = ($type === 'email') ? t('limit_email.items_emails') : t('limit_email.items_invoices');
     $upgrade_url = BASE_SHOPIFY_AF_URL . 'change-plan?shop=' . urlencode($shop_data['shop']);
 
-    $subject = 'Action needed: your ' . $plan['plan_name'] . ' plan limit is reached';
-    $body = '<p>Hi ' . htmlspecialchars($shop_data['shop_owner']) . ',</p>'
-        . '<p>Your <strong>' . htmlspecialchars($plan['plan_name']) . '</strong> plan allows '
-        . $limit . ' ' . $what . ' per billing cycle, and that limit has now been reached.</p>'
-        . '<p>Automatic invoices to your customers have been paused. Upgrade your plan to '
-        . 'resume sending invoices right away.</p>'
-        . '<p><a href="' . htmlspecialchars($upgrade_url) . '">Upgrade your plan</a></p>'
-        . '<p>— SWB Auto PDF Invoices</p>';
+    $subject = t('limit_email.subject', ['plan' => $plan['plan_name']]);
+    $body = '<p>' . e('limit_email.greeting', ['owner' => $shop_data['shop_owner']]) . '</p>'
+        . '<p>' . t_html('limit_email.body', [
+                'plan'  => $plan['plan_name'],
+                'limit' => fmt_number($limit),
+                'items' => $what,
+          ]) . '</p>'
+        . '<p>' . e('limit_email.paused') . '</p>'
+        . '<p><a href="' . htmlspecialchars($upgrade_url) . '">' . e('limit_email.cta') . '</a></p>'
+        . '<p>' . e('limit_email.signature') . '</p>';
 
     $smtp_settings = getStoreSmtpSettings($shop_data);
     $sent = sendPlainEmail($smtp_settings, $to_email, $shop_data['shop_owner'], $subject, $body);
@@ -633,14 +697,17 @@ function sendemail($shop_id,$order_id, $personal_copy = false){
     );
 
     if ($shop_data) {
+        // Customer-facing email — render in the store's language.
+        i18n_boot($shop_data);
+
         $shop_name = preg_replace('/[^a-zA-Z0-9_]/', '_', strtolower($shop_data['shop']));
         $invoice_table = "invoices_" . $shop_name;
-        
+
         // Fetch invoice details
         $invoice = DBHelper::selectOne("SELECT * FROM `$invoice_table` WHERE order_id = ?","s", [$order_id]);
 
         if ($invoice) {
-            
+
             // Check email limits for non-personal copies
             if (!$personal_copy) {
                 $currentPlan = DBHelper::selectOne(
@@ -652,7 +719,7 @@ function sendemail($shop_id,$order_id, $personal_copy = false){
                 if ($currentPlan['email_used'] >= $currentPlan['email_limit']) {
                     return json_encode([
                         'status' => 'error',
-                        'message' => 'Email limit reached. Please upgrade your plan to send more emails.'
+                        'message' => t('errors.email_limit_reached')
                     ]);
                 }
             }
@@ -665,7 +732,7 @@ function sendemail($shop_id,$order_id, $personal_copy = false){
             if ($personal_copy) {
                 $to_email = $shop_data['email_invoice'] ?? $shop_data['email'];
                 $to_name = $shop_data['shop_owner'];
-                $subject = "[Store Copy] " . str_replace(['{invoice_number}','{shop_name}'],[$invoice['order_name'],$shop_data['store_name']],$smtp_settings['subject']);
+                $subject = t('invoice_email.store_copy_prefix') . ' ' . str_replace(['{invoice_number}','{shop_name}'],[$invoice['order_name'],$shop_data['store_name']],$smtp_settings['subject']);
             } else {
                 $to_email = $invoice['customer_email'];
                 $to_name = $invoice['customer_name'];
@@ -701,23 +768,25 @@ function sendemail($shop_id,$order_id, $personal_copy = false){
                 );
             }
 
+            // A failed send is an error, not a success with a sad message —
+            // script.js switches the toast colour on `status`.
             return json_encode([
-                'status' => 'success',
-                'message' => $personal_copy ? 
-                    ($email_sent ? 'Store copy sent successfully.' : 'Failed to send store copy.') :
-                    ($email_sent ? 'Email sent successfully.' : 'Failed to send email.'),
+                'status' => $email_sent ? 'success' : 'error',
+                'message' => $personal_copy
+                    ? ($email_sent ? t('toast.email_owner_sent') : t('toast.email_owner_failed'))
+                    : ($email_sent ? t('toast.email_sent') : t('toast.email_failed')),
                 'email_status' => $email_status
             ]);
         } else {
             return json_encode([
                 'status' => 'error',
-                'message' => 'No invoice found with the specified order ID.'
+                'message' => t('errors.invoice_not_found')
             ]);
         }
     } else {
         return json_encode([
             'status' => 'error',
-            'message' => 'No shop found with the specified ID.'
+            'message' => t('errors.shop_not_found')
         ]);
     }
 }

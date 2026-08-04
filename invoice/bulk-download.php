@@ -28,11 +28,11 @@ if ($type === 'packing_slip' && $packingSlipReady) {
         "",
         []
     );
-    $heading      = 'Bulk Download Packing Slips';
-    $subheading   = 'Select multiple generated packing slips and download them as a single ZIP file.';
+    $heading      = t('bulk.packing_slips_title');
+    $subheading   = t('bulk.packing_slips_subtitle');
     $generateHref = 'packing-slip?shop=' . htmlspecialchars($shop);
-    $generateLabel = 'Packing Slips page';
-    $emptyMessage = 'No generated packing slips yet. Generate them from the';
+    $generateLabel = t('bulk.link_packing_slips');
+    $emptyMessage = t('bulk.empty_packing_slips');
 } else {
     if ($type === 'packing_slip' && !$packingSlipReady) {
         // Force the type back to invoice if migration hasn't run yet.
@@ -48,11 +48,11 @@ if ($type === 'packing_slip' && $packingSlipReady) {
         "",
         []
     );
-    $heading      = 'Bulk Download Invoices';
-    $subheading   = 'Select multiple generated invoices and download them as a single ZIP file.';
+    $heading      = t('bulk.invoices_title');
+    $subheading   = t('bulk.invoices_subtitle');
     $generateHref = 'index?shop=' . htmlspecialchars($shop);
-    $generateLabel = 'Dashboard';
-    $emptyMessage = 'No generated invoices yet. Generate invoices from the';
+    $generateLabel = t('bulk.link_dashboard');
+    $emptyMessage = t('bulk.empty_invoices');
 }
 ?>
 
@@ -65,25 +65,25 @@ if ($type === 'packing_slip' && $packingSlipReady) {
     <!-- Type toggle -->
     <div class="bulk-type-toggle">
         <a href="bulk-download?shop=<?= htmlspecialchars($shop) ?>&type=invoice"
-           class="<?= $type === 'invoice' ? 'active' : '' ?>">Invoices</a>
+           class="<?= $type === 'invoice' ? 'active' : '' ?>"><?= e('bulk.tab_invoices') ?></a>
         <a href="bulk-download?shop=<?= htmlspecialchars($shop) ?>&type=packing_slip"
-           class="<?= $type === 'packing_slip' ? 'active' : '' ?>">Packing Slips</a>
+           class="<?= $type === 'packing_slip' ? 'active' : '' ?>"><?= e('bulk.tab_packing_slips') ?></a>
     </div>
 
     <?php if ($type === 'packing_slip' && !$packingSlipReady): ?>
         <div class="bulk-upgrade-banner" style="background:#fef2f2; border-color:#fca5a5;">
             <div>
-                <strong style="color:#991b1b;">Packing slips not enabled yet.</strong>
-                <p style="color:#7f1d1d;">A one-time database update is required to enable packing slips for your store. Please contact support.</p>
+                <strong style="color:#991b1b;"><?= e('packing.not_enabled_title') ?></strong>
+                <p style="color:#7f1d1d;"><?= e('packing.not_enabled_body') ?></p>
             </div>
         </div>
     <?php elseif ($isFreePlan): ?>
         <div class="bulk-upgrade-banner">
             <div>
-                <strong>Bulk download is a paid feature.</strong>
-                <p>You can preview the list below, but downloading multiple files at once requires a paid plan.</p>
+                <strong><?= e('bulk.paid_feature_title') ?></strong>
+                <p><?= e('bulk.paid_feature_body') ?></p>
             </div>
-            <a href="change-plan?shop=<?= htmlspecialchars($shop) ?>" class="upgrade-btn">Upgrade Plan</a>
+            <a href="change-plan?shop=<?= htmlspecialchars($shop) ?>" class="upgrade-btn"><?= e('common.upgrade_plan') ?></a>
         </div>
     <?php endif; ?>
 
@@ -92,7 +92,7 @@ if ($type === 'packing_slip' && $packingSlipReady) {
             <p style="padding: 24px; text-align: center; color: #6b7280; font-size: 14px;">
                 <?= htmlspecialchars($emptyMessage) ?>
                 <a href="<?= $generateHref ?>" style="color: #111827; text-decoration: underline;"><?= htmlspecialchars($generateLabel) ?></a>
-                first, then come back here to bulk download.
+                <?= e('bulk.empty_suffix') ?>
             </p>
         <?php else: ?>
             <form id="bulk-download-form" method="post" action="bulk-download-zip" target="_blank">
@@ -102,17 +102,17 @@ if ($type === 'packing_slip' && $packingSlipReady) {
                 <div class="bulk-toolbar">
                     <label class="bulk-select-all">
                         <input type="checkbox" id="bulk-select-all" <?= $isFreePlan ? 'disabled' : '' ?>>
-                        <span>Select all</span>
+                        <span><?= e('common.select_all') ?></span>
                     </label>
-                    <span class="bulk-selected-count" id="bulk-selected-count">0 selected</span>
+                    <span class="bulk-selected-count" id="bulk-selected-count"><?= e('common.selected_count', ['count' => fmt_number(0)]) ?></span>
                     <?php if ($isFreePlan): ?>
-                        <button type="button" class="bulk-download-btn locked" disabled aria-label="Upgrade to unlock bulk download">
-                            <span class="lock-icon">&#128274;</span> Download ZIP
+                        <button type="button" class="bulk-download-btn locked" disabled aria-label="<?= e('bulk.aria_upgrade_download') ?>">
+                            <span class="lock-icon">&#128274;</span> <?= e('common.download_zip') ?>
                         </button>
-                        <a href="change-plan?shop=<?= htmlspecialchars($shop) ?>" class="upgrade-btn">Upgrade to unlock</a>
+                        <a href="change-plan?shop=<?= htmlspecialchars($shop) ?>" class="upgrade-btn"><?= e('common.upgrade_to_unlock') ?></a>
                     <?php else: ?>
                         <button type="submit" class="bulk-download-btn" id="bulk-download-btn" disabled>
-                            Download ZIP
+                            <?= e('common.download_zip') ?>
                         </button>
                     <?php endif; ?>
                 </div>
@@ -121,10 +121,10 @@ if ($type === 'packing_slip' && $packingSlipReady) {
                     <thead>
                         <tr>
                             <th style="width: 40px;">&nbsp;</th>
-                            <th>ORDER ID</th>
-                            <th>DATE</th>
-                            <th>CUSTOMER</th>
-                            <th>AMOUNT</th>
+                            <th><?= e('table.order_id') ?></th>
+                            <th><?= e('table.date') ?></th>
+                            <th><?= e('table.customer') ?></th>
+                            <th><?= e('table.amount') ?></th>
                         </tr>
                     </thead>
                     <tbody>
@@ -140,9 +140,9 @@ if ($type === 'packing_slip' && $packingSlipReady) {
                                     >
                                 </td>
                                 <td><?= htmlspecialchars($row['order_name'] ?? ('#' . $row['order_number'])) ?></td>
-                                <td><?= htmlspecialchars($row['created_at']) ?></td>
+                                <td data-order="<?= htmlspecialchars($row['created_at']) ?>"><?= htmlspecialchars(fmt_date($row['created_at'])) ?></td>
                                 <td><?= htmlspecialchars($row['customer_name']) ?></td>
-                                <td><?= htmlspecialchars($row['currency']) ?> <?= number_format((float)$row['total_price'], 2) ?></td>
+                                <td><?= htmlspecialchars(fmt_currency($row['total_price'], $row['currency'])) ?></td>
                             </tr>
                         <?php endforeach; ?>
                     </tbody>

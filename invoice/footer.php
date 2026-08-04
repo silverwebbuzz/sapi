@@ -1,7 +1,12 @@
 <footer class="main-footer">
-    <p>© 2025, made with ❤️ by <a href="https://www.silverwebbuzz.com" target="_blank">silverwebbuzz</a></p>
+    <p><?= e('footer.credit', ['year' => date('Y')]) ?> <a href="https://www.silverwebbuzz.com" target="_blank">silverwebbuzz</a></p>
 </footer>
-<script> const BASE_URL = "<?= BASE_URL ?>";</script>
+<script>
+    const BASE_URL = "<?= BASE_URL ?>";
+    // Translations for js/script.js. Only the keys that script.js actually
+    // uses cross over, so page weight doesn't grow with the catalog.
+    window.SAPI_I18N = <?= json_encode(i18n_js_payload(), JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES) ?>;
+</script>
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 <!-- Popper.js (required for Bootstrap 4 tooltips) -->
 <script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.1/dist/umd/popper.min.js"></script>

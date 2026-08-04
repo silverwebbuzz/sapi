@@ -11,7 +11,10 @@
 require_once '../config/config.php';
 require_once '../config/db.php';
 require_once 'helper.php';
+require_once 'i18n.php';
 require_once '../vendor/autoload.php';
+
+i18n_boot();
 
 $shop_id  = isset($_REQUEST['shop_id'])  ? (int)$_REQUEST['shop_id'] : 0;
 $order_id = isset($_REQUEST['order_id']) ? (string)$_REQUEST['order_id'] : '';
@@ -19,7 +22,7 @@ $view     = !empty($_REQUEST['view']);
 
 if ($shop_id <= 0 || $order_id === '') {
     http_response_code(400);
-    die('Missing shop_id or order_id.');
+    die(t('errors.missing_shop_or_order'));
 }
 
 // Confirm the store is installed and look up its active plan price.
@@ -36,8 +39,12 @@ $store = DBHelper::selectOne(
 );
 if (!$store) {
     http_response_code(404);
-    die('Store not found.');
+    die(t('errors.store_not_found'));
 }
+
+// Errors from here on are shown to the merchant, so use their language.
+$store_row = DBHelper::selectOne("SELECT * FROM stores WHERE id = ?", "i", [$shop_id]);
+i18n_boot($store_row);
 
 $isFreePlan = ((float)($store['price'] ?? 0) == 0.00);
 
@@ -45,7 +52,7 @@ $isFreePlan = ((float)($store['price'] ?? 0) == 0.00);
 // users too — they may have packing slips generated before downgrading.
 if (!$view && $isFreePlan) {
     http_response_code(403);
-    die('Packing slip generation requires a paid plan.');
+    die(t('errors.packing_slip_paid_only'));
 }
 
 if ($view) {
@@ -58,7 +65,7 @@ if ($view) {
     if (!$row || empty($row['packing_slip_pdf'])) {
         http_response_code(404);
         header('Content-Type: application/json');
-        echo json_encode(['status' => 'error', 'message' => 'Packing slip not generated yet.']);
+        echo json_encode(['status' => 'error', 'message' => t('errors.packing_slip_not_generated')]);
         exit;
     }
     // Return the base64 PDF as JSON so the page can render it via a
