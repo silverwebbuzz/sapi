@@ -4,6 +4,16 @@ require_once '../config/db.php';
 require_once 'helper.php';
 require_once 'shopify_functions.php';
 require_once '../vendor/autoload.php';
+
+// Why an automatic invoice/email did or didn't go out is otherwise invisible:
+// the webhook answers 200 to Shopify either way.
+function webhook_log($label, $data = null) {
+    $line = '[' . date('Y-m-d H:i:s') . '] ' . $label;
+    if ($data !== null) {
+        $line .= ' :: ' . (is_scalar($data) ? var_export($data, true) : json_encode($data, JSON_UNESCAPED_SLASHES));
+    }
+    error_log($line . "\n", 3, __DIR__ . '/webhook_debug.log');
+}
  
 // Verify webhook HMAC
 $hmac = $_SERVER['HTTP_X_SHOPIFY_HMAC_SHA256'];
@@ -54,8 +64,6 @@ if ($topic === 'app/uninstalled') {
         tax_amount = VALUES(tax_amount),
         discount_amount = VALUES(discount_amount),
         shipping_cost = VALUES(shipping_cost),
-        invoice_status = VALUES(invoice_status),
-        email_status = VALUES(email_status),
         payment_method = VALUES(payment_method),
         order_status = VALUES(order_status),
         products = VALUES(products)
@@ -64,8 +72,9 @@ if ($topic === 'app/uninstalled') {
     $order_id = $order['id']; 
     $order_number = $order['order_number'];
     $order_name = $order['name'];
-    $customer_name = $order['customer']['first_name'] . ' ' . $order['customer']['last_name'];
-    $customer_email = $order['customer']['email'];
+    $contact = extractOrderContact($order);
+    $customer_name = $contact['name'];
+    $customer_email = $contact['email'];
     $currency = $order['currency'];
     $subtotal_price = $order['subtotal_price'];
     $total_price = $order['total_price'];
@@ -100,45 +109,72 @@ if ($topic === 'app/uninstalled') {
     $order_status,
     $products]);
 
+    if ($webhook_invoice_id === false) {
+        webhook_log('ORDER_INSERT_FAILED', ['shop' => $shop, 'order_id' => $order_id]);
+    }
+
     $shop_data = DBHelper::selectOne(
         "SELECT id, shop_owner, status, auto_invoice_customer, auto_invoice_personal FROM stores WHERE `shop` = ? AND `status` = ?",
         "ss", 
         [$shop, "installed"]
     );
-    $shop_id = $shop_data['id'];
+
+    if (!$shop_data) {
+        // Nothing below can run without an installed store row; log it instead
+        // of dereferencing null and silently doing nothing.
+        webhook_log('AUTO_SKIPPED_NO_INSTALLED_STORE', ['shop' => $shop, 'order_id' => $order_id]);
+    } else {
+        $shop_id = $shop_data['id'];
     
-    $sql_currentPlan = "SELECT * FROM store_subscriptions ss WHERE ss.store_id = ? AND ss.status = 'active'  ORDER BY ss.activated_on DESC LIMIT 1 ";
-    $currentPlan = DBHelper::selectOne($sql_currentPlan, "i", [$shop_id]);
+        $sql_currentPlan = "SELECT * FROM store_subscriptions ss WHERE ss.store_id = ? AND ss.status = 'active'  ORDER BY ss.activated_on DESC LIMIT 1 ";
+        $currentPlan = DBHelper::selectOne($sql_currentPlan, "i", [$shop_id]);
 
-    // Reset usage counters if the billing period has rolled over (monthly quota).
-    $currentPlan = applyMonthlyUsageReset($currentPlan);
+        // Reset usage counters if the billing period has rolled over (monthly quota).
+        $currentPlan = applyMonthlyUsageReset($currentPlan);
 
-    // Free and paid plans run the same automatic flow — the plan's own limits
-    // are the only gate (Lifetime Free = 20 invoices / 20 emails). Once a limit
-    // is hit the owner is emailed once, and the admin shows the same warning.
-    if ($currentPlan) {
-        $autoEnabled = ($shop_data['auto_invoice_customer'] == 'Yes' || $shop_data['auto_invoice_personal'] == 'Yes');
+        // Free and paid plans run the same automatic flow — the plan's own limits
+        // are the only gate (Lifetime Free = 20 invoices / 20 emails). Once a limit
+        // is hit the owner is emailed once, and the admin shows the same warning.
+        if ($currentPlan) {
+            $autoEnabled = ($shop_data['auto_invoice_customer'] == 'Yes' || $shop_data['auto_invoice_personal'] == 'Yes');
 
-        if ($currentPlan['order_used'] < $currentPlan['order_limit']) {
-            $generatepdf = generatepdf($shop_id, $order_id);
+            if ($currentPlan['order_used'] < $currentPlan['order_limit']) {
+                $generatepdf = generatepdf($shop_id, $order_id);
 
-            $emailQuotaLeft = ($currentPlan['email_used'] < $currentPlan['email_limit']);
+                $emailQuotaLeft = ($currentPlan['email_used'] < $currentPlan['email_limit']);
 
-            if ($autoEnabled && !$emailQuotaLeft) {
-                notifyPlanLimitReached($shop_id, 'email');
+                webhook_log('AUTO_FLOW', [
+                    'shop' => $shop,
+                    'order_id' => $order_id,
+                    'customer_email' => $customer_email !== '' ? $customer_email : '(empty)',
+                    'auto_customer' => $shop_data['auto_invoice_customer'],
+                    'auto_personal' => $shop_data['auto_invoice_personal'],
+                    'email_used' => $currentPlan['email_used'],
+                    'email_limit' => $currentPlan['email_limit'],
+                ]);
+
+                if ($autoEnabled && !$emailQuotaLeft) {
+                    notifyPlanLimitReached($shop_id, 'email');
+                }
+
+                // Send email to customer if enabled
+                if ($shop_data['auto_invoice_customer'] == 'Yes' && $emailQuotaLeft) {
+                    $sendemail = sendemail($shop_id, $order_id);
+                    webhook_log('AUTO_EMAIL_CUSTOMER', ['order_id' => $order_id, 'result' => $sendemail]);
+                }
+
+                // Send personal copy if enabled (independent of customer email setting)
+                if ($shop_data['auto_invoice_personal'] == 'Yes' && $emailQuotaLeft) {
+                    $sendemail = sendemail($shop_id, $order_id, true);
+                    webhook_log('AUTO_EMAIL_OWNER', ['order_id' => $order_id, 'result' => $sendemail]);
+                }
+            } elseif ($autoEnabled) {
+                notifyPlanLimitReached($shop_id, 'order');
             }
-
-            // Send email to customer if enabled
-            if ($shop_data['auto_invoice_customer'] == 'Yes' && $emailQuotaLeft) {
-                $sendemail = sendemail($shop_id, $order_id);
-            }
-
-            // Send personal copy if enabled (independent of customer email setting)
-            if ($shop_data['auto_invoice_personal'] == 'Yes' && $emailQuotaLeft) {
-                $sendemail = sendemail($shop_id, $order_id, true);
-            }
-        } elseif ($autoEnabled) {
-            notifyPlanLimitReached($shop_id, 'order');
+        } else {
+            // No active subscription row — the whole automatic flow is a no-op,
+            // which used to be invisible.
+            webhook_log('AUTO_SKIPPED_NO_ACTIVE_PLAN', ['shop' => $shop, 'store_id' => $shop_id, 'order_id' => $order_id]);
         }
     }
 

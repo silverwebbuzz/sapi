@@ -250,6 +250,7 @@
   "errors.packing_slip_paid_only": "生成装箱单需要付费套餐。",
   "errors.packing_slip_storage_missing": "此店铺尚未启用装箱单存储功能。请联系支持团队。",
   "errors.email_limit_reached": "已达到邮件额度上限。请升级套餐以发送更多邮件。",
+  "errors.no_recipient_email": "此订单没有客户邮箱地址，因此无法发送发票。",
   "errors.invalid_request_method": "请求方式无效。",
   "errors.invalid_parameters": "参数无效。",
   "errors.missing_shop_param": "缺少 shop 参数。请从您的 Shopify 后台重新打开应用。",

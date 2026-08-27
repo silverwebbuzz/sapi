@@ -8,6 +8,43 @@ use PHPMailer\PHPMailer\PHPMailer;
 use PHPMailer\PHPMailer\SMTP;
 use PHPMailer\PHPMailer\Exception;
 
+/**
+ * Pull the recipient's email + name out of a Shopify order payload.
+ *
+ * `customer` is absent on guest checkouts and on payloads where Shopify
+ * redacts customer data, so relying on `customer.email` alone leaves the
+ * invoice row with an empty address and every automatic email fails inside
+ * PHPMailer. Shopify still exposes the buyer's address as `email` /
+ * `contact_email` in those cases; the name falls back to the billing and then
+ * shipping address.
+ */
+function extractOrderContact(array $order) {
+    $email = '';
+    foreach ([$order['customer']['email'] ?? '', $order['email'] ?? '', $order['contact_email'] ?? ''] as $candidate) {
+        $candidate = trim((string)$candidate);
+        if ($candidate !== '') {
+            $email = $candidate;
+            break;
+        }
+    }
+
+    $name = trim(($order['customer']['first_name'] ?? '') . ' ' . ($order['customer']['last_name'] ?? ''));
+    if ($name === '') {
+        foreach (['billing_address', 'shipping_address'] as $addr) {
+            $candidate = trim((string)($order[$addr]['name'] ?? ''));
+            if ($candidate === '') {
+                $candidate = trim(($order[$addr]['first_name'] ?? '') . ' ' . ($order[$addr]['last_name'] ?? ''));
+            }
+            if ($candidate !== '') {
+                $name = $candidate;
+                break;
+            }
+        }
+    }
+
+    return ['email' => $email, 'name' => $name];
+}
+
 function generatepdf($shop_id,$order_id){
     $shop_data = DBHelper::selectOne(
         "SELECT * FROM stores WHERE `id` = ? ",
@@ -715,8 +752,9 @@ function sendemail($shop_id,$order_id, $personal_copy = false){
                     "i",
                     [$shop_id]
                 );
-                
-                if ($currentPlan['email_used'] >= $currentPlan['email_limit']) {
+                $currentPlan = applyMonthlyUsageReset($currentPlan);
+
+                if ($currentPlan && $currentPlan['email_used'] >= $currentPlan['email_limit']) {
                     return json_encode([
                         'status' => 'error',
                         'message' => t('errors.email_limit_reached')
@@ -738,6 +776,24 @@ function sendemail($shop_id,$order_id, $personal_copy = false){
                 $to_name = $invoice['customer_name'];
                 $subject = str_replace(['{invoice_number}','{shop_name}'],[$invoice['order_name'],$shop_data['store_name']],$smtp_settings['subject']);
             }
+            // Guest checkouts (and payloads with no customer object) can leave
+            // the invoice with no address at all — PHPMailer would just throw
+            // and the merchant would see a bare "failed".
+            if (trim((string)$to_email) === '') {
+                if (!$personal_copy) {
+                    DBHelper::execute(
+                        "UPDATE `$invoice_table` SET email_status = 'failed' WHERE order_id = ? ",
+                        "s",
+                        [$order_id]
+                    );
+                }
+                return json_encode([
+                    'status' => 'error',
+                    'message' => $personal_copy ? t('toast.email_owner_failed') : t('errors.no_recipient_email'),
+                    'email_status' => 'failed'
+                ]);
+            }
+
             $body = $smtp_settings['body'];
             //When sending an email, you would replace the variables like this:
             $email_body = str_replace(
@@ -867,7 +923,8 @@ function sendEmailWithAttachment($smtp_settings, $to_email, $to_name, $subject, 
          return true;
  
      } catch (Exception $e) {
-         echo "Error: " . $e->getMessage();
+         // Never echo — sendemail.php returns JSON to the admin UI, and the
+         // webhook must not emit a body before its 200.
          error_log("Mail Error: " . $e->getMessage());
          return false;
          

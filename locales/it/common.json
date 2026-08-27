@@ -250,6 +250,7 @@
   "errors.packing_slip_paid_only": "La generazione dei documenti di trasporto richiede un piano a pagamento.",
   "errors.packing_slip_storage_missing": "L'archiviazione dei documenti di trasporto non è ancora attiva per questo negozio. Contatta l'assistenza.",
   "errors.email_limit_reached": "Limite email raggiunto. Passa a un piano superiore per inviare altre email.",
+  "errors.no_recipient_email": "Questo ordine non ha un indirizzo email del cliente, quindi la fattura non è stata inviata.",
   "errors.invalid_request_method": "Metodo di richiesta non valido.",
   "errors.invalid_parameters": "Parametri non validi.",
   "errors.missing_shop_param": "Parametro «shop» mancante. Riapri l'app dal tuo pannello Shopify.",

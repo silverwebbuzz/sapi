@@ -250,6 +250,7 @@
   "errors.packing_slip_paid_only": "יצירת תעודות משלוח מחייבת תוכנית בתשלום.",
   "errors.packing_slip_storage_missing": "אחסון תעודות משלוח עדיין לא הופעל עבור חנות זו. פנו לתמיכה.",
   "errors.email_limit_reached": "הגעתם למכסת האימיילים. שדרגו את התוכנית כדי לשלוח עוד.",
+  "errors.no_recipient_email": "להזמנה זו אין כתובת אימייל של הלקוח, ולכן לא ניתן היה לשלוח את החשבונית.",
   "errors.invalid_request_method": "שיטת בקשה לא חוקית.",
   "errors.invalid_parameters": "פרמטרים לא חוקיים.",
   "errors.missing_shop_param": "הפרמטר shop חסר. פתחו מחדש את האפליקציה מממשק הניהול של Shopify.",

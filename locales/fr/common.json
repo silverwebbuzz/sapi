@@ -250,6 +250,7 @@
   "errors.packing_slip_paid_only": "La génération de bons de livraison nécessite un forfait payant.",
   "errors.packing_slip_storage_missing": "Le stockage des bons de livraison n'est pas encore activé pour cette boutique. Veuillez contacter le support.",
   "errors.email_limit_reached": "Limite d'e-mails atteinte. Passez à un forfait supérieur pour envoyer plus d'e-mails.",
+  "errors.no_recipient_email": "Cette commande n'a pas d'adresse e-mail client, la facture n'a donc pas pu être envoyée.",
   "errors.invalid_request_method": "Méthode de requête invalide.",
   "errors.invalid_parameters": "Paramètres invalides.",
   "errors.missing_shop_param": "Paramètre « shop » manquant. Veuillez rouvrir l'application depuis votre admin Shopify.",

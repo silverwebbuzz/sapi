@@ -250,6 +250,7 @@
   "errors.packing_slip_paid_only": "يتطلب إنشاء قوائم التعبئة خطة مدفوعة.",
   "errors.packing_slip_storage_missing": "لم يتم تفعيل تخزين قوائم التعبئة لهذا المتجر بعد. يُرجى التواصل مع الدعم.",
   "errors.email_limit_reached": "تم بلوغ حد الرسائل. قم بترقية خطتك لإرسال المزيد.",
+  "errors.no_recipient_email": "لا يحتوي هذا الطلب على بريد إلكتروني للعميل، لذا تعذّر إرسال الفاتورة.",
   "errors.invalid_request_method": "طريقة الطلب غير صالحة.",
   "errors.invalid_parameters": "معطيات غير صالحة.",
   "errors.missing_shop_param": "المعطى «shop» مفقود. يُرجى إعادة فتح التطبيق من لوحة تحكم Shopify.",

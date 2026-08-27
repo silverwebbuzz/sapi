@@ -250,6 +250,7 @@
   "errors.packing_slip_paid_only": "För att skapa följesedlar krävs en betalplan.",
   "errors.packing_slip_storage_missing": "Lagring av följesedlar är inte aktiverad för den här butiken ännu. Kontakta supporten.",
   "errors.email_limit_reached": "E-postgränsen är nådd. Uppgradera din plan för att skicka fler meddelanden.",
+  "errors.no_recipient_email": "Den här ordern saknar kundens e-postadress, så fakturan kunde inte skickas.",
   "errors.invalid_request_method": "Ogiltig begäransmetod.",
   "errors.invalid_parameters": "Ogiltiga parametrar.",
   "errors.missing_shop_param": "Parametern ”shop” saknas. Öppna appen igen från din Shopify-administration.",

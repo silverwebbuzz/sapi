@@ -250,6 +250,7 @@
   "errors.packing_slip_paid_only": "Oprettelse af følgesedler kræver et betalt abonnement.",
   "errors.packing_slip_storage_missing": "Lagring af følgesedler er ikke aktiveret for denne butik endnu. Kontakt support.",
   "errors.email_limit_reached": "E-mailgrænsen er nået. Opgrader dit abonnement for at sende flere e-mails.",
+  "errors.no_recipient_email": "Denne ordre har ingen kunde-e-mailadresse, så fakturaen kunne ikke sendes.",
   "errors.invalid_request_method": "Ugyldig anmodningsmetode.",
   "errors.invalid_parameters": "Ugyldige parametre.",
   "errors.missing_shop_param": "Parameteren \"shop\" mangler. Åbn appen igen fra din Shopify-administration.",

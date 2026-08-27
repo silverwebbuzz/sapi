@@ -250,6 +250,7 @@
   "errors.packing_slip_paid_only": "Für die Erstellung von Lieferscheinen ist ein kostenpflichtiger Tarif erforderlich.",
   "errors.packing_slip_storage_missing": "Die Lieferschein-Speicherung ist für diesen Shop noch nicht aktiviert. Bitte kontaktieren Sie den Support.",
   "errors.email_limit_reached": "E-Mail-Limit erreicht. Bitte upgraden Sie Ihren Tarif, um weitere E-Mails zu senden.",
+  "errors.no_recipient_email": "Diese Bestellung hat keine Kunden-E-Mail-Adresse, daher konnte die Rechnung nicht gesendet werden.",
   "errors.invalid_request_method": "Ungültige Anfragemethode.",
   "errors.invalid_parameters": "Ungültige Parameter.",
   "errors.missing_shop_param": "Der Parameter „shop“ fehlt. Bitte öffnen Sie die App erneut über Ihr Shopify-Admin.",

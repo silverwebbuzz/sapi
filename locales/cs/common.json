@@ -250,6 +250,7 @@
   "errors.packing_slip_paid_only": "Generování dodacích listů vyžaduje placený tarif.",
   "errors.packing_slip_storage_missing": "Ukládání dodacích listů zatím není pro tento obchod aktivované. Kontaktujte podporu.",
   "errors.email_limit_reached": "Byl dosažen limit e-mailů. Pro odeslání dalších přejděte na vyšší tarif.",
+  "errors.no_recipient_email": "Tato objednávka nemá e-mail zákazníka, proto fakturu nelze odeslat.",
   "errors.invalid_request_method": "Neplatná metoda požadavku.",
   "errors.invalid_parameters": "Neplatné parametry.",
   "errors.missing_shop_param": "Chybí parametr „shop“. Otevřete aplikaci znovu ze svého administračního rozhraní Shopify.",

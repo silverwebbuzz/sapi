@@ -250,6 +250,7 @@
   "errors.packing_slip_paid_only": "거래명세서를 생성하려면 유료 플랜이 필요합니다.",
   "errors.packing_slip_storage_missing": "이 스토어에는 아직 거래명세서 저장이 활성화되지 않았습니다. 고객지원팀에 문의해 주세요.",
   "errors.email_limit_reached": "이메일 한도에 도달했습니다. 더 보내려면 플랜을 업그레이드하세요.",
+  "errors.no_recipient_email": "이 주문에는 고객 이메일 주소가 없어 인보이스를 보낼 수 없습니다.",
   "errors.invalid_request_method": "잘못된 요청 방식입니다.",
   "errors.invalid_parameters": "잘못된 매개변수입니다.",
   "errors.missing_shop_param": "'shop' 매개변수가 없습니다. Shopify 관리자 화면에서 앱을 다시 열어 주세요.",

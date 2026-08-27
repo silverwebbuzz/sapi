@@ -250,6 +250,7 @@
   "errors.packing_slip_paid_only": "A geração de guias de remessa requer um plano pago.",
   "errors.packing_slip_storage_missing": "O armazenamento de guias de remessa ainda não está ativado para esta loja. Contacte o suporte.",
   "errors.email_limit_reached": "Limite de e-mails atingido. Faça upgrade do seu plano para enviar mais e-mails.",
+  "errors.no_recipient_email": "Este pedido não tem e-mail do cliente, por isso a fatura não pôde ser enviada.",
   "errors.invalid_request_method": "Método de pedido inválido.",
   "errors.invalid_parameters": "Parâmetros inválidos.",
   "errors.missing_shop_param": "Falta o parâmetro «shop». Volte a abrir a aplicação a partir do seu painel Shopify.",

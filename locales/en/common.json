@@ -250,6 +250,7 @@
   "errors.packing_slip_paid_only": "Packing slip generation requires a paid plan.",
   "errors.packing_slip_storage_missing": "Packing slip storage is not enabled for this store yet. Please contact support.",
   "errors.email_limit_reached": "Email limit reached. Please upgrade your plan to send more emails.",
+  "errors.no_recipient_email": "This order has no customer email address, so the invoice could not be sent.",
   "errors.invalid_request_method": "Invalid request method.",
   "errors.invalid_parameters": "Invalid parameters.",
   "errors.missing_shop_param": "Missing shop parameter. Please re-open the app from your Shopify admin.",

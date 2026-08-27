@@ -250,6 +250,7 @@
   "errors.packing_slip_paid_only": "Voor het aanmaken van pakbonnen is een betaald abonnement vereist.",
   "errors.packing_slip_storage_missing": "Pakbonopslag is nog niet ingeschakeld voor deze winkel. Neem contact op met support.",
   "errors.email_limit_reached": "E-maillimiet bereikt. Upgrade je abonnement om meer e-mails te versturen.",
+  "errors.no_recipient_email": "Deze bestelling heeft geen e-mailadres van de klant, dus de factuur kon niet worden verzonden.",
   "errors.invalid_request_method": "Ongeldige aanvraagmethode.",
   "errors.invalid_parameters": "Ongeldige parameters.",
   "errors.missing_shop_param": "Parameter 'shop' ontbreekt. Open de app opnieuw vanuit je Shopify-beheer.",

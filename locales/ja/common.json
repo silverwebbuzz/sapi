@@ -250,6 +250,7 @@
   "errors.packing_slip_paid_only": "納品書の作成には有料プランが必要です。",
   "errors.packing_slip_storage_missing": "このストアではまだ納品書の保存が有効になっていません。サポートまでご連絡ください。",
   "errors.email_limit_reached": "メールの上限に達しました。さらに送信するにはプランをアップグレードしてください。",
+  "errors.no_recipient_email": "この注文には顧客のメールアドレスがないため、請求書を送信できませんでした。",
   "errors.invalid_request_method": "リクエストメソッドが無効です。",
   "errors.invalid_parameters": "パラメーターが無効です。",
   "errors.missing_shop_param": "パラメーター「shop」がありません。Shopify管理画面からアプリを開き直してください。",

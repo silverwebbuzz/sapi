@@ -250,6 +250,7 @@
   "errors.packing_slip_paid_only": "Å opprette pakksedler krever et betalt abonnement.",
   "errors.packing_slip_storage_missing": "Lagring av pakksedler er ikke aktivert for denne butikken ennå. Kontakt kundestøtte.",
   "errors.email_limit_reached": "E-postgrensen er nådd. Oppgrader abonnementet for å sende flere e-poster.",
+  "errors.no_recipient_email": "Denne ordren har ingen e-postadresse for kunden, så fakturaen kunne ikke sendes.",
   "errors.invalid_request_method": "Ugyldig forespørselsmetode.",
   "errors.invalid_parameters": "Ugyldige parametere.",
   "errors.missing_shop_param": "Parameteren «shop» mangler. Åpne appen på nytt fra Shopify-administrasjonen.",

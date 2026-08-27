@@ -250,6 +250,7 @@
   "errors.packing_slip_paid_only": "La generación de albaranes requiere un plan de pago.",
   "errors.packing_slip_storage_missing": "El almacenamiento de albaranes aún no está activado para esta tienda. Ponte en contacto con soporte.",
   "errors.email_limit_reached": "Límite de correos alcanzado. Mejora tu plan para enviar más correos.",
+  "errors.no_recipient_email": "Este pedido no tiene correo electrónico del cliente, por lo que no se pudo enviar la factura.",
   "errors.invalid_request_method": "Método de solicitud no válido.",
   "errors.invalid_parameters": "Parámetros no válidos.",
   "errors.missing_shop_param": "Falta el parámetro «shop». Vuelve a abrir la aplicación desde tu panel de Shopify.",

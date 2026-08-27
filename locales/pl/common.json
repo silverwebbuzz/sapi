@@ -250,6 +250,7 @@
   "errors.packing_slip_paid_only": "Generowanie dokumentów wysyłki wymaga planu płatnego.",
   "errors.packing_slip_storage_missing": "Przechowywanie dokumentów wysyłki nie jest jeszcze włączone dla tego sklepu. Skontaktuj się z pomocą techniczną.",
   "errors.email_limit_reached": "Osiągnięto limit e-maili. Ulepsz plan, aby wysyłać więcej wiadomości.",
+  "errors.no_recipient_email": "To zamówienie nie ma adresu e-mail klienta, więc nie można było wysłać faktury.",
   "errors.invalid_request_method": "Nieprawidłowa metoda żądania.",
   "errors.invalid_parameters": "Nieprawidłowe parametry.",
   "errors.missing_shop_param": "Brak parametru „shop”. Otwórz aplikację ponownie z panelu Shopify.",

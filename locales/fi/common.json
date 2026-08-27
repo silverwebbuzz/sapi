@@ -250,6 +250,7 @@
   "errors.packing_slip_paid_only": "Lähetysluetteloiden luonti vaatii maksullisen tilauksen.",
   "errors.packing_slip_storage_missing": "Lähetysluetteloiden tallennusta ei ole vielä otettu käyttöön tälle kaupalle. Ota yhteyttä tukeen.",
   "errors.email_limit_reached": "Sähköpostiraja saavutettu. Päivitä tilauksesi lähettääksesi lisää sähköposteja.",
+  "errors.no_recipient_email": "Tällä tilauksella ei ole asiakkaan sähköpostiosoitetta, joten laskua ei voitu lähettää.",
   "errors.invalid_request_method": "Virheellinen pyyntömenetelmä.",
   "errors.invalid_parameters": "Virheelliset parametrit.",
   "errors.missing_shop_param": "Parametri ”shop” puuttuu. Avaa sovellus uudelleen Shopify-hallinnastasi.",

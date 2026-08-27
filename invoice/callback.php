@@ -208,10 +208,10 @@ $create_table_query = "CREATE TABLE IF NOT EXISTS `$invoice_table` (
     `shipping_cost` decimal(10,2) DEFAULT NULL,
     `created_at` timestamp NULL DEFAULT current_timestamp(),
     `payment_method` varchar(50) DEFAULT NULL,
-    `order_status` ENUM('pending','paid','failed','refunded') DEFAULT 'pending',
+    `order_status` varchar(32) DEFAULT 'pending',
     `products` LONGTEXT DEFAULT NULL,
     `invoice_status` enum('pending','generated') DEFAULT 'pending',
-    `email_status` enum('pending','sent') DEFAULT 'pending',
+    `email_status` enum('pending','sent','failed') DEFAULT 'pending',
     `pdf_invoice` LONGTEXT DEFAULT NULL,
     `packing_slip_pdf` LONGTEXT DEFAULT NULL,
     `packing_slip_status` ENUM('pending','generated') NOT NULL DEFAULT 'pending',
@@ -258,8 +258,6 @@ ON DUPLICATE KEY UPDATE
     tax_amount = VALUES(tax_amount),
     discount_amount = VALUES(discount_amount),
     shipping_cost = VALUES(shipping_cost),
-    invoice_status = VALUES(invoice_status),
-    email_status = VALUES(email_status),
     payment_method = VALUES(payment_method),
     order_status = VALUES(order_status),
     products = VALUES(products)
@@ -270,8 +268,9 @@ foreach ($orders as $order) {
         $order_id = $order['id'];
         $order_number = $order['order_number'];
         $order_name = $order['name'];
-        $customer_name = isset($order['customer']) ? trim(($order['customer']['first_name'] ?? '') . ' ' . ($order['customer']['last_name'] ?? '')) : '';
-        $customer_email = $order['customer']['email'] ?? '';
+        $contact = extractOrderContact($order);
+        $customer_name = $contact['name'];
+        $customer_email = $contact['email'];
         $currency = $order['currency'];
         $subtotal_price = $order['subtotal_price'];
         $total_price = $order['total_price'];

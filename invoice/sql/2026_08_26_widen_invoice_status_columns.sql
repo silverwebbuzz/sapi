@@ -1,0 +1,22 @@
+-- The per-shop `invoices_*` tables had two status columns that were narrower
+-- than the values the app writes:
+--
+--   email_status: sendemail() writes 'failed', which the enum did not allow —
+--                 under strict mode that UPDATE errored, so a failed automatic
+--                 email still displayed as "Pending".
+--   order_status: Shopify's financial_status also returns 'authorized',
+--                 'partially_paid', 'partially_refunded', 'voided', 'expired' —
+--                 under strict mode the order INSERT failed outright for those
+--                 orders, leaving no invoice row and therefore no automatic
+--                 invoice email.
+--
+-- There is one table per shop, so apply this with the migration script, which
+-- walks them all:
+--
+--     php tools/migrate-invoice-status-columns.php --apply
+--
+-- The per-table statement it runs is:
+--
+-- ALTER TABLE `invoices_<shop>`
+--     MODIFY `email_status` enum('pending','sent','failed') DEFAULT 'pending',
+--     MODIFY `order_status` varchar(32) DEFAULT 'pending';

@@ -250,6 +250,7 @@
   "errors.packing_slip_paid_only": "產生出貨單需要付費方案。",
   "errors.packing_slip_storage_missing": "此商店尚未啟用出貨單儲存功能。請聯絡支援團隊。",
   "errors.email_limit_reached": "已達郵件額度上限。請升級方案以寄送更多郵件。",
+  "errors.no_recipient_email": "此訂單沒有客戶電子郵件地址，因此無法寄送發票。",
   "errors.invalid_request_method": "無效的請求方法。",
   "errors.invalid_parameters": "無效的參數。",
   "errors.missing_shop_param": "缺少 shop 參數。請從您的 Shopify 後台重新開啟應用程式。",
