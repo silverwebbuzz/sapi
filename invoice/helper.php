@@ -1,4 +1,10 @@
 <?php
+// Every helper below (PDF, packing slip, email, limit notices) renders
+// user-facing strings through i18n, so the catalog must be loaded here rather
+// than left to the caller — non-page entry points like webhook.php include
+// this file without ever touching header.php.
+require_once __DIR__ . '/i18n.php';
+
 // Import Dom PDF classes
 use Dompdf\Dompdf;
 use Dompdf\Options;
