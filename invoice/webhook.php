@@ -14,7 +14,40 @@ function webhook_log($label, $data = null) {
     }
     error_log($line . "\n", 3, __DIR__ . '/webhook_debug.log');
 }
- 
+
+// Shopify gives a webhook 5 seconds to respond and retries anything slower as
+// a failed delivery. Rendering the PDF and opening one or two SMTP sessions
+// routinely takes longer than that, so the delivery is acknowledged here and
+// the real work runs with the response already flushed and the connection
+// closed. Idempotent: safe to call again at the end of the script.
+function webhook_ack() {
+    static $acked = false;
+    if ($acked) {
+        return;
+    }
+    $acked = true;
+
+    // The client is gone once we flush, so the rest of the script must not be
+    // killed with it, and it needs more than the default request budget.
+    ignore_user_abort(true);
+    @set_time_limit(120);
+
+    http_response_code(200);
+    header('Content-Type: text/plain; charset=utf-8');
+    header('Content-Length: 0');
+    header('Connection: close');
+
+    while (ob_get_level() > 0) {
+        ob_end_flush();
+    }
+    flush();
+
+    // PHP-FPM: hands the response back and lets the worker keep running.
+    if (function_exists('fastcgi_finish_request')) {
+        fastcgi_finish_request();
+    }
+}
+
 // Verify webhook HMAC
 $hmac = $_SERVER['HTTP_X_SHOPIFY_HMAC_SHA256'];
 $data = file_get_contents('php://input');
@@ -31,6 +64,9 @@ $shop = $_SERVER['HTTP_X_SHOPIFY_SHOP_DOMAIN'];
 $topic = $_SERVER['HTTP_X_SHOPIFY_TOPIC']; // Get webhook topic
 $cdate = date("Y-m-d H:i:s");
 
+// Past this point the payload is authenticated and everything left is our own
+// bookkeeping, none of which Shopify needs to wait on.
+webhook_ack();
 
 // webhook logs.
 $insertSql = "INSERT INTO webhook (shop, topic, orders, cdate) VALUES (?, ?, ?, ?)";
@@ -254,6 +290,7 @@ if ($topic === 'app/uninstalled') {
     }
 }
 
-// Respond to Shopify
-http_response_code(200);
+// Already answered above; this only matters if an early return path ever skips
+// the ack.
+webhook_ack();
 exit();

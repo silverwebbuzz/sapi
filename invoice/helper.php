@@ -865,6 +865,9 @@ function sendPlainEmail($smtp_settings, $to_email, $to_name, $subject, $html_bod
         $mail->Password   = $smtp_settings['password'];
         $mail->SMTPSecure = PHPMailer::ENCRYPTION_STARTTLS;
         $mail->Port       = $smtp_settings['port'];
+        // An unresponsive mail host must not hold the worker open indefinitely;
+        // this runs after the webhook has already answered Shopify.
+        $mail->Timeout    = 20;
 
         $from_email = !empty($smtp_settings['from_email']) ? $smtp_settings['from_email'] : $smtp_settings['username'];
         $mail->setFrom($from_email, $smtp_settings['displayname'], true);
@@ -898,6 +901,7 @@ function sendEmailWithAttachment($smtp_settings, $to_email, $to_name, $subject, 
          $mail->SMTPSecure = PHPMailer::ENCRYPTION_STARTTLS;
          $mail->Port       = $smtp_settings['port'];
          $mail->SMTPKeepAlive = true;
+         $mail->Timeout    = 20;
  
          // Critical headers
          // Use from_email if set, otherwise fallback to username
