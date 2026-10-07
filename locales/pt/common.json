@@ -220,6 +220,7 @@
   "toast.packing_slip_failed": "Não foi possível gerar a guia de remessa.",
   "toast.packing_slip_loading": "A carregar guia de remessa…",
   "toast.packing_slip_load_failed": "Não foi possível carregar a guia de remessa.",
+  "toast.invoice_load_failed": "Não foi possível carregar a fatura.",
   "toast.select_one_invoice": "Selecione pelo menos uma fatura.",
   "toast.select_one_order": "Selecione pelo menos uma encomenda.",
   "toast.select_one_generated_slip": "Selecione pelo menos uma guia de remessa já gerada para transferir.",

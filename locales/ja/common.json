@@ -220,6 +220,7 @@
   "toast.packing_slip_failed": "納品書の作成に失敗しました。",
   "toast.packing_slip_loading": "納品書を読み込んでいます…",
   "toast.packing_slip_load_failed": "納品書を読み込めませんでした。",
+  "toast.invoice_load_failed": "請求書を読み込めませんでした。",
   "toast.select_one_invoice": "請求書を1件以上選択してください。",
   "toast.select_one_order": "注文を1件以上選択してください。",
   "toast.select_one_generated_slip": "ダウンロードする作成済みの納品書を1件以上選択してください。",

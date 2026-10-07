@@ -220,6 +220,7 @@
   "toast.packing_slip_failed": "Dodací list se nepodařilo vygenerovat.",
   "toast.packing_slip_loading": "Načítání dodacího listu…",
   "toast.packing_slip_load_failed": "Dodací list se nepodařilo načíst.",
+  "toast.invoice_load_failed": "Fakturu se nepodařilo načíst.",
   "toast.select_one_invoice": "Vyberte alespoň jednu fakturu.",
   "toast.select_one_order": "Vyberte alespoň jednu objednávku.",
   "toast.select_one_generated_slip": "Ke stažení vyberte alespoň jeden již vygenerovaný dodací list.",

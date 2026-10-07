@@ -220,6 +220,7 @@
   "toast.packing_slip_failed": "装箱单生成失败。",
   "toast.packing_slip_loading": "正在加载装箱单…",
   "toast.packing_slip_load_failed": "无法加载装箱单。",
+  "toast.invoice_load_failed": "无法加载发票。",
   "toast.select_one_invoice": "请至少选择一张发票。",
   "toast.select_one_order": "请至少选择一个订单。",
   "toast.select_one_generated_slip": "请至少选择一张已生成的装箱单进行下载。",

@@ -220,6 +220,7 @@
   "toast.packing_slip_failed": "Følgesedlen kunne ikke oprettes.",
   "toast.packing_slip_loading": "Indlæser følgeseddel…",
   "toast.packing_slip_load_failed": "Følgesedlen kunne ikke indlæses.",
+  "toast.invoice_load_failed": "Fakturaen kunne ikke indlæses.",
   "toast.select_one_invoice": "Vælg mindst én faktura.",
   "toast.select_one_order": "Vælg mindst én ordre.",
   "toast.select_one_generated_slip": "Vælg mindst én allerede oprettet følgeseddel til download.",

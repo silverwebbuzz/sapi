@@ -220,6 +220,7 @@
   "toast.packing_slip_failed": "出貨單產生失敗。",
   "toast.packing_slip_loading": "正在載入出貨單…",
   "toast.packing_slip_load_failed": "無法載入出貨單。",
+  "toast.invoice_load_failed": "無法載入發票。",
   "toast.select_one_invoice": "請至少選取一張發票。",
   "toast.select_one_order": "請至少選取一筆訂單。",
   "toast.select_one_generated_slip": "請至少選取一張已產生的出貨單以進行下載。",

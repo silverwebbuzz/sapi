@@ -220,6 +220,7 @@
   "toast.packing_slip_failed": "Följesedeln kunde inte skapas.",
   "toast.packing_slip_loading": "Läser in följesedel…",
   "toast.packing_slip_load_failed": "Följesedeln kunde inte läsas in.",
+  "toast.invoice_load_failed": "Fakturan kunde inte läsas in.",
   "toast.select_one_invoice": "Markera minst en faktura.",
   "toast.select_one_order": "Markera minst en order.",
   "toast.select_one_generated_slip": "Markera minst en redan skapad följesedel att ladda ner.",

@@ -220,6 +220,7 @@
   "toast.packing_slip_failed": "Lieferschein konnte nicht erstellt werden.",
   "toast.packing_slip_loading": "Lieferschein wird geladen…",
   "toast.packing_slip_load_failed": "Lieferschein konnte nicht geladen werden.",
+  "toast.invoice_load_failed": "Rechnung konnte nicht geladen werden.",
   "toast.select_one_invoice": "Bitte wählen Sie mindestens eine Rechnung aus.",
   "toast.select_one_order": "Bitte wählen Sie mindestens eine Bestellung aus.",
   "toast.select_one_generated_slip": "Wählen Sie zum Herunterladen mindestens einen bereits erstellten Lieferschein aus.",

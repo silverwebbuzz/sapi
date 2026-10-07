@@ -140,11 +140,34 @@ $(document).ready(function() {
     console.log('[script.js] binding delegated click handlers');
 
     // View Invoice — open modal
-    $(document).on('click', '.view-invoice-btn', function (e) {
+    // The listing pages don't carry the PDF (loading every row's base64 PDF
+    // blew PHP's memory limit), so fetch it on demand like packing slips.
+    $(document).on('click', '.js-view-invoice', function (e) {
         e.preventDefault();
-        var invoiceId = $(this).data('invoice-id');
-        $('#invoiceFrame').attr('src', 'data:application/pdf;base64,' + invoiceId);
+        var shopId  = $(this).data('shop-id');
+        var orderId = $(this).data('order-id');
+
+        $('#invoiceFrame').attr('src', '');
         $('#invoiceModal').show();
+
+        $.ajax({
+            url: BASE_URL + '/invoice/view-invoice.php',
+            method: 'GET',
+            data: { shop_id: shopId, order_id: orderId },
+            dataType: 'json',
+            timeout: 30000
+        }).done(function (resp) {
+            if (resp && resp.status === 'success' && resp.pdf_base64) {
+                $('#invoiceFrame').attr('src', 'data:application/pdf;base64,' + resp.pdf_base64);
+            } else {
+                $('#invoiceModal').hide();
+                showMessage((resp && resp.message) || t('toast.invoice_load_failed'), 'error');
+            }
+        }).fail(function (xhr) {
+            $('#invoiceModal').hide();
+            var resp = xhr && xhr.responseJSON;
+            showMessage((resp && resp.message) || t('toast.invoice_load_failed'), 'error');
+        });
     });
 
     // Generate Invoice

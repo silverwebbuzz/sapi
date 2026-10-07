@@ -220,6 +220,7 @@
   "toast.packing_slip_failed": "No se pudo generar el albarán.",
   "toast.packing_slip_loading": "Cargando albarán…",
   "toast.packing_slip_load_failed": "No se pudo cargar el albarán.",
+  "toast.invoice_load_failed": "No se pudo cargar la factura.",
   "toast.select_one_invoice": "Selecciona al menos una factura.",
   "toast.select_one_order": "Selecciona al menos un pedido.",
   "toast.select_one_generated_slip": "Selecciona al menos un albarán ya generado para descargarlo.",

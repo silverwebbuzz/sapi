@@ -220,6 +220,7 @@
   "toast.packing_slip_failed": "Nie udało się wygenerować dokumentu wysyłki.",
   "toast.packing_slip_loading": "Ładowanie dokumentu wysyłki…",
   "toast.packing_slip_load_failed": "Nie udało się załadować dokumentu wysyłki.",
+  "toast.invoice_load_failed": "Nie udało się załadować faktury.",
   "toast.select_one_invoice": "Zaznacz co najmniej jedną fakturę.",
   "toast.select_one_order": "Zaznacz co najmniej jedno zamówienie.",
   "toast.select_one_generated_slip": "Zaznacz co najmniej jeden już wygenerowany dokument wysyłki do pobrania.",

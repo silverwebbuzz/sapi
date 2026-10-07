@@ -220,6 +220,7 @@
   "toast.packing_slip_failed": "Aanmaken van de pakbon is mislukt.",
   "toast.packing_slip_loading": "Pakbon laden…",
   "toast.packing_slip_load_failed": "Kan de pakbon niet laden.",
+  "toast.invoice_load_failed": "Kan de factuur niet laden.",
   "toast.select_one_invoice": "Selecteer minstens één factuur.",
   "toast.select_one_order": "Selecteer minstens één bestelling.",
   "toast.select_one_generated_slip": "Selecteer minstens één al aangemaakte pakbon om te downloaden.",

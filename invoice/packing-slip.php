@@ -18,7 +18,8 @@ $orders = [];
 if ($migrated) {
     $orders = DBHelper::select(
         "SELECT order_id, order_number, order_name, customer_name, currency, total_price,
-                created_at, packing_slip_status, packing_slip_pdf
+                created_at, packing_slip_status,
+                (packing_slip_pdf IS NOT NULL AND packing_slip_pdf != '') AS has_slip
            FROM `$invoice_table`
           ORDER BY created_at DESC",
         "",
@@ -105,7 +106,7 @@ $BULK_BATCH_CAP = 50;
             <tbody>
             <?php foreach ($orders as $o): ?>
                 <?php
-                    $hasSlip = !empty($o['packing_slip_pdf']);
+                    $hasSlip = (bool)$o['has_slip'];
                     $status  = $hasSlip ? 'generated' : 'pending';
                 ?>
                 <tr>

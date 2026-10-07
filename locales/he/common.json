@@ -220,6 +220,7 @@
   "toast.packing_slip_failed": "יצירת תעודת המשלוח נכשלה.",
   "toast.packing_slip_loading": "טוען תעודת משלוח…",
   "toast.packing_slip_load_failed": "לא ניתן לטעון את תעודת המשלוח.",
+  "toast.invoice_load_failed": "לא ניתן לטעון את החשבונית.",
   "toast.select_one_invoice": "בחרו לפחות חשבונית אחת.",
   "toast.select_one_order": "בחרו לפחות הזמנה אחת.",
   "toast.select_one_generated_slip": "בחרו לפחות תעודת משלוח אחת שכבר נוצרה כדי להוריד.",

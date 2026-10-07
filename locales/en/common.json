@@ -220,6 +220,7 @@
   "toast.packing_slip_failed": "Failed to generate packing slip.",
   "toast.packing_slip_loading": "Loading packing slip…",
   "toast.packing_slip_load_failed": "Could not load packing slip.",
+  "toast.invoice_load_failed": "Could not load invoice.",
   "toast.select_one_invoice": "Please select at least one invoice.",
   "toast.select_one_order": "Please select at least one order.",
   "toast.select_one_generated_slip": "Select at least one already-generated packing slip to download.",

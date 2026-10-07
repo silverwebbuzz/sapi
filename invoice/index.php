@@ -6,7 +6,18 @@ include 'nav.php';
 
 //fetch invoices
 $invoice_table = "invoices_" . preg_replace('/[^a-zA-Z0-9_]/', '_', strtolower($shop));
-$invoices_query = DBHelper::select("SELECT * FROM `$invoice_table` ORDER BY created_at DESC","",[]);
+// Only the listing columns: pdf_invoice / packing_slip_pdf hold the full
+// base64 PDFs, and loading them for every order exhausts PHP's memory limit
+// on busy stores. The PDF is fetched on demand by view-invoice.php.
+$invoices_query = DBHelper::select(
+    "SELECT order_id, order_number, order_name, customer_name, currency, total_price,
+            created_at, invoice_status, email_status,
+            (pdf_invoice IS NOT NULL AND pdf_invoice != '') AS has_pdf
+       FROM `$invoice_table`
+      ORDER BY created_at DESC",
+    "",
+    []
+);
 ?>
 
 <main class="main-content">
@@ -122,9 +133,10 @@ $invoices_query = DBHelper::select("SELECT * FROM `$invoice_table` ORDER BY crea
                     <td><span class="status <?= htmlspecialchars($invoice['invoice_status']) ?>"><?= htmlspecialchars(t_status($invoice['invoice_status'])) ?></span></td>
                     <td><span class="status <?= htmlspecialchars($invoice['email_status']) ?>"><?= htmlspecialchars(t_status($invoice['email_status'])) ?></span></td>
                     <td>
-                        <?php if ($invoice['pdf_invoice'] != ''): ?>
-                            <a href="#" class="view-invoice-btn"
-                               data-invoice-id="<?= htmlspecialchars($invoice['pdf_invoice']) ?>"><?= e('actions.view_invoice') ?></a>
+                        <?php if ($invoice['has_pdf']): ?>
+                            <a href="#" class="view-invoice-btn js-view-invoice"
+                               data-shop-id="<?= htmlspecialchars($shop_id) ?>"
+                               data-order-id="<?= htmlspecialchars($invoice['order_id']) ?>"><?= e('actions.view_invoice') ?></a>
                             <?php if ($send_email_upgrade_plan_button != ''): ?>
                                 <?= $send_email_upgrade_plan_button ?>
                             <?php else: ?>

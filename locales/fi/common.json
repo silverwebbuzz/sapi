@@ -220,6 +220,7 @@
   "toast.packing_slip_failed": "Lähetysluettelon luonti epäonnistui.",
   "toast.packing_slip_loading": "Ladataan lähetysluetteloa…",
   "toast.packing_slip_load_failed": "Lähetysluetteloa ei voitu ladata.",
+  "toast.invoice_load_failed": "Laskua ei voitu ladata.",
   "toast.select_one_invoice": "Valitse vähintään yksi lasku.",
   "toast.select_one_order": "Valitse vähintään yksi tilaus.",
   "toast.select_one_generated_slip": "Valitse ladattavaksi vähintään yksi jo luotu lähetysluettelo.",

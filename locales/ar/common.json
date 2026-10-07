@@ -220,6 +220,7 @@
   "toast.packing_slip_failed": "تعذّر إنشاء قائمة التعبئة.",
   "toast.packing_slip_loading": "جارٍ تحميل قائمة التعبئة…",
   "toast.packing_slip_load_failed": "تعذّر تحميل قائمة التعبئة.",
+  "toast.invoice_load_failed": "تعذّر تحميل الفاتورة.",
   "toast.select_one_invoice": "يُرجى تحديد فاتورة واحدة على الأقل.",
   "toast.select_one_order": "يُرجى تحديد طلب واحد على الأقل.",
   "toast.select_one_generated_slip": "حدّد قائمة تعبئة واحدة على الأقل تم إنشاؤها مسبقًا لتنزيلها.",

@@ -220,6 +220,7 @@
   "toast.packing_slip_failed": "Pakkseddelen kunne ikke opprettes.",
   "toast.packing_slip_loading": "Laster pakkseddel…",
   "toast.packing_slip_load_failed": "Pakkseddelen kunne ikke lastes.",
+  "toast.invoice_load_failed": "Fakturaen kunne ikke lastes.",
   "toast.select_one_invoice": "Velg minst én faktura.",
   "toast.select_one_order": "Velg minst én ordre.",
   "toast.select_one_generated_slip": "Velg minst én allerede opprettet pakkseddel for nedlasting.",

@@ -220,6 +220,7 @@
   "toast.packing_slip_failed": "Échec de la génération du bon de livraison.",
   "toast.packing_slip_loading": "Chargement du bon de livraison…",
   "toast.packing_slip_load_failed": "Impossible de charger le bon de livraison.",
+  "toast.invoice_load_failed": "Impossible de charger la facture.",
   "toast.select_one_invoice": "Veuillez sélectionner au moins une facture.",
   "toast.select_one_order": "Veuillez sélectionner au moins une commande.",
   "toast.select_one_generated_slip": "Sélectionnez au moins un bon de livraison déjà généré à télécharger.",

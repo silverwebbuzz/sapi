@@ -689,6 +689,7 @@ function i18n_js_keys() {
         'toast.packing_slip_failed',
         'toast.packing_slip_loading',
         'toast.packing_slip_load_failed',
+        'toast.invoice_load_failed',
         'toast.select_one_invoice',
         'toast.select_one_order',
         'toast.select_one_generated_slip',

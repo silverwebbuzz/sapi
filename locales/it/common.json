@@ -220,6 +220,7 @@
   "toast.packing_slip_failed": "Impossibile generare il documento di trasporto.",
   "toast.packing_slip_loading": "Caricamento del documento di trasporto…",
   "toast.packing_slip_load_failed": "Impossibile caricare il documento di trasporto.",
+  "toast.invoice_load_failed": "Impossibile caricare la fattura.",
   "toast.select_one_invoice": "Seleziona almeno una fattura.",
   "toast.select_one_order": "Seleziona almeno un ordine.",
   "toast.select_one_generated_slip": "Seleziona almeno un documento di trasporto già generato da scaricare.",
